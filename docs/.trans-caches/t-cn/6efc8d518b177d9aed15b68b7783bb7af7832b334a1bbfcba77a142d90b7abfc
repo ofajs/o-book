@@ -1,5 +1,0 @@
-1. 打開 [LiveServer](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) 擴展頁面，點擊安裝，然後會自動打開VSCode並進行擴展安裝。
-
-2. 將下載的項目解壓縮，使用 VSCode 打開該文件夾。
-
-3. 在VSCode內，右鍵根目錄下的 `_preview.html` 文件，選擇 `open with live server`。等待頁面初始化完成後，就能點擊頁面上的鏈接進行預覽。

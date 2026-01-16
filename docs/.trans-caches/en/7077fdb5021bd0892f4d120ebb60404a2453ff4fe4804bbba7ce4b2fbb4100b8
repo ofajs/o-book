@@ -1,1 +1,0 @@
-Please note that the Markdown content inside custom components will be translated into HTML elements. For example, regular line breaks will be converted into `p` elements, and `##` will be translated into `h2` elements, etc. Inside custom components, you can initialize and process elements by accessing the elements inside the slot.

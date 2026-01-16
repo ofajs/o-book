@@ -1,1 +1,0 @@
-In the above content, the `source` refers to the location of the **project configuration file**, and the **project file** will be discussed in the next chapter. The `lang` attribute is used to set the default language used by the document site. By default, `obook` supports multiple languages. If you do not need multi-language support, you can keep only one `source`.

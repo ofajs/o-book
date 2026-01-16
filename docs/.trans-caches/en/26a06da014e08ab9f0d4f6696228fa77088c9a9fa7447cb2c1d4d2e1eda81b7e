@@ -1,3 +1,0 @@
-1. **Standard Mode**: Use a local server to view the o-book component and preview and generate the documentation site.
-2. **Command-line mode**: Use Node.js and the command line to preview and generate the documentation site.
-3. **Web application mode**: Preview and generate by directly selecting a local Markdown folder through a web page.

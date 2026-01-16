@@ -1,1 +1,0 @@
-In the above example, we set up a home page (`index.md`), which means the home page will only contain the top navigation component, and will not display the left document navigation and right article navigation for document type pages.

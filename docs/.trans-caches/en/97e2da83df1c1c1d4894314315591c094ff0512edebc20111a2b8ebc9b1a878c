@@ -1,1 +1,0 @@
-You can add documentation in other languages by modifying the `book-tool` component inside the `_preview.html` file and adding a `source` tag. Please note that the documentation in other languages must correspond one-to-one with the original content.
