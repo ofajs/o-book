@@ -1,0 +1,58 @@
+<template page>
+  <style>
+    :host {
+      display: block;
+    }
+    .container {
+      padding: 16px;
+    }
+    h2 {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    .btn {
+      font-size: 24px;
+      margin-right: 8px;
+      padding: 6px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .btn:hover {
+      background-color: rgba(134, 134, 134, 0.413);
+    }
+  </style>
+  <div class="container">
+    <h2>
+      <div class="btn" on:click="goBack">←</div>
+      About
+    </h2>
+    <div
+      style="
+        min-height: 60vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <p>
+        For detailed documentation, please visit the official site of
+        <a href="https://ofajs.com" target="_blank">ofa.js</a>.
+      </p>
+    </div>
+  </div>
+  <script>
+    export default async ({ load }) => {
+      return {
+        data: {},
+        proto: {
+          goBack() {
+            this.back();
+          },
+        },
+      };
+    };
+  </script>
+</template>

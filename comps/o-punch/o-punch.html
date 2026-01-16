@@ -1,0 +1,93 @@
+<template component>
+  <style>
+    :host {
+      display: block;
+      font-size: 22px;
+    }
+
+    @keyframes punch-anime {
+      0% {
+        opacity: 1;
+        transform: translate(0px, 0px);
+      }
+      40% {
+        transform: translate(0px, 0px);
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-200px, 0) rotate(600deg) scale(0.6);
+      }
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      animation: punch-anime 0.6s ease-in-out;
+      animation-fill-mode: both;
+      animation-delay: 0.4s;
+    }
+
+    .main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: punch cubic-bezier(0.34, -0.42, 0.52, 1.6) 0.8s;
+    }
+
+    @keyframes punch {
+      0% {
+        opacity: 0;
+        transform: translate(200px, 0);
+      }
+      50% {
+        opacity: 1;
+        transform: translate(200px, 0);
+      }
+      100% {
+        transform: translate(0%, 0);
+      }
+    }
+
+    .logo-text {
+      font-size: 36px;
+      font-weight: bold;
+      margin-left: 8px;
+      animation: logo-anime 0.3s ease-in-out both;
+      animation-delay: 0.8s;
+    }
+
+    @keyframes logo-anime {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+  </style>
+  <div class="content">
+    <slot name="fly"></slot>
+  </div>
+  <div class="main">
+    <img src="./logo.svg" width="80px" />
+    <div class="logo-text">
+      <slot></slot>
+    </div>
+  </div>
+  <script>
+    export default async ({ load }) => {
+      return {
+        tag: "o-punch",
+        data: {},
+      };
+    };
+  </script>
+</template>

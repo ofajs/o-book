@@ -3,9 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>o-book 3</title>
+    <title>Project Name</title>
+    <script src="/gh/kirakiray/ofa.js/dist/ofa.js"></script>
+    <script src="/gh/kirakiray/ofa.js/libs/router/dist/router.min.js"></script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, Segoe UI,
+          Microsoft Yahei, Helvetica, Arial, sans-serif, Apple Color Emoji,
+          Segoe UI Emoji;
+      }
+    </style>
   </head>
   <body>
-    o-book3
+    <o-router fix-body>
+      <o-app src="./app-config.js"></o-app>
+    </o-router>
   </body>
 </html>

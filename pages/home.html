@@ -1,0 +1,46 @@
+<template page>
+  <l-m src="../comps/o-punch/o-punch.html"></l-m>
+  <style>
+    :host {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+
+    .container {
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+      padding: 16px;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--md-sys-color-normal);
+      margin-top: 32px;
+    }
+  </style>
+  <div class="container">
+    <o-punch>
+      ofa.js
+      <div slot="fly">😫</div>
+      <div slot="fly">😈</div>
+      <div slot="fly">☹️</div>
+    </o-punch>
+    <h2>Welcome to Your ofa.js App</h2>
+    <a href="./about.html" olink>About</a>
+  </div>
+  <script>
+    export default async ({ load }) => {
+      return {
+        data: {},
+        proto: {},
+      };
+    };
+  </script>
+</template>
