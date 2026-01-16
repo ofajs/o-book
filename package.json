@@ -4,7 +4,9 @@
   "type": "module",
   "description": "A document system built on ofa.js (like gitbook)",
   "main": "shell/index.js",
-  "scripts": {},
+  "scripts": {
+    "static": "http-server -p 30021 -c-1"
+  },
   "author": "YAO",
   "license": "MIT",
   "repository": {
@@ -15,5 +17,8 @@
     "obook",
     "o-book",
     "document"
-  ]
+  ],
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
 }
