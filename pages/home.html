@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
     :host {
       display: block;
@@ -8,13 +9,19 @@
 
     .container {
       box-sizing: border-box;
+      display: flex;
       justify-content: center;
+      align-items: center;
       flex-direction: column;
-      height: 100%;
       width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
+      height: 100%;
       padding: 32px;
+    }
+
+    .main {
+      width: 100%;
+      min-height: 60vh;
+      max-width: 800px;
     }
 
     h2 {
@@ -25,23 +32,47 @@
     }
   </style>
   <div class="container">
-    <h2>OBook</h2>
-    <p>欢迎来到OBook，它是一款将你的markdown生成好看的文档站的工具</p>
-    <p>
-      你不需要安装任何应用，不需要下载应用，不需要使用nodejs，只需要使用chrome系的浏览器，点击按钮选择打开本地的文件夹，就能开始使用OBook
-    </p>
-    <p>
-      只要按照OBook的格式配置设置目录，编写markdown文件，就能生成好看的文档站。
-    </p>
-    <p>
-      Obook还能根据你的配置，自动为文档正文翻译为多语言。你只需要用你的母语编写文档，再添加AI的key，就能自动利用AI为你的正文进行翻译。这个翻译每次只会翻译未翻译的部份，翻译过且未改动的内容，不会调用AIAPI，节省你的token成本。
-    </p>
+    <div class="main">
+      <h2>OBook</h2>
+      <p>欢迎使用 OBook——把 Markdown 秒变高颜值文档站的魔法工具。</p>
+      <p>
+        无需安装、无需下载、无需 Node.js，仅需一款 Chrome
+        内核浏览器，点一下按钮，选择本地文件夹，即刻开启写作。
+      </p>
+      <p>
+        按 OBook 约定配置目录、撰写
+        Markdown，即可一键生成结构清晰、美观大方的在线文档站。
+      </p>
+      <p>
+        内置多语言 AI 翻译：用母语写完文档，填好 AI Key，OBook
+        自动识别未翻译段落并精准翻译，已翻译且无变动的内容零重复调用，为你省下每一分
+        Token。
+      </p>
+      <o-if :value="canUse">
+        <p-button on:click="selectDirectory">选择本地目录</p-button>
+      </o-if>
+      <o-else>
+        <p style="color: var(--md-sys-color-error)">
+          您的浏览器不支持选择本地目录，请升级到最新版本的 Chrome 浏览器。
+        </p>
+      </o-else>
+    </div>
   </div>
   <script>
     export default async ({ load }) => {
+      const { mount } = await load("/nos/fs/handle/mount/mount.js");
+
       return {
-        data: {},
-        proto: {},
+        data: {
+          canUse: !!window.showDirectoryPicker,
+        },
+        proto: {
+          async selectDirectory() {
+            const handle = await mount();
+
+            debugger;
+          },
+        },
       };
     };
   </script>
