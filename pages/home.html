@@ -1,5 +1,6 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <style>
     :host {
       display: block;
@@ -34,20 +35,52 @@
   <div class="container">
     <div class="main">
       <h2>OBook</h2>
-      <p>欢迎使用 OBook——把 Markdown 秒变高颜值文档站的魔法工具。</p>
-      <p>
-        无需安装、无需下载、无需 Node.js，仅需一款 Chrome
-        内核浏览器，点一下按钮，选择本地文件夹，即刻开启写作。
-      </p>
-      <p>
-        按 OBook 约定配置目录、撰写
-        Markdown，即可一键生成结构清晰、美观大方的在线文档站。
-      </p>
-      <p>
-        内置多语言 AI 翻译：用母语写完文档，填好 AI Key，OBook
-        自动识别未翻译段落并精准翻译，已翻译且无变动的内容零重复调用，为你省下每一分
-        Token。
-      </p>
+      <locale-text>
+        <p lang="cn">
+          欢迎使用 OBook——把 Markdown 秒变高颜值文档站的魔法工具。
+        </p>
+        <p lang="en">
+          Welcome to OBook, the magic tool that transforms Markdown into
+          beautiful, feature-rich documentation sites in seconds.
+        </p>
+      </locale-text>
+
+      <locale-text>
+        <p lang="cn">
+          无需安装、无需下载、无需 Node.js，仅需一款 Chrome
+          内核浏览器，点一下按钮，选择本地文件夹，即刻开启写作。
+        </p>
+        <p lang="en">
+          No installation, no download, no Node.js required. Simply use a Chrome
+          browser, click the button, select your local folder, and start
+          writing.
+        </p>
+      </locale-text>
+      <locale-text>
+        <p lang="cn">
+          按 OBook 约定配置目录、撰写
+          Markdown，即可一键生成结构清晰、美观大方的在线文档站。
+        </p>
+        <p lang="en">
+          Configure your directory according to OBook conventions, write
+          Markdown, and generate a beautiful, feature-rich documentation site in
+          seconds.
+        </p>
+      </locale-text>
+      <locale-text>
+        <p lang="cn">
+          内置多语言 AI 翻译：用母语写完文档，填好 AI Key，OBook
+          自动识别未翻译段落并精准翻译，已翻译且无变动的内容零重复调用，为你省下每一分
+          Token。
+        </p>
+        <p lang="en">
+          OBook comes with built-in multi-language AI translation. Write your
+          documentation in your native language, fill in your AI Key, and OBook
+          will automatically translate the untranslated paragraphs and keep
+          track of the translated content. No need to repeat calls for unchanged
+          content, saving you every Token.
+        </p>
+      </locale-text>
       <o-if :value="canUse">
         <p-button on:click="selectDirectory">选择本地目录</p-button>
       </o-if>
