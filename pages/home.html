@@ -1,5 +1,4 @@
 <template page>
-  <l-m src="../comps/o-punch/o-punch.html"></l-m>
   <style>
     :host {
       display: block;
@@ -9,13 +8,13 @@
 
     .container {
       box-sizing: border-box;
-      display: flex;
-      align-items: center;
       justify-content: center;
       flex-direction: column;
       height: 100%;
       width: 100%;
-      padding: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px;
     }
 
     h2 {
@@ -26,14 +25,17 @@
     }
   </style>
   <div class="container">
-    <o-punch>
-      ofa.js
-      <div slot="fly">😫</div>
-      <div slot="fly">😈</div>
-      <div slot="fly">☹️</div>
-    </o-punch>
-    <h2>Welcome to Your ofa.js App</h2>
-    <a href="./about.html" olink>About</a>
+    <h2>OBook</h2>
+    <p>欢迎来到OBook，它是一款将你的markdown生成好看的文档站的工具</p>
+    <p>
+      你不需要安装任何应用，不需要下载应用，不需要使用nodejs，只需要使用chrome系的浏览器，点击按钮选择打开本地的文件夹，就能开始使用OBook
+    </p>
+    <p>
+      只要按照OBook的格式配置设置目录，编写markdown文件，就能生成好看的文档站。
+    </p>
+    <p>
+      Obook还能根据你的配置，自动为文档正文翻译为多语言。你只需要用你的母语编写文档，再添加AI的key，就能自动利用AI为你的正文进行翻译。这个翻译每次只会翻译未翻译的部份，翻译过且未改动的内容，不会调用AIAPI，节省你的token成本。
+    </p>
   </div>
   <script>
     export default async ({ load }) => {
