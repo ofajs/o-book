@@ -16,7 +16,7 @@
       flex-direction: column;
       width: 100%;
       height: 100%;
-      padding: 32px;
+      padding: 16px;
     }
 
     .main {
@@ -56,6 +56,7 @@
           writing.
         </p>
       </locale-text>
+
       <locale-text>
         <p lang="cn">
           按 OBook 约定配置目录、撰写
@@ -79,6 +80,24 @@
           will automatically translate the untranslated paragraphs and keep
           track of the translated content. No need to repeat calls for unchanged
           content, saving you every Token.
+        </p>
+      </locale-text>
+
+      <locale-text>
+        <p lang="cn">
+          选择本地文件后，所有操作均在浏览器内完成，<span
+            style="color: var(--md-sys-color-primary)"
+          >
+            内容不会上传至任何服务器
+          </span>
+          ，确保数据完全留在本地，安全无忧。
+        </p>
+        <p lang="en">
+          After selecting a local file, all operations are performed within the
+          browser, and
+          <span style="color: var(--md-sys-color-primary)">
+            no content is uploaded to any server </span
+          >. Your data remains secure and private, with no risk of exposure.
         </p>
       </locale-text>
       <o-if :value="canUse">
