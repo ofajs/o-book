@@ -1,0 +1,35 @@
+<template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/navigation/nav-layout.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/navigation/nav-bar.html"></l-m>
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+
+  <p-nav-layout>
+    <p-nav-bar slot="nav">
+      <p-nav-item attr:active-item="activeId === 'start'">
+        Start
+        <n-icon icon="material-symbols:start-rounded" slot="icon"></n-icon>
+      </p-nav-item>
+      <p-nav-item attr:active-item="activeId === 'movies'">
+        <n-icon icon="uil:setting" slot="icon"></n-icon>
+        Setting
+      </p-nav-item>
+    </p-nav-bar>
+    <div style="position: relative; height: 100%">
+      <slot></slot>
+    </div>
+  </p-nav-layout>
+
+  <script>
+    export default async ({ load }) => {
+      return {
+        data: {
+          activeId: "start",
+        },
+      };
+    };
+  </script>
+</template>

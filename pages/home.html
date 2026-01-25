@@ -1,6 +1,7 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/nos/locale-text/locale-text.html"></l-m>
+  <l-m src="/nos/n-icon/n-icon.html"></l-m>
   <style>
     :host {
       display: block;
@@ -111,8 +112,10 @@
     </div>
   </div>
   <script>
+    export const parent = "./layout.html";
+
     export default async ({ load }) => {
-      const { mount, save } = await load("/nos/fs/handle/mount/mount.js");
+      // const { mount, save } = await load("/nos/fs/handle/mount/mount.js");
       const { EverCache } = await load("/gh/kirakiray/ever-cache/src/main.js");
 
       const storage = new EverCache("obook");
