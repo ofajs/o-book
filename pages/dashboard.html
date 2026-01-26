@@ -7,9 +7,29 @@
   <script>
     export const parent = "./layout.html";
 
-    export default async ({ load }) => {
+    export default async ({ load, query }) => {
+      const { get } = await load("/nos/fs/handle/mount/mount.js");
+      const { getData } = await load("../util/yaml-handle.js");
+
       return {
         data: {},
+        proto: {
+          async init() {
+            const handle = await get(query.path);
+
+            // 读取配置文件
+            const config = await getData(handle);
+            const mainLang = config.mainLang || "en";
+
+            // 读取主语言文件
+            const mainLangConfig = await getData(
+              handle,
+              `${mainLang}/_config.yaml`,
+            );
+
+            debugger;
+          },
+        },
         attached() {
           this.emit("set-active-id", {
             composed: true,
@@ -17,6 +37,8 @@
               name: "dashboard",
             },
           });
+
+          this.init();
         },
       };
     };
