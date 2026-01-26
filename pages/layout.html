@@ -1,6 +1,8 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/navigation/nav-layout.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/navigation/nav-bar.html"></l-m>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
+  <l-m src="/nos/n-icon/n-icon.html"></l-m>
   <style>
     :host {
       display: block;
@@ -9,10 +11,21 @@
 
   <p-nav-layout>
     <p-nav-bar slot="nav">
-      <p-nav-item attr:active-item="activeId === 'start'">
-        Start
-        <n-icon icon="material-symbols:start-rounded" slot="icon"></n-icon>
-      </p-nav-item>
+      <o-if :value="activeId === 'start'">
+        <p-nav-item attr:active-item="activeId === 'start'">
+          Start
+          <n-icon icon="material-symbols:start-rounded" slot="icon"></n-icon>
+        </p-nav-item>
+      </o-if>
+      <o-if :value="activeId !== 'start'">
+        <p-nav-item attr:active-item="activeId === 'dashboard'">
+          Dashboard
+          <n-icon
+            icon="material-symbols:dashboard-outline-rounded"
+            slot="icon"
+          ></n-icon>
+        </p-nav-item>
+      </o-if>
       <p-nav-item attr:active-item="activeId === 'movies'">
         <n-icon icon="uil:setting" slot="icon"></n-icon>
         Setting
@@ -27,7 +40,12 @@
     export default async ({ load }) => {
       return {
         data: {
-          activeId: "start",
+          activeId: "",
+        },
+        ready() {
+          this.on("set-active-id", (e) => {
+            this.activeId = e.data.name;
+          });
         },
       };
     };

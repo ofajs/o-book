@@ -1,0 +1,24 @@
+<template page>
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  <script>
+    export const parent = "./layout.html";
+
+    export default async ({ load }) => {
+      return {
+        data: {},
+        attached() {
+          this.emit("set-active-id", {
+            composed: true,
+            data: {
+              name: "dashboard",
+            },
+          });
+        },
+      };
+    };
+  </script>
+</template>

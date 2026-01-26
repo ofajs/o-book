@@ -1,7 +1,5 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
-  <l-m src="/nos/locale-text/locale-text.html"></l-m>
-  <l-m src="/nos/n-icon/n-icon.html"></l-m>
   <style>
     :host {
       display: block;
@@ -115,7 +113,7 @@
     export const parent = "./layout.html";
 
     export default async ({ load }) => {
-      // const { mount, save } = await load("/nos/fs/handle/mount/mount.js");
+      const { mount, save } = await load("/nos/fs/handle/mount/mount.js");
       const { EverCache } = await load("/gh/kirakiray/ever-cache/src/main.js");
 
       const storage = new EverCache("obook");
@@ -128,12 +126,27 @@
           async selectDirectory() {
             const handle = await mount();
 
-            const length = await handle.length();
+            await save(handle); // 保存目录句柄
 
-            if (length) {
-              debugger;
+            const history = (await storage.getItem("history")) || [];
+
+            if (!history.includes(handle.path)) {
+              history.push(handle.path);
+              await storage.setItem("history", history);
             }
+
+            // TODO: 检查文件夹内容是否符合 OBook 约定
+
+            this.goto(`./dashboard.html?path=${handle.path}`);
           },
+        },
+        attached() {
+          this.emit("set-active-id", {
+            composed: true,
+            data: {
+              name: "start",
+            },
+          });
         },
       };
     };
