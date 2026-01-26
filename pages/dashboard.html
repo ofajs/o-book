@@ -1,9 +1,67 @@
 <template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <style>
     :host {
       display: block;
     }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 16px;
+    }
+
+    .list-content {
+      width: 240px;
+      padding: 4px;
+    }
+
+    p-list-item {
+      border-radius: 20px;
+    }
+
+    h2 {
+      font-size: 14px;
+      padding: 8px 0;
+      margin: 0;
+      color: var(--md-ref-palette-normal40);
+    }
   </style>
+  <div class="container">
+    <div class="list-content">
+      <h2>导航内容</h2>
+      <p-list>
+        <o-fill :value="header">
+          <p-list-item
+            button
+            on:click="$host.clickHeaderItem($data.url)"
+            attr:active-item="$host.activeHeader === $data.url"
+          >
+            {{$data.name}}
+            <!-- <div secondary>{{$data.url}}</div> -->
+          </p-list-item>
+        </o-fill>
+      </p-list>
+    </div>
+    <div class="list-content">
+      <h2>列表内容</h2>
+      <p-list>
+        <o-fill :value="documentList" name="document-item"> </o-fill>
+      </p-list>
+    </div>
+
+    <template name="document-item">
+      <p-list-item>
+        <o-if :value="$data.url" slot="prefix">
+          <n-icon icon="material-symbols:article-outline"></n-icon>
+        </o-if>
+        {{$data.name}}
+        <p-list slot="childs">
+          <o-fill :value="$data.content" name="document-item"></o-fill>
+        </p-list>
+      </p-list-item>
+    </template>
+  </div>
   <script>
     export const parent = "./layout.html";
 
@@ -12,8 +70,29 @@
       const { getData } = await load("../util/yaml-handle.js");
 
       return {
-        data: {},
+        data: {
+          header: [], // 导航内容
+          documentList: [], // 目标导航下的文档列表
+          activeHeader: "",
+        },
         proto: {
+          async clickHeaderItem(url) {
+            this.activeHeader = url;
+            const targetItem = this.header.find((item) => item.url === url);
+
+            const documentList = await getData(
+              this._documentHandle,
+              `${targetItem.url}`,
+            );
+
+            if (Array.isArray(documentList)) {
+              console.log(documentList);
+              this.documentList = documentList;
+            } else {
+              this.documentList = [];
+              debugger;
+            }
+          },
           async init() {
             const handle = await get(query.path);
 
@@ -27,7 +106,9 @@
               `${mainLang}/_config.yaml`,
             );
 
-            debugger;
+            this._documentHandle = await handle.get(mainLang);
+
+            this.header = mainLangConfig.header || [];
           },
         },
         attached() {
