@@ -1,5 +1,6 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
     :host {
       display: block;
@@ -17,7 +18,8 @@
     }
 
     p-list-item {
-      border-radius: 20px;
+      border-radius: 8px;
+      margin: 2px 0;
     }
 
     h2 {
@@ -26,10 +28,21 @@
       margin: 0;
       color: var(--md-ref-palette-normal40);
     }
+
+    .hide {
+      display: none !important;
+    }
   </style>
   <div class="container">
+    <div style="width: 100%; display: flex">
+      <p-button> 预览网页 </p-button>
+      <p-button variant="outlined" style="margin-left: 8px">
+        <n-icon icon="material-symbols:refresh" slot="prefix"></n-icon>
+        刷新预览页
+      </p-button>
+    </div>
     <div class="list-content">
-      <h2>导航内容</h2>
+      <h2>顶部导航</h2>
       <p-list>
         <o-fill :value="header">
           <p-list-item
@@ -44,17 +57,34 @@
       </p-list>
     </div>
     <div class="list-content">
-      <h2>列表内容</h2>
+      <h2>导航对应列表</h2>
       <p-list>
         <o-fill :value="documentList" name="document-item"> </o-fill>
       </p-list>
     </div>
 
+    <style>
+      .article-item {
+        color: var(--md-sys-color-primary);
+      }
+
+      n-icon[slot="prefix"] {
+        margin-right: 4px;
+        font-size: 16px;
+      }
+    </style>
+
     <template name="document-item">
-      <p-list-item>
-        <o-if :value="$data.url" slot="prefix">
-          <n-icon icon="material-symbols:article-outline"></n-icon>
-        </o-if>
+      <p-list-item collapse-childs="open" attr:button="$data.url">
+        <n-icon
+          class="article-item"
+          class:hide="!$data.url"
+          icon="material-symbols:article-outline"
+          slot="prefix"
+        ></n-icon>
+        <x-if :value="$data.content && $data.content.length > 0">
+          <i toggle-collapse triangle slot="suffix" style="z-index: 3"></i>
+        </x-if>
         {{$data.name}}
         <p-list slot="childs">
           <o-fill :value="$data.content" name="document-item"></o-fill>
@@ -109,6 +139,8 @@
             this._documentHandle = await handle.get(mainLang);
 
             this.header = mainLangConfig.header || [];
+
+            this.clickHeaderItem(this.header[0].url);
           },
         },
         attached() {
