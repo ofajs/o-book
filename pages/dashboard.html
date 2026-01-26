@@ -36,9 +36,13 @@
   <div class="container">
     <div style="width: 100%; display: flex">
       <p-button> 预览网页 </p-button>
-      <p-button variant="outlined" style="margin-left: 8px">
+      <p-button
+        on:click="refreshPreview"
+        variant="outlined"
+        style="margin-left: 8px"
+      >
         <n-icon icon="material-symbols:refresh" slot="prefix"></n-icon>
-        刷新预览页
+        完全刷新
       </p-button>
     </div>
     <div class="list-content">
@@ -98,14 +102,20 @@
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../util/yaml-handle.js");
+      const { initGenerator } = await load("../util/genarate.js");
 
       return {
         data: {
           header: [], // 导航内容
           documentList: [], // 目标导航下的文档列表
           activeHeader: "",
+          _topHandle: null, // 顶部目录句柄
+          _documentHandle: null, // 主语言文档所在的目录句柄
         },
         proto: {
+          async refreshPreview() {
+            debugger;
+          },
           async clickHeaderItem(url) {
             this.activeHeader = url;
             const targetItem = this.header.find((item) => item.url === url);
@@ -126,21 +136,30 @@
           async init() {
             const handle = await get(query.path);
 
+            this._topHandle = handle;
+
             // 读取配置文件
             const config = await getData(handle);
-            const mainLang = config.mainLang || "en";
+            const writingLang = config.writingLang || "en";
 
             // 读取主语言文件
-            const mainLangConfig = await getData(
+            const writingLangConfig = await getData(
               handle,
-              `${mainLang}/_config.yaml`,
+              `${writingLang}/_config.yaml`,
             );
 
-            this._documentHandle = await handle.get(mainLang);
+            this._documentHandle = await handle.get(writingLang);
 
-            this.header = mainLangConfig.header || [];
+            this.header = writingLangConfig.header || [];
 
             this.clickHeaderItem(this.header[0].url);
+
+            initGenerator({
+              articleHandle: this._documentHandle,
+              websiteHandle: await this._topHandle.get("website", {
+                create: "dir",
+              }),
+            });
           },
         },
         attached() {
