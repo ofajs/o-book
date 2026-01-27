@@ -7,5 +7,5 @@ export const initGenerator = async ({
   // 获取配置文件
   const configData = await getData(articleHandle);
 
-  debugger;
+  console.log(configData);
 };
