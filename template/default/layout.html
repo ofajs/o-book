@@ -1,0 +1,17 @@
+<template page>
+  <style>
+    :host {
+      display: block;
+      height: 100%;
+      background-color: rgba(255, 0, 0, 0.285);
+    }
+  </style>
+  <slot></slot>
+  <script>
+    export default async ({ load }) => {
+      return {
+        data: {},
+      };
+    };
+  </script>
+</template>

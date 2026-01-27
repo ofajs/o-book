@@ -4,8 +4,51 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/gh/kirakiray/ofa.js@4.6.17/dist/ofa.js#debug"></script>
+    <script src="https://cdn.jsdelivr.net/gh/kirakiray/ofa.js@4.6.17/libs/scsr/dist/scsr.min.js"></script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          Segoe UI,
+          Microsoft Yahei,
+          Helvetica,
+          Arial,
+          sans-serif,
+          Apple Color Emoji,
+          Segoe UI Emoji;
+      }
+
+      o-app {
+        height: 100%;
+      }
+    </style>
   </head>
   <body>
-    
+    <o-app src="./app-config.js">
+      <template page>
+        <style>
+          :host {
+            display: block;
+          }
+        </style>
+        home
+        <script>
+          export const parent = "./layout.html";
+
+          export default async ({ load }) => {
+            return {
+              data: {},
+            };
+          };
+        </script>
+      </template>
+    </o-app>
   </body>
 </html>
