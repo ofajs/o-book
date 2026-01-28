@@ -25,11 +25,29 @@
     .header-btn-group {
       display: flex;
       align-items: center;
-      margin-left: auto;
+      margin-left: 16px;
     }
 
     .header-btn-group p-button {
       margin-left: 4px;
+    }
+
+    .menu-list {
+      display: flex;
+      margin-left: auto;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      height: 30px;
+      margin: 0 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+    .menu-item:hover {
+      color: var(--md-sys-color-primary);
     }
   </style>
 
@@ -37,15 +55,22 @@
     <img class="logo" src="https://ofajs.com/publics/logo.svg" alt="" />
     <div class="logo-text">ofa.js</div>
   </a>
+
+  <div class="menu-list">
+    <div class="menu-item">Item1</div>
+    <div class="menu-item">Item2</div>
+    <div class="menu-item">Item3</div>
+  </div>
+
   <div class="header-btn-group">
     <p-button variant="text" icon on:click="clickMode">
-      <o-if :value="displayMode === 'dark'">
+      <o-if :value="theme === 'dark'">
         <n-icon
           icon="material-symbols:dark-mode"
           style="font-size: 24px"
         ></n-icon>
       </o-if>
-      <o-else-if :value="displayMode === 'light'">
+      <o-else-if :value="theme === 'light'">
         <n-icon
           icon="material-symbols:light-mode"
           style="font-size: 24px"
@@ -64,45 +89,28 @@
     </p-button>
   </div>
 
+  <o-consumer name="pui" watch:theme="theme"></o-consumer>
+
   <script>
     export default async () => {
       return {
         data: {
-          displayMode: localStorage.getItem("displayMode") || "auto", // auto dark light
-        },
-        watch: {
-          displayMode(mode) {
-            changeMode(mode);
-          },
+          theme: "",
         },
         proto: {
           clickMode() {
-            if (this.displayMode === "auto") {
-              this.displayMode = "dark";
-            } else if (this.displayMode === "dark") {
-              this.displayMode = "light";
+            const puiProvider = this.getProvider("pui");
+            if (puiProvider.theme === "auto") {
+              puiProvider.theme = "dark";
+            } else if (puiProvider.theme === "dark") {
+              puiProvider.theme = "light";
             } else {
-              this.displayMode = "auto";
+              puiProvider.theme = "auto";
             }
           },
         },
+        attached() {},
       };
     };
-
-    function changeMode(mode) {
-      if (mode === "light") {
-        $("html").classList.add("theme-light-mode");
-        $("html").classList.remove("theme-dark-mode");
-        localStorage.setItem("displayMode", "light");
-      } else if (mode === "dark") {
-        $("html").classList.add("theme-dark-mode");
-        $("html").classList.remove("theme-light-mode");
-        localStorage.setItem("displayMode", "dark");
-      } else {
-        $("html").classList.remove("theme-light-mode");
-        $("html").classList.remove("theme-dark-mode");
-        localStorage.setItem("displayMode", "auto");
-      }
-    }
   </script>
 </template>
