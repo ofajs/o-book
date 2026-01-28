@@ -21,21 +21,6 @@
       border-bottom: var(--md-sys-color-normal-container) solid 1px;
     }
 
-    .logo-link,
-    .logo {
-      display: flex;
-      align-items: center;
-      height: 30px;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .logo-text {
-      font-weight: bold;
-      font-size: 18px;
-      margin-left: 4px;
-    }
-
     .max-container {
       display: inherit;
       max-width: 1200px;
@@ -57,55 +42,11 @@
       flex: 1;
       background-color: rgba(255, 0, 0, 0.285);
     }
-
-    .header-btn-group {
-      display: flex;
-      align-items: center;
-      margin-left: auto;
-    }
-    .header-btn-group p-button {
-      margin-left: 4px;
-    }
   </style>
   <div class="container">
     <div class="header">
-      <div
-        class="max-container"
-        style="display: flex; align-items: center; padding: 0 16px"
-      >
-        <a class="logo-link" href="">
-          <img class="logo" src="https://ofajs.com/publics/logo.svg" alt="" />
-          <div class="logo-text">ofa.js</div>
-        </a>
-        <div class="header-btn-group">
-          <p-button variant="text" icon on:click="clickMode">
-            <o-if :value="displayMode === 'dark'">
-              <n-icon
-                icon="material-symbols:dark-mode"
-                style="font-size: 24px"
-              ></n-icon>
-            </o-if>
-            <o-else-if :value="displayMode === 'light'">
-              <n-icon
-                icon="material-symbols:light-mode"
-                style="font-size: 24px"
-              ></n-icon>
-            </o-else-if>
-            <o-else>
-              <n-icon
-                icon="line-md:light-dark"
-                style="font-size: 24px"
-              ></n-icon>
-            </o-else>
-          </p-button>
-          <p-button variant="text">
-            <n-icon icon="mdi:language" slot="prefix"> </n-icon>
-            简体中文
-          </p-button>
-          <p-button variant="text" icon>
-            <n-icon icon="mdi:github" style="font-size: 24px"></n-icon>
-          </p-button>
-        </div>
+      <div class="max-container" style="padding: 0 16px">
+        <o-page src="./header.html"></o-page>
       </div>
     </div>
     <style>
@@ -145,7 +86,6 @@
       return {
         data: {
           hideLeft: true,
-          displayMode: localStorage.getItem("displayMode") || "auto", // auto dark light
           list: [
             {
               name: "选项1",
@@ -168,42 +108,9 @@
             },
           ],
         },
-        watch: {
-          displayMode(mode) {
-            changeMode(mode);
-          },
-        },
-        proto: {
-          clickMode() {
-            if (this.displayMode === "auto") {
-              this.displayMode = "dark";
-            } else if (this.displayMode === "dark") {
-              this.displayMode = "light";
-            } else {
-              this.displayMode = "auto";
-            }
-          },
-        },
-        attached() {
-          changeMode(this.displayMode);
-        },
+        proto: {},
+        attached() {},
       };
     };
-
-    function changeMode(mode) {
-      if (mode === "light") {
-        $("html").classList.add("theme-light-mode");
-        $("html").classList.remove("theme-dark-mode");
-        localStorage.setItem("displayMode", "light");
-      } else if (mode === "dark") {
-        $("html").classList.add("theme-dark-mode");
-        $("html").classList.remove("theme-light-mode");
-        localStorage.setItem("displayMode", "dark");
-      } else {
-        $("html").classList.remove("theme-light-mode");
-        $("html").classList.remove("theme-dark-mode");
-        localStorage.setItem("displayMode", "auto");
-      }
-    }
   </script>
 </template>
