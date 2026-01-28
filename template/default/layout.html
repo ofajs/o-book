@@ -1,6 +1,7 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/nos/n-icon/n-icon.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <style>
     :host {
       display: block;
@@ -49,7 +50,7 @@
 
     .left-side {
       width: 240px;
-      background-color: rgba(14, 14, 204, 0.327);
+      padding: 0 4px;
     }
 
     .article {
@@ -63,7 +64,6 @@
       margin-left: auto;
     }
     .header-btn-group p-button {
-      /* font-size: 20px; */
       margin-left: 4px;
     }
   </style>
@@ -78,18 +78,62 @@
           <div class="logo-text">ofa.js</div>
         </a>
         <div class="header-btn-group">
-          <p-button variant="text" size="large" icon>
-            <n-icon icon="mdi:language"></n-icon>
+          <p-button variant="text" icon on:click="clickMode">
+            <o-if :value="displayMode === 'dark'">
+              <n-icon
+                icon="material-symbols:dark-mode"
+                style="font-size: 24px"
+              ></n-icon>
+            </o-if>
+            <o-else-if :value="displayMode === 'light'">
+              <n-icon
+                icon="material-symbols:light-mode"
+                style="font-size: 24px"
+              ></n-icon>
+            </o-else-if>
+            <o-else>
+              <n-icon
+                icon="line-md:light-dark"
+                style="font-size: 24px"
+              ></n-icon>
+            </o-else>
           </p-button>
-          <p-button variant="text" size="large" icon>
-            <n-icon icon="mdi:github"></n-icon>
+          <p-button variant="text">
+            <n-icon icon="mdi:language" slot="prefix"> </n-icon>
+            简体中文
+          </p-button>
+          <p-button variant="text" icon>
+            <n-icon icon="mdi:github" style="font-size: 24px"></n-icon>
           </p-button>
         </div>
       </div>
     </div>
+    <style>
+      .left-side p-list-item {
+        border-radius: 8px;
+        margin: 2px 0;
+      }
+    </style>
+    <template name="list-item">
+      <p-list-item button="suffix" collapse-childs="open">
+        {{$data.name}}
+
+        <x-if :value="$data.content">
+          <i toggle-collapse triangle slot="suffix" style="z-index: 3"></i>
+        </x-if>
+
+        <p-list slot="childs">
+          <o-fill :value="$data.content" name="list-item"></o-fill>
+        </p-list>
+      </p-list-item>
+    </template>
     <div class="main">
       <div class="max-container">
-        <div class="left-side"></div>
+        <div class="left-side">
+          <p-list style="--ladder-left: 8px">
+            <o-fill :value="list" name="list-item"></o-fill>
+          </p-list>
+        </div>
         <div class="article">
           <slot></slot>
         </div>
@@ -99,8 +143,67 @@
   <script>
     export default async ({ load }) => {
       return {
-        data: {},
+        data: {
+          hideLeft: true,
+          displayMode: localStorage.getItem("displayMode") || "auto", // auto dark light
+          list: [
+            {
+              name: "选项1",
+              content: [
+                {
+                  name: "1-1",
+                  content: [
+                    {
+                      name: "1-1-1",
+                    },
+                  ],
+                },
+                {
+                  name: "1-2",
+                },
+              ],
+            },
+            {
+              name: "选项2",
+            },
+          ],
+        },
+        watch: {
+          displayMode(mode) {
+            changeMode(mode);
+          },
+        },
+        proto: {
+          clickMode() {
+            if (this.displayMode === "auto") {
+              this.displayMode = "dark";
+            } else if (this.displayMode === "dark") {
+              this.displayMode = "light";
+            } else {
+              this.displayMode = "auto";
+            }
+          },
+        },
+        attached() {
+          changeMode(this.displayMode);
+        },
       };
     };
+
+    function changeMode(mode) {
+      if (mode === "light") {
+        $("html").classList.add("theme-light-mode");
+        $("html").classList.remove("theme-dark-mode");
+        localStorage.setItem("displayMode", "light");
+      } else if (mode === "dark") {
+        $("html").classList.add("theme-dark-mode");
+        $("html").classList.remove("theme-light-mode");
+        localStorage.setItem("displayMode", "dark");
+      } else {
+        $("html").classList.remove("theme-light-mode");
+        $("html").classList.remove("theme-dark-mode");
+        localStorage.setItem("displayMode", "auto");
+      }
+    }
   </script>
 </template>
