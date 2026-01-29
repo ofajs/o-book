@@ -99,6 +99,11 @@
         },
         proto: {
           clickMode() {
+            $("html").css.transition = "all 0.3s ease-in-out";
+            clearTimeout(this._timer);
+            this._timer = setTimeout(() => {
+              $("html").css.transition = "";
+            }, 300);
             const puiProvider = this.getProvider("pui");
             if (puiProvider.theme === "auto") {
               puiProvider.theme = "dark";
