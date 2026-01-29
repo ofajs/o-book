@@ -17,34 +17,40 @@ export const initGenerator = async ({
   const configData = await getData(articleHandle);
 
   const tempDir = `${getRootUrl()}template/default`;
+  {
+    // 先复制静态模板过去
+    const files = [
+      {
+        name: "header.html",
+        path: `${tempDir}/header.html`,
+      },
+      {
+        name: "layout.html",
+        path: `${tempDir}/layout.html`,
+      },
+      {
+        name: "index.html",
+        path: `${tempDir}/index.html`,
+      },
+      {
+        name: "app-config.js",
+        path: `${tempDir}/app-config.js`,
+      },
+    ];
 
-  // 先复制静态模板过去
-  const files = [
-    {
-      name: "header.html",
-      path: `${tempDir}/header.html`,
-    },
-    {
-      name: "layout.html",
-      path: `${tempDir}/layout.html`,
-    },
-    {
-      name: "index.html",
-      path: `${tempDir}/index.html`,
-    },
-    {
-      name: "app-config.js",
-      path: `${tempDir}/app-config.js`,
-    },
-  ];
+    for (const { name, path } of files) {
+      const fileHTML = await fetch(path).then((e) => e.text());
+      const fileHandle = await websiteHandle.get(name, {
+        create: "file",
+      });
+      await fileHandle.write(fileHTML);
+    }
 
-  for (const { name, path } of files) {
-    const fileHTML = await fetch(path).then((e) => e.text());
-    const fileHandle = await websiteHandle.get(name, {
-      create: "file",
-    });
-    await fileHandle.write(fileHTML);
+    console.log(configData);
   }
+};
 
-  console.log(configData);
+// 将输入的文件转为对应网页
+const formatPage = (inputHandle, outputHandle, configData) => {
+  debugger;
 };
