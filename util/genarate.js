@@ -73,22 +73,25 @@ const traversingFiles = async ({
         });
       }
     } else {
-      continue;
-      // debugger;
-
       // 目录，继续遍历内部
-      // await traversingFiles({
-      //   articleHandle: handle,
-      //   websiteLangHandle,
-      //   configData,
-      // });
+      await traversingFiles({
+        fromArticleHandle: handle, // 文章来源
+        toWebsiteHandle: await toWebsiteHandle.get(handle.name, {
+          create: "dir",
+        }), // 要遍历的目录句柄
+        websiteLangHandle, // 文章对应语言的顶部文件夹
+      });
     }
   }
 };
 
 // 将输入的文件转为对应网页
 const formatPage = async ({ inputHandle, outputHandle, websiteLangHandle }) => {
-  const content = await inputHandle.text();
+  let content = await inputHandle.text();
+
+  if (inputHandle.name.endsWith("md")) {
+    debugger;
+  }
 
   // 替换主体内容
   let outputContent = indexHTML.replace("<!-- main content -->", content);
