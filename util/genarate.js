@@ -1,4 +1,6 @@
 import { getData } from "./yaml-handle.js";
+import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
+import jsBeautify from "/npm/js-beautify@1.15.1/+esm";
 
 export const getRootUrl = () => {
   if (location.href.includes("$mount-")) {
@@ -63,10 +65,12 @@ const traversingFiles = async ({
   for await (let handle of fromArticleHandle.values()) {
     if (handle.kind === "file") {
       if (handle.name.endsWith(".html") || handle.name.endsWith(".md")) {
+        const outputName = handle.name.replace(/\.(html|md)$/, ".html");
+
         // 需要转换的文件
         await formatPage({
           inputHandle: handle,
-          outputHandle: await toWebsiteHandle.get(handle.name, {
+          outputHandle: await toWebsiteHandle.get(outputName, {
             create: "file",
           }),
           websiteLangHandle,
@@ -90,7 +94,7 @@ const formatPage = async ({ inputHandle, outputHandle, websiteLangHandle }) => {
   let content = await inputHandle.text();
 
   if (inputHandle.name.endsWith("md")) {
-    debugger;
+    content = marked.parse(content);
   }
 
   // 替换主体内容
@@ -121,10 +125,17 @@ const formatPage = async ({ inputHandle, outputHandle, websiteLangHandle }) => {
     )
     .replace(
       `<link rel="stylesheet" href="../../css/theme.css" />`,
-      `<link rel="stylesheet" href="${relateStr}css/theme.css" pui-colors />`,
+      `<link rel="stylesheet" href="${relateStr}css/theme.css" />`,
     );
 
-  await outputHandle.write(outputContent);
+  await outputHandle.write(
+    jsBeautify.html(outputContent, {
+      indent_size: 2,
+      indent_char: " ",
+      eol: "\n",
+      preserve_newlines: false,
+    }),
+  );
 };
 
 let indexHTML = "";
