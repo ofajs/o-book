@@ -46,7 +46,7 @@
   <div class="container">
     <div class="header">
       <div class="max-container" style="padding: 0 16px">
-        <o-page src="./header.html"></o-page>
+        <o-page src="./header.html" id="header"></o-page>
       </div>
     </div>
     <style>
@@ -109,6 +109,9 @@
           ],
         },
         proto: {},
+        routerChange() {
+          this.shadow.$("#header").refreshActive();
+        },
         attached() {},
       };
     };

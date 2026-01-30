@@ -38,6 +38,18 @@ export const initGenerator = async ({
       const configData = await getData(articleHandle, configItem.url);
 
       configItem.data = configData;
+
+      const prefix = configItem.url
+        .replace(/^\.\//, "")
+        .replace("_config.yaml", "");
+
+      const flatContent = configData.flatMap((item) => item.content || [item]);
+      const firstItem = flatContent[0];
+
+      configItem.firstUrl =
+        prefix + firstItem.url.replace(/^\.\//, "").replace(/\.md/, ".html");
+
+      configItem.prefix = prefix;
     }
 
     // 保存文件数据
@@ -158,6 +170,10 @@ const initStaticFile = async ({ websiteHandle }) => {
       {
         name: "app-config.js",
         path: `${tempDir}/app-config.js`,
+      },
+      {
+        name: "util.js",
+        path: `${tempDir}/util.js`,
       },
       {
         name: "palette.css",

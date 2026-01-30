@@ -41,13 +41,21 @@
       display: flex;
       align-items: center;
       margin-left: 12px;
-      padding: 8px;
+      padding: 8px 16px;
       font-size: 14px;
       cursor: pointer;
       transition: all 0.3s ease-in-out;
+      border-radius: 20px;
+      color: inherit;
+      text-decoration: none;
     }
     .menu-item:hover {
       color: var(--md-sys-color-primary);
+    }
+
+    .menu-item.active {
+      color: var(--md-sys-color-primary);
+      background-color: var(--md-sys-color-primary-container);
     }
   </style>
 
@@ -57,9 +65,16 @@
   </a>
 
   <div class="menu-list">
-    <div class="menu-item">Item1</div>
-    <div class="menu-item">Item2</div>
-    <div class="menu-item">Item3</div>
+    <o-fill :value="header">
+      <a
+        class="menu-item"
+        class:active="$data.active"
+        attr:href="$data.url"
+        olink
+      >
+        {{$data.name}}
+      </a>
+    </o-fill>
   </div>
 
   <div class="header-btn-group">
@@ -92,10 +107,15 @@
   <o-consumer name="pui" watch:theme="theme"></o-consumer>
 
   <script>
-    export default async () => {
+    export default async ({ load, url: headerUrl }) => {
+      const { getCurrentLang } = await load("./util.js");
+
+      const lang = getCurrentLang();
+
       return {
         data: {
           theme: "",
+          header: [],
         },
         proto: {
           clickMode() {
@@ -113,8 +133,34 @@
               puiProvider.theme = "auto";
             }
           },
+          async loadHeaders() {
+            const { header } = await load(`./${lang}/article-config.json`);
+
+            this.header = header.map((e) => {
+              return {
+                name: e.name,
+                activePrefix: `${headerUrl.replace(/\/header\.html$/, "")}/${lang}/${e.prefix}`, // 导航前缀
+                url: `${headerUrl.replace(/\/header\.html$/, "")}/${lang}/${e.firstUrl}`, // 导航链接
+              };
+            });
+          },
+          refreshActive() {
+            const current = this.app.current;
+
+            // 修复激活态
+            this.header.forEach((item) => {
+              if (current.src.startsWith(item.activePrefix)) {
+                item.active = true;
+              } else {
+                item.active = false;
+              }
+            });
+          },
         },
-        attached() {},
+        async attached() {
+          await this.loadHeaders();
+          this.refreshActive();
+        },
       };
     };
   </script>
