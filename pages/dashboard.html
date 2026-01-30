@@ -159,6 +159,8 @@
             this.clickHeaderItem(this.header[0].url);
 
             initGenerator({
+              websiteConfig: config,
+              topHandle: this._topHandle,
               articleHandle: this._documentHandle,
               websiteHandle: await this._topHandle.get("website", {
                 create: "dir",
