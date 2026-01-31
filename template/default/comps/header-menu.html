@@ -37,6 +37,7 @@
         class="menu-item"
         class:active="$data.active"
         attr:href="$data.url"
+        on:click="$host.emit('clicked-item')"
         olink
       >
         {{$data.name}}

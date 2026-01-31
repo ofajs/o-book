@@ -84,7 +84,7 @@
 
     .mask {
       position: fixed;
-      z-index: 3;
+      z-index: 10;
       top: 0;
       left: 0;
       width: 100%;
@@ -102,7 +102,6 @@
       width: 100%;
       height: calc(100% - 52px);
       background-color: var(--md-sys-color-surface);
-      transform: translateX(16px);
       transition: all 0.3s ease-in-out;
     }
 
@@ -111,7 +110,6 @@
       pointer-events: auto;
     }
     .show-mask .mask-content {
-      transform: translateX(0);
       transition: all 0.1s ease-in-out;
     }
     @media screen and (min-width: 768px) {
@@ -129,7 +127,7 @@
           icon
           slot="menu"
           on:click="showMobileMenu = !showMobileMenu"
-          style="margin-right: 4px; position: relative; z-index: 4"
+          style="margin-right: 4px; position: relative; z-index: 11"
         >
           <o-if :value="showMobileMenu">
             <n-icon icon="material-symbols:close"></n-icon>
@@ -145,8 +143,11 @@
       class:show-mask="showMobileMenu"
       on:click="showMobileMenu = false"
     >
-      <div class="mask-content" on:click="clickMobileContent($event)">
-        <div style="padding: 8px 8px 0 0">
+      <div class="mask-content" on:click="$event.stopPropagation()">
+        <div
+          style="padding: 8px 8px 0 0"
+          on:clicked-item="showMobileMenu = false"
+        >
           <header-menu></header-menu>
           <hr />
           <article-menu></article-menu>
@@ -174,11 +175,7 @@
           hideLeft: sessionStorage.getItem("_old_hide_left") === "1",
           showMobileMenu: false,
         },
-        proto: {
-          clickMobileContent(e) {
-            e.stopPropagation();
-          },
-        },
+        proto: {},
         attached() {},
       };
     };

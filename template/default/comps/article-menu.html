@@ -32,7 +32,9 @@
       collapse-childs="open"
     >
       <x-if :value="$data.finalUrl">
-        <a attr:href="$data.finalUrl" olink> {{$data.name}} </a>
+        <a attr:href="$data.finalUrl" olink on:click="$host.emit('clicked-item')">
+          {{$data.name}}
+        </a>
       </x-if>
       <x-else>
         <div>{{$data.name}}</div>
