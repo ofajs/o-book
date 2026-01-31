@@ -32,6 +32,12 @@
     .header-btn-group p-button {
       margin-left: 4px;
     }
+
+    @media (max-width: 768px) {
+      header-menu {
+        display: none;
+      }
+    }
   </style>
 
   <slot name="menu"></slot>
@@ -41,7 +47,9 @@
     <div class="logo-text">ofa.js</div>
   </a>
 
-  <header-menu style="margin-left: auto"></header-menu>
+  <div style="margin-left: auto">
+    <header-menu></header-menu>
+  </div>
 
   <div class="header-btn-group">
     <p-button variant="text" icon on:click="clickMode">

@@ -89,10 +89,7 @@
             sessionStorage.setItem("_old_hide_left", 0);
 
             // 如果和之前的list一样，就不用更新
-            if (
-              !this.list.length ||
-              sessionStorage._old_prefix !== targetItem.prefix
-            ) {
+            if (!this.list.length || this._old_prefix !== targetItem.prefix) {
               // 更新左侧的列表
               const list = targetItem.data || [];
 
@@ -113,7 +110,7 @@
 
               this.list = list;
 
-              sessionStorage._old_prefix = targetItem.prefix;
+              this._old_prefix = targetItem.prefix;
             }
 
             // 更新左侧的active
