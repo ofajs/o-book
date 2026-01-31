@@ -100,6 +100,7 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
 
   if (inputHandle.name.endsWith("md")) {
     content = marked.parse(content);
+    content = `<article>${content}</article>`;
   }
 
   let finalHtml = indexHTML.replace("<!-- main content -->", content);
