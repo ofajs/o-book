@@ -38,6 +38,10 @@
       padding: 0 4px;
     }
 
+    .hide-left {
+      display: none;
+    }
+
     .article {
       position: relative;
       flex: 1;
@@ -71,7 +75,7 @@
     </template>
     <div class="main">
       <div class="max-container">
-        <div class="left-side">
+        <div class="left-side" class:hide-left="hideLeft">
           <p-list style="--ladder-left: 8px">
             <o-fill :value="list" name="list-item"></o-fill>
           </p-list>
@@ -83,7 +87,10 @@
     </div>
   </div>
   <script>
-    export default async ({ load }) => {
+    export default async ({ load, url: layoutUrl }) => {
+      const { getCurrentLang } = await load("./util.js");
+      const lang = getCurrentLang();
+
       return {
         data: {
           hideLeft: true,
@@ -109,11 +116,40 @@
             },
           ],
         },
-        proto: {},
+        proto: {
+          async refreshList() {
+            const { header } = await load(`./${lang}/article-config.json`);
+
+            let targetItem = null;
+
+            for (const e of header) {
+              const activePrefix = `${layoutUrl.replace(/\/layout\.html$/, "")}/${lang}/${e.prefix}`; // 导航前缀
+
+              // 判断是否当前的前缀
+              const currentSrc = this.app.current.src;
+              if (currentSrc.startsWith(activePrefix)) {
+                targetItem = e;
+                break;
+              }
+            }
+
+            if (!targetItem) {
+              this.hideLeft = true;
+              return;
+            }
+
+            this.hideLeft = false;
+
+            this.list = targetItem.data || [];
+          },
+        },
         routerChange() {
           this.shadow.$("#header").refreshActive();
+          this.refreshList();
         },
-        attached() {},
+        attached() {
+          this.refreshList();
+        },
       };
     };
   </script>
