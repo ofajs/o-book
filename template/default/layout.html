@@ -6,7 +6,7 @@
     :host {
       display: block;
       height: 100%;
-      --max-container-width: 1200px;
+      --max-container-width: 900px;
     }
 
     .container {
@@ -18,23 +18,20 @@
     .header {
       display: flex;
       align-items: center;
+      padding: 0 16px;
       height: 52px;
       border-bottom: var(--md-sys-color-normal-container) solid 1px;
     }
 
-    .max-container {
-      display: inherit;
-      /* max-width: 1200px; */
-      width: 100%;
-      margin: 0 auto;
-    }
-
     .main {
+      position: relative;
       display: flex;
       flex: 1;
     }
 
     .left-side {
+      height: 100%;
+      overflow: auto;
       width: 240px;
       padding: 0 4px;
       overflow: hidden;
@@ -59,12 +56,7 @@
   </style>
   <div class="container">
     <div class="header">
-      <div
-        class="max-container"
-        style="padding: 0 16px; max-width: var(--max-container-width, 1200px)"
-      >
-        <o-page src="./header.html" id="header"></o-page>
-      </div>
+      <o-page src="./header.html" id="header"></o-page>
     </div>
     <style>
       .left-side p-list-item {
