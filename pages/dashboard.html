@@ -103,6 +103,7 @@
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../util/yaml-handle.js");
       const { initGenerator, getBasePath } = await load("../util/generate.js");
+      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
 
       return {
         data: {
@@ -114,11 +115,16 @@
         },
         proto: {
           clickPreview() {
-            window.open(`/${query.path}/website/index.html`, "_blank");
+            window.open(`/${query.path}/website/cn/index.html`, "_blank");
           },
           async refreshPreview() {
+            await this.init();
+
             // 从模板复制文件到
-            debugger;
+            toast({
+              color: "success",
+              content: "刷新完成",
+            });
           },
           async clickHeaderItem(url) {
             this.activeHeader = url;
@@ -161,7 +167,6 @@
             initGenerator({
               websiteConfig: config,
               topHandle: this._topHandle,
-              articleHandle: this._documentHandle,
               websiteHandle: await this._topHandle.get("website", {
                 create: "dir",
               }),
