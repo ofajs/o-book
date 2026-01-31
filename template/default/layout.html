@@ -30,13 +30,26 @@
     }
 
     .left-side {
-      height: 100%;
+      position: absolute;
+      left: 0;
+      margin-top: 16px;
+      height: calc(100% - 16px);
       overflow: auto;
       width: 240px;
-      padding: 0 4px;
+      padding-right: 8px;
       overflow: hidden;
       opacity: 1;
       transition: all 0.3s ease-in-out;
+    }
+
+    @media screen and (max-width: 1440px) {
+      .left-side {
+        position: static;
+        left: 0;
+        height: auto;
+        padding-right: 0;
+        overflow: auto;
+      }
     }
 
     .left-side-inner {
@@ -60,8 +73,13 @@
     </div>
     <style>
       .left-side p-list-item {
-        border-radius: 8px;
+        border-radius: 0 16px 16px 0;
         margin: 2px 0;
+      }
+
+      p-list-item[active-item] {
+        color: var(--md-sys-color-primary-container);
+        background-color: var(--md-sys-color-on-primary-container);
       }
     </style>
     <template name="list-item">
@@ -99,26 +117,27 @@
         data: {
           hideLeft: sessionStorage.getItem("_old_hide_left") === "1",
           list: [
-            {
-              name: "选项1",
-              content: [
-                {
-                  name: "1-1",
-                  content: [
-                    {
-                      name: "1-1-1",
-                    },
-                  ],
-                },
-                {
-                  name: "1-2",
-                },
-              ],
-            },
-            {
-              name: "选项2",
-            },
+            // {
+            //   name: "选项1",
+            //   content: [
+            //     {
+            //       name: "1-1",
+            //       content: [
+            //         {
+            //           name: "1-1-1",
+            //         },
+            //       ],
+            //     },
+            //     {
+            //       name: "1-2",
+            //     },
+            //   ],
+            // },
+            // {
+            //   name: "选项2",
+            // },
           ],
+          activeLeftUrl: "",
         },
         proto: {
           async refreshList() {
@@ -142,6 +161,8 @@
               sessionStorage.setItem("_old_hide_left", 1);
               return;
             }
+
+            debugger;
 
             this.hideLeft = false;
             sessionStorage.setItem("_old_hide_left", 0);
