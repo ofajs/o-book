@@ -4,5 +4,6 @@
   "js/app-config.js",
   "js/util.js",
   "comps/center-block.html",
-  "comps/article-menu.html"
+  "comps/article-menu.html",
+  "comps/header-menu.html"
 ]

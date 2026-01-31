@@ -96,13 +96,8 @@
           hideLeft: sessionStorage.getItem("_old_hide_left") === "1",
         },
         proto: {},
-        routerChange() {
-          this.shadow.$("#header").refreshActive();
-          this.shadow.$("article-menu").refreshList();
-        },
-        attached() {
-          this.shadow.$("article-menu").refreshList();
-        },
+        routerChange() {},
+        attached() {},
       };
     };
   </script>

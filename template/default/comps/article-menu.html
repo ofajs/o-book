@@ -120,7 +120,19 @@
             this.activeLeftUrl = location.pathname;
           },
         },
-        attached() {},
+        attached() {
+          this.refreshList();
+
+          this.app.on(
+            "router-change",
+            (this._rc_func = () => {
+              this.refreshList();
+            }),
+          );
+        },
+        detached() {
+          this.app.off("router-change", this._rc_func);
+        },
       };
     };
   </script>
