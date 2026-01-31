@@ -59,7 +59,7 @@
     }
   </style>
 
-  <a class="logo-link" href="">
+  <a class="logo-link" attr:href="indexUrl" olink>
     <img class="logo" src="https://ofajs.com/publics/logo.svg" alt="" />
     <div class="logo-text">ofa.js</div>
   </a>
@@ -116,6 +116,7 @@
         data: {
           theme: "",
           header: [],
+          indexUrl: "",
         },
         proto: {
           clickMode() {
@@ -135,6 +136,8 @@
           },
           async loadHeaders() {
             const { header } = await load(`./${lang}/article-config.json`);
+
+            this.indexUrl = `${headerUrl.replace(/\/header\.html$/, "")}/${lang}/index.html`;
 
             this.header = header.map((e) => {
               return {
