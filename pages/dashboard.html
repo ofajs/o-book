@@ -102,7 +102,7 @@
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../util/yaml-handle.js");
-      const { initGenerator, getRootUrl } = await load("../util/genarate.js");
+      const { initGenerator, getBasePath } = await load("../util/generate.js");
 
       return {
         data: {
