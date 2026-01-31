@@ -48,7 +48,7 @@
     </p-list-item>
   </template>
   <script>
-    export default async ({ load }) => {
+    export default async ({ load, url: menuUrl }) => {
       const { getCurrentLang } = await load("../js/util.js");
       const lang = getCurrentLang();
 
@@ -59,13 +59,13 @@
           activeLeftUrl: "",
         },
         proto: {
-          async refreshList({ layoutUrl }) {
+          async refreshList() {
             const { header } = await load(`../${lang}/article-config.json`);
 
             let targetItem = null;
 
             for (const e of header) {
-              const activePrefix = `${layoutUrl.replace(/\/layout\.html$/, "")}/${lang}/${e.prefix}`; // 导航前缀
+              const activePrefix = `${menuUrl.replace(/\/comps\/article-menu\.html$/, "")}/${lang}/${e.prefix}`; // 导航前缀
 
               // 判断是否当前的前缀
               const currentSrc = this.app.current.src;
@@ -99,7 +99,7 @@
               const fixList = (list) => {
                 list.forEach((item) => {
                   if (item.url) {
-                    const finalUrl = `${layoutUrl.replace(/\/layout\.html$/, "")}/${lang}/${targetItem.prefix}${item.url}`;
+                    const finalUrl = `${menuUrl.replace(/\/comps\/article-menu\.html$/, "")}/${lang}/${targetItem.prefix}${item.url}`;
                     const urlData = new URL(finalUrl);
                     item.finalUrl = urlData.pathname;
                   }
