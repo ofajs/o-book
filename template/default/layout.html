@@ -23,7 +23,7 @@
 
     .max-container {
       display: inherit;
-      max-width: 1200px;
+      /* max-width: 1200px; */
       width: 100%;
       margin: 0 auto;
     }
@@ -36,10 +36,14 @@
     .left-side {
       width: 240px;
       padding: 0 4px;
+      overflow: hidden;
+      opacity: 1;
+      transition: width 0.3s ease-in-out;
     }
 
     .hide-left {
-      display: none;
+      width: 0;
+      opacity: 0;
     }
 
     .article {
@@ -50,7 +54,7 @@
   </style>
   <div class="container">
     <div class="header">
-      <div class="max-container" style="padding: 0 16px">
+      <div class="max-container" style="padding: 0 16px; max-width: 1200px">
         <o-page src="./header.html" id="header"></o-page>
       </div>
     </div>
