@@ -111,7 +111,7 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
 
   if (inputHandle.name.endsWith("md")) {
     content = marked.parse(content);
-    content = `<article>${content}</article>`;
+    content = `<article class="markdown-body">${content}</article>`;
   }
 
   let finalHtml = indexHTML.replace("<!-- main content -->", content);
@@ -141,6 +141,10 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
     .replace(
       `<link rel="stylesheet" href="../../css/theme.css" />`,
       `<link rel="stylesheet" href="${pathPrefix}css/theme.css" />`,
+    )
+    .replace(
+      `<link rel="stylesheet" href="../../css/github-markdown.css" />`,
+      `<link rel="stylesheet" href="${pathPrefix}css/github-markdown.css" />`,
     )
     .replace(
       '<l-m src="./comps/center-block.html"></l-m>',
@@ -173,6 +177,11 @@ const initStaticFile = async ({ websiteHandle }) => {
       name: "theme.css",
       path: `${cssBasePath}/theme.css`,
       outputPath: "css/theme.css",
+    },
+    {
+      name: "github-markdown.css",
+      path: `${cssBasePath}/github-markdown.css`,
+      outputPath: "css/github-markdown.css",
     },
   ];
 

@@ -35,6 +35,7 @@
   <body>
     <o-app src="./js/app-config.js">
       <template page>
+        <link rel="stylesheet" href="../../css/github-markdown.css" />
         <l-m src="./comps/center-block.html"></l-m>
         <style>
           :host {
@@ -45,7 +46,8 @@
             overflow: auto;
           }
 
-          article {
+          article,
+          article.markdown-body {
             max-width: var(--max-container-width, 1200px);
             margin: 0 auto;
           }
