@@ -188,6 +188,11 @@ const initStaticFile = async ({ websiteHandle }) => {
       outputPath: "comps/center-block.html",
     },
     {
+      name: "article-menu.html",
+      path: `${templateBasePath}/comps/article-menu.html`,
+      outputPath: "comps/article-menu.html",
+    },
+    {
       name: "palette.css",
       path: `${cssBasePath}/palette.css`,
       outputPath: "css/palette.css",

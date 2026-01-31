@@ -1,7 +1,7 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/nos/n-icon/n-icon.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
+  <l-m src="./comps/article-menu.html"></l-m>
   <style>
     :host {
       display: block;
@@ -75,51 +75,13 @@
         </p-button>
       </o-page>
     </div>
-    <style>
-      .left-side p-list-item {
-        border-radius: 0 16px 16px 0;
-        margin: 2px 0;
-        transition: all 0.1s ease-in-out;
-      }
-
-      p-list-item[active-item] {
-        color: var(--md-sys-color-primary);
-        background-color: var(--md-sys-color-on-primary);
-      }
-
-      p-list-item a {
-        color: inherit;
-        text-decoration: none;
-      }
-    </style>
-    <template name="list-item">
-      <p-list-item
-        button="suffix"
-        attr:active-item="$host.activeLeftUrl === $data.finalUrl"
-        collapse-childs="open"
-      >
-        <x-if :value="$data.finalUrl">
-          <a attr:href="$data.finalUrl" olink> {{$data.name}} </a>
-        </x-if>
-        <x-else>
-          <div>{{$data.name}}</div>
-        </x-else>
-
-        <x-if :value="$data.content">
-          <i toggle-collapse triangle slot="suffix" style="z-index: 3"></i>
-        </x-if>
-
-        <p-list slot="childs">
-          <o-fill :value="$data.content" name="list-item"></o-fill>
-        </p-list>
-      </p-list-item>
-    </template>
     <div class="main">
       <div class="left-side" class:hide-left="hideLeft">
         <div class="left-side-inner">
-          <p-list style="--ladder-left: 8px">
+          <article-menu on:hide-left="hideLeft = $event.data"></article-menu>
+          <!-- <p-list style="--ladder-left: 8px">
             <o-fill :value="list" name="list-item"></o-fill>
-          </p-list>
+          </p-list> -->
         </div>
       </div>
       <div class="article">
@@ -135,93 +97,14 @@
       return {
         data: {
           hideLeft: sessionStorage.getItem("_old_hide_left") === "1",
-          list: [
-            // {
-            //   name: "选项1",
-            //   content: [
-            //     {
-            //       name: "1-1",
-            //       content: [
-            //         {
-            //           name: "1-1-1",
-            //         },
-            //       ],
-            //     },
-            //     {
-            //       name: "1-2",
-            //     },
-            //   ],
-            // },
-            // {
-            //   name: "选项2",
-            // },
-          ],
-          activeLeftUrl: "",
         },
-        proto: {
-          async refreshList() {
-            const { header } = await load(`./${lang}/article-config.json`);
-
-            let targetItem = null;
-
-            for (const e of header) {
-              const activePrefix = `${layoutUrl.replace(/\/layout\.html$/, "")}/${lang}/${e.prefix}`; // 导航前缀
-
-              // 判断是否当前的前缀
-              const currentSrc = this.app.current.src;
-              if (currentSrc.startsWith(activePrefix)) {
-                targetItem = e;
-                break;
-              }
-            }
-
-            if (!targetItem) {
-              this.hideLeft = true;
-              sessionStorage.setItem("_old_hide_left", 1);
-              return;
-            }
-
-            this.hideLeft = false;
-            sessionStorage.setItem("_old_hide_left", 0);
-
-            // 如果和之前的list一样，就不用更新
-            if (
-              !this.list.length ||
-              sessionStorage._old_prefix !== targetItem.prefix
-            ) {
-              // 更新左侧的列表
-              const list = targetItem.data || [];
-
-              const fixList = (list) => {
-                list.forEach((item) => {
-                  if (item.url) {
-                    const finalUrl = `${layoutUrl.replace(/\/layout\.html$/, "")}/${lang}/${targetItem.prefix}${item.url}`;
-                    const urlData = new URL(finalUrl);
-                    item.finalUrl = urlData.pathname;
-                  }
-                  if (item.content) {
-                    fixList(item.content);
-                  }
-                });
-              };
-
-              fixList(list);
-
-              this.list = list;
-
-              sessionStorage._old_prefix = targetItem.prefix;
-            }
-
-            // 更新左侧的active
-            this.activeLeftUrl = location.pathname;
-          },
-        },
+        proto: {},
         routerChange() {
           this.shadow.$("#header").refreshActive();
-          this.refreshList();
+          this.shadow.$("article-menu").refreshList({ layoutUrl });
         },
         attached() {
-          this.refreshList();
+          this.shadow.$("article-menu").refreshList({ layoutUrl });
         },
       };
     };
