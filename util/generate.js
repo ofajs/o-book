@@ -40,13 +40,24 @@ export const initGenerator = async ({
         .replace(/^\.\//, "")
         .replace("_config.yaml", "");
 
-      const flattenedItems = headerItemData.flatMap(
-        (item) => item.content || [item],
-      );
+      const fixContentUrl = (data) => {
+        if (data.url) {
+          data.url = data.url.replace(/^\.\//, "").replace(/\.md/, ".html");
+        }
+        if (data.content) {
+          data.content.forEach(fixContentUrl);
+        }
+      };
+
+      fixContentUrl({ content: headerItemData });
+
+      const flattenedItems = headerItemData.flatMap((item) => {
+        return item.content || [item];
+      });
+
       const firstNavItem = flattenedItems[0];
 
-      headerItem.firstUrl =
-        prefix + firstNavItem.url.replace(/^\.\//, "").replace(/\.md/, ".html");
+      headerItem.firstUrl = prefix + firstNavItem.url;
 
       headerItem.prefix = prefix;
     }

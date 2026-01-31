@@ -75,16 +75,31 @@
       .left-side p-list-item {
         border-radius: 0 16px 16px 0;
         margin: 2px 0;
+        transition: all 0.1s ease-in-out;
       }
 
       p-list-item[active-item] {
-        color: var(--md-sys-color-primary-container);
-        background-color: var(--md-sys-color-on-primary-container);
+        color: var(--md-sys-color-primary);
+        background-color: var(--md-sys-color-on-primary);
+      }
+
+      p-list-item a {
+        color: inherit;
+        text-decoration: none;
       }
     </style>
     <template name="list-item">
-      <p-list-item button="suffix" collapse-childs="open">
-        {{$data.name}}
+      <p-list-item
+        button="suffix"
+        attr:active-item="$host.activeLeftUrl === $data.finalUrl"
+        collapse-childs="open"
+      >
+        <x-if :value="$data.finalUrl">
+          <a attr:href="$data.finalUrl" olink> {{$data.name}} </a>
+        </x-if>
+        <x-else>
+          <div>{{$data.name}}</div>
+        </x-else>
 
         <x-if :value="$data.content">
           <i toggle-collapse triangle slot="suffix" style="z-index: 3"></i>
@@ -162,12 +177,39 @@
               return;
             }
 
-            debugger;
-
             this.hideLeft = false;
             sessionStorage.setItem("_old_hide_left", 0);
 
-            this.list = targetItem.data || [];
+            // 如果和之前的list一样，就不用更新
+            if (
+              !this.list.length ||
+              sessionStorage._old_prefix !== targetItem.prefix
+            ) {
+              // 更新左侧的列表
+              const list = targetItem.data || [];
+
+              const fixList = (list) => {
+                list.forEach((item) => {
+                  if (item.url) {
+                    const finalUrl = `${layoutUrl.replace(/\/layout\.html$/, "")}/${lang}/${targetItem.prefix}${item.url}`;
+                    const urlData = new URL(finalUrl);
+                    item.finalUrl = urlData.pathname;
+                  }
+                  if (item.content) {
+                    fixList(item.content);
+                  }
+                });
+              };
+
+              fixList(list);
+
+              this.list = list;
+
+              sessionStorage._old_prefix = targetItem.prefix;
+            }
+
+            // 更新左侧的active
+            this.activeLeftUrl = location.pathname;
           },
         },
         routerChange() {
