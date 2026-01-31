@@ -1,0 +1,8 @@
+[
+  "header.html",
+  "layout.html",
+  "js/app-config.js",
+  "js/util.js",
+  "comps/center-block.html",
+  "comps/article-menu.html"
+]

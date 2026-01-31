@@ -165,34 +165,6 @@ const initStaticFile = async ({ websiteHandle }) => {
 
   const staticFiles = [
     {
-      name: "header.html",
-      path: `${templateBasePath}/header.html`,
-    },
-    {
-      name: "layout.html",
-      path: `${templateBasePath}/layout.html`,
-    },
-    {
-      name: "app-config.js",
-      path: `${templateBasePath}/js/app-config.js`,
-      outputPath: "js/app-config.js",
-    },
-    {
-      name: "util.js",
-      path: `${templateBasePath}/js/util.js`,
-      outputPath: "js/util.js",
-    },
-    {
-      name: "center-block.html",
-      path: `${templateBasePath}/comps/center-block.html`,
-      outputPath: "comps/center-block.html",
-    },
-    {
-      name: "article-menu.html",
-      path: `${templateBasePath}/comps/article-menu.html`,
-      outputPath: "comps/article-menu.html",
-    },
-    {
       name: "palette.css",
       path: `${cssBasePath}/palette.css`,
       outputPath: "css/palette.css",
@@ -203,6 +175,18 @@ const initStaticFile = async ({ websiteHandle }) => {
       outputPath: "css/theme.css",
     },
   ];
+
+  const _files = await fetch(`${templateBasePath}/_files.json`).then((e) =>
+    e.json(),
+  );
+
+  _files.forEach((path) => {
+    staticFiles.push({
+      name: path.split("/").pop(),
+      path: `${templateBasePath}/${path}`,
+      outputPath: path,
+    });
+  });
 
   for (const { name, path, outputPath } of staticFiles) {
     const fileContent = await fetch(path).then((e) => e.text());
