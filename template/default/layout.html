@@ -105,7 +105,7 @@
 
       return {
         data: {
-          hideLeft: true,
+          hideLeft: sessionStorage.getItem("_old_hide_left") === "1",
           list: [
             {
               name: "选项1",
@@ -147,10 +147,12 @@
 
             if (!targetItem) {
               this.hideLeft = true;
+              sessionStorage.setItem("_old_hide_left", 1);
               return;
             }
 
             this.hideLeft = false;
+            sessionStorage.setItem("_old_hide_left", 0);
 
             this.list = targetItem.data || [];
           },
