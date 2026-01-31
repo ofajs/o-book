@@ -6,6 +6,7 @@
     :host {
       display: block;
       height: 100%;
+      --max-container-width: 1200px;
     }
 
     .container {
@@ -38,7 +39,11 @@
       padding: 0 4px;
       overflow: hidden;
       opacity: 1;
-      transition: width 0.3s ease-in-out;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .left-side-inner {
+      width: 240px;
     }
 
     .hide-left {
@@ -54,7 +59,10 @@
   </style>
   <div class="container">
     <div class="header">
-      <div class="max-container" style="padding: 0 16px; max-width: 1200px">
+      <div
+        class="max-container"
+        style="padding: 0 16px; max-width: var(--max-container-width, 1200px)"
+      >
         <o-page src="./header.html" id="header"></o-page>
       </div>
     </div>
@@ -78,15 +86,15 @@
       </p-list-item>
     </template>
     <div class="main">
-      <div class="max-container">
-        <div class="left-side" class:hide-left="hideLeft">
+      <div class="left-side" class:hide-left="hideLeft">
+        <div class="left-side-inner">
           <p-list style="--ladder-left: 8px">
             <o-fill :value="list" name="list-item"></o-fill>
           </p-list>
         </div>
-        <div class="article">
-          <slot></slot>
-        </div>
+      </div>
+      <div class="article">
+        <slot></slot>
       </div>
     </div>
   </div>
