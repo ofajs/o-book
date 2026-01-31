@@ -116,8 +116,8 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
 
   finalHtml = finalHtml
     .replace(
-      ' <o-app src="./app-config.js">',
-      ` <o-app src="${pathPrefix}app-config.js">`,
+      '<o-app src="./js/app-config.js">',
+      `<o-app src="${pathPrefix}js/app-config.js">`,
     )
     .replace(
       ' export const parent = "./layout.html";',
@@ -163,11 +163,13 @@ const initStaticFile = async ({ websiteHandle }) => {
     },
     {
       name: "app-config.js",
-      path: `${templateBasePath}/app-config.js`,
+      path: `${templateBasePath}/js/app-config.js`,
+      outputPath: "js/app-config.js",
     },
     {
       name: "util.js",
-      path: `${templateBasePath}/util.js`,
+      path: `${templateBasePath}/js/util.js`,
+      outputPath: "js/util.js",
     },
     {
       name: "center-block.html",

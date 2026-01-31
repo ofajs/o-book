@@ -100,7 +100,7 @@
   </div>
   <script>
     export default async ({ load, url: layoutUrl }) => {
-      const { getCurrentLang } = await load("./util.js");
+      const { getCurrentLang } = await load("./js/util.js");
       const lang = getCurrentLang();
 
       return {
