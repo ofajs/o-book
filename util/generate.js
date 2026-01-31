@@ -40,7 +40,9 @@ export const initGenerator = async ({
         .replace(/^\.\//, "")
         .replace("_config.yaml", "");
 
-      const flattenedItems = headerItemData.flatMap((item) => item.content || [item]);
+      const flattenedItems = headerItemData.flatMap(
+        (item) => item.content || [item],
+      );
       const firstNavItem = flattenedItems[0];
 
       headerItem.firstUrl =
@@ -127,6 +129,10 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
     .replace(
       `<link rel="stylesheet" href="../../css/theme.css" />`,
       `<link rel="stylesheet" href="${pathPrefix}css/theme.css" />`,
+    )
+    .replace(
+      '<l-m src="./comps/center-block.html"></l-m>',
+      `<l-m src="${pathPrefix}comps/center-block.html"></l-m>`,
     );
 
   await outputHandle.write(
@@ -163,6 +169,11 @@ const initStaticFile = async ({ websiteHandle }) => {
       path: `${templateBasePath}/util.js`,
     },
     {
+      name: "center-block.html",
+      path: `${templateBasePath}/comps/center-block.html`,
+      outputPath: "comps/center-block.html",
+    },
+    {
       name: "palette.css",
       path: `${cssBasePath}/palette.css`,
       outputPath: "css/palette.css",
@@ -182,5 +193,7 @@ const initStaticFile = async ({ websiteHandle }) => {
     await fileHandle.write(fileContent);
   }
 
-  indexHTML = await fetch(`${templateBasePath}/index.html`).then((e) => e.text());
+  indexHTML = await fetch(`${templateBasePath}/index.html`).then((e) =>
+    e.text(),
+  );
 };

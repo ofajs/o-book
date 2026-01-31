@@ -1,0 +1,28 @@
+<template component>
+  <style>
+    :host {
+      display: block;
+    }
+
+    .container {
+      max-width: var(--container-max-width, 1200px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      margin: 0 auto;
+    }
+  </style>
+  <div class="container">
+    <slot></slot>
+  </div>
+  <script>
+    export default async ({ load }) => {
+      return {
+        tag: "center-block",
+        data: {},
+      };
+    };
+  </script>
+</template>
