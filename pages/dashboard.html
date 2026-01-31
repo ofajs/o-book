@@ -34,7 +34,7 @@
     }
   </style>
   <div class="container">
-    <div style="width: 100%; display: flex">
+    <div style="width: 100%; display: flex; align-items: center">
       <p-button on:click="clickPreview"> 预览网页 </p-button>
       <p-button
         on:click="refreshPreview"
@@ -44,6 +44,15 @@
         <n-icon icon="material-symbols:refresh" slot="prefix"></n-icon>
         完全刷新
       </p-button>
+      <span
+        style="
+          color: var(--md-sys-color-normal);
+          font-size: 13px;
+          margin-left: 8px;
+        "
+      >
+        写作语言 </span
+      >: {{writingLang}}
     </div>
     <div class="list-content">
       <h2>顶部导航</h2>
@@ -112,6 +121,7 @@
           activeHeader: "",
           _topHandle: null, // 顶部目录句柄
           _documentHandle: null, // 主语言文档所在的目录句柄
+          writingLang: "", // 主语言
         },
         proto: {
           clickPreview() {
@@ -151,6 +161,8 @@
             // 读取配置文件
             const config = await getData(handle);
             const writingLang = config.writingLang || "en";
+
+            this.writingLang = writingLang;
 
             // 读取主语言文件
             const writingLangConfig = await getData(
