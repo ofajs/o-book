@@ -15,6 +15,7 @@ export const initGenerator = async ({
   websiteConfig,
   topHandle,
   websiteHandle,
+  watchArticle = false,
 }) => {
   await initStaticFile({
     websiteHandle,
@@ -22,12 +23,42 @@ export const initGenerator = async ({
 
   const { languages } = websiteConfig;
 
+  let cancels = []; // 取消监听函数
+
   for (const lang of languages) {
     const websiteLangHandle = await websiteHandle.get(lang, {
       create: "dir",
     });
 
     const articleHandle = await topHandle.get(lang);
+
+    if (watchArticle) {
+      // 监听文章变化，及时生成对应的html文件
+      cancels.push(
+        articleHandle.observe(async (e) => {
+          const relatePath = e.path.replace(articleHandle.path + "/", "");
+
+          if (!(relatePath.endsWith(".md") || relatePath.endsWith(".html"))) {
+            // 必须是文章才监听
+            return;
+          }
+
+          const originHandle = await articleHandle.get(relatePath);
+          const targetHandle = await websiteLangHandle.get(
+            relatePath.replace(/\.(html|md)$/, ".html"),
+            {
+              create: "file",
+            },
+          );
+
+          await formatPage({
+            inputHandle: originHandle,
+            outputHandle: targetHandle,
+            languageDirHandle: websiteLangHandle,
+          });
+        }),
+      );
+    }
 
     const siteConfig = await getData(articleHandle);
 
@@ -74,12 +105,14 @@ export const initGenerator = async ({
       languageDirHandle: websiteLangHandle,
     });
   }
+
+  return cancels;
 };
 
 const traverseFiles = async ({
-  sourceHandle,
-  targetHandle,
-  languageDirHandle,
+  sourceHandle, // 原始markdown文件目录
+  targetHandle, // 需要输出网页到这个目录上
+  languageDirHandle, // 对应语言网页的首个目录
 }) => {
   for await (const handle of sourceHandle.values()) {
     if (handle.kind === "file") {

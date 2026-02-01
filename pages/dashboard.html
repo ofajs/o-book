@@ -176,12 +176,13 @@
 
             this.clickHeaderItem(this.header[0].url);
 
-            initGenerator({
+            this._cancels = initGenerator({
               websiteConfig: config,
               topHandle: this._topHandle,
               websiteHandle: await this._topHandle.get("website", {
                 create: "dir",
               }),
+              watchArticle: true,
             });
           },
         },
@@ -194,6 +195,9 @@
           });
 
           this.init();
+        },
+        detached() {
+          this._cancels && this._cancels.forEach((cancel) => cancel());
         },
       };
     };
