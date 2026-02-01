@@ -1,6 +1,33 @@
 import { getData } from "./yaml-handle.js";
 import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
+import hljs from "/npm/highlight.js@11.9.0/+esm";
 import jsBeautify from "/npm/js-beautify@1.15.1/+esm";
+
+marked.use({
+  renderer: {
+    code({ text, lang }) {
+      const code = text || "";
+      const language = lang || null;
+
+      if (language && hljs.getLanguage(language)) {
+        try {
+          const highlighted = hljs.highlight(code, { language }).value;
+          return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`;
+        } catch (e) {
+          console.warn(`Highlight error for language ${language}:`, e);
+        }
+      }
+
+      try {
+        const highlighted = hljs.highlightAuto(code).value;
+        return `<pre><code class="hljs">${highlighted}</code></pre>`;
+      } catch (e) {
+        console.warn("Auto highlight error:", e);
+        return `<pre><code>${code}</code></pre>`;
+      }
+    },
+  },
+});
 
 export const getBasePath = () => {
   if (location.href.includes("$mount-")) {
@@ -179,6 +206,7 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
 
   if (inputHandle.name.endsWith("md")) {
     content = marked.parse(content);
+
     content = `<article class="markdown-body">${content}</article>`;
   }
 
@@ -261,6 +289,10 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
     .replace(
       /href="\.\.\/\.\.\/css\/github-markdown\.css"/g,
       `href="${pathPrefix}css/github-markdown.css"`,
+    )
+    .replace(
+      /href="\.\.\/\.\.\/css\/hljs-dark\.css"/g,
+      `href="${pathPrefix}css/hljs-dark.css"`,
     );
 
   if (titleText) {
@@ -301,6 +333,16 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
       name: "github-markdown.css",
       path: `${cssBasePath}/github-markdown.css`,
       outputPath: "css/github-markdown.css",
+    },
+    {
+      name: "hljs-dark.css",
+      path: `${cssBasePath}/hljs-dark.css`,
+      outputPath: "css/hljs-dark.css",
+    },
+    {
+      name: "hljs-light.css",
+      path: `${cssBasePath}/hljs-light.css`,
+      outputPath: "css/hljs-light.css",
     },
   ];
 
