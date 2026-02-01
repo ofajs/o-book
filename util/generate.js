@@ -29,6 +29,26 @@ export const initGenerator = async ({
       : "",
   });
 
+  // 修正 header 的logo路径
+  if (projectConfig.logoImg || projectConfig.logoName) {
+    const headerHandle = await websiteHandle.get("header.html");
+
+    const headerContent = await headerHandle.text();
+
+    const fixedHeaderContent = headerContent
+      .replace(
+        `<img class="logo" src="https://ofajs.com/publics/logo.svg" />`,
+        `<img class="logo" src="./img/${projectConfig.logoImg.split("/").pop()}" />`,
+      )
+      .replace(
+        `<div class="logo-text">ofa.js</div>`,
+        `<div class="logo-text">${projectConfig.logoName || ""}</div>`,
+      );
+
+    // 写回header文件
+    await headerHandle.write(fixedHeaderContent);
+  }
+
   const { languages } = websiteConfig;
 
   let cancels = []; // 取消监听函数
