@@ -259,13 +259,8 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
   const relativePath = outputHandle.path.replace(languageDirHandle.path, "");
   const directoryDepth = relativePath.split("/").length - 1;
 
-  let pathPrefix = "";
-
-  for (let i = 0; i < directoryDepth; i++) {
-    pathPrefix += "../";
-  }
-
-  pathPrefix = pathPrefix.replace(/\/$/, "");
+  // 根据目录深度生成相对路径前缀
+  const pathPrefix = "../".repeat(directoryDepth).replace(/\/$/, "");
 
   finalHtml = finalHtml.replace(/\{pathPrefix\}/g, pathPrefix);
 
