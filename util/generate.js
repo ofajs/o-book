@@ -147,6 +147,27 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
     content = `<article class="markdown-body">${content}</article>`;
   }
 
+  let titleText = "";
+
+  // 获取title内容
+  {
+    const tempEl = $(`<template>${content}</template>`);
+
+    // 获取标题
+    const titleEl = tempEl.$("title,h1,h2,h3,h4");
+
+    if (titleEl) {
+      titleText = titleEl.text.trim();
+    }
+
+    // 不应该在正文出现 title
+    if (titleEl && titleEl.is("title")) {
+      titleEl.remove();
+
+      content = tempEl.html;
+    }
+  }
+
   let finalHtml = indexHTML.replace("<!-- main content -->", content);
 
   const relativePath = outputHandle.path.replace(languageDirHandle.path, "");
@@ -183,6 +204,13 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
       /href="\.\.\/\.\.\/css\/github-markdown\.css"/g,
       `href="${pathPrefix}css/github-markdown.css"`,
     );
+
+  if (titleText) {
+    finalHtml = finalHtml.replace(
+      "<title>Document</title>",
+      `<title>${titleText}</title>`,
+    );
+  }
 
   await outputHandle.write(
     jsBeautify.html(finalHtml, {
