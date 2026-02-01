@@ -170,6 +170,13 @@ const traverseFiles = async ({
 const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
   let content = await inputHandle.text();
 
+  // 产看是否ofa.js的组件或页面
+  if (content.trim().startsWith("<template ")) {
+    // 不做转换，直接输出
+    await outputHandle.write(content);
+    return;
+  }
+
   if (inputHandle.name.endsWith("md")) {
     content = marked.parse(content);
     content = `<article class="markdown-body">${content}</article>`;
