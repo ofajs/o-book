@@ -265,35 +265,9 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
     pathPrefix += "../";
   }
 
-  finalHtml = finalHtml
-    .replace(
-      '<o-app src="./js/app-config.js">',
-      `<o-app src="${pathPrefix}js/app-config.js">`,
-    )
-    .replace(
-      ' export const parent = "./layout.html";',
-      ` export const parent = "${pathPrefix}layout.html";`,
-    )
-    .replace(
-      `<link rel="stylesheet" href="../../css/palette.css" pui-colors />`,
-      `<link rel="stylesheet" href="${pathPrefix}css/palette.css" pui-colors />`,
-    )
-    .replace(
-      `<link rel="stylesheet" href="../../css/theme.css" />`,
-      `<link rel="stylesheet" href="${pathPrefix}css/theme.css" />`,
-    )
-    .replace(
-      '<l-m src="./comps/center-block.html"></l-m>',
-      `<l-m src="${pathPrefix}comps/center-block.html"></l-m>`,
-    )
-    .replace(
-      /href="\.\.\/\.\.\/css\/github-markdown\.css"/g,
-      `href="${pathPrefix}css/github-markdown.css"`,
-    )
-    .replace(
-      /href="\.\.\/\.\.\/css\/hljs-dark\.css"/g,
-      `href="${pathPrefix}css/hljs-dark.css"`,
-    );
+  pathPrefix = pathPrefix.replace(/\/$/, "");
+
+  finalHtml = finalHtml.replace(/\{pathPrefix\}/g, pathPrefix);
 
   if (titleText) {
     finalHtml = finalHtml.replace(
