@@ -304,14 +304,9 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
       outputPath: "css/github-markdown.css",
     },
     {
-      name: "hljs-dark.css",
-      path: `${cssBasePath}/hljs-dark.css`,
-      outputPath: "css/hljs-dark.css",
-    },
-    {
-      name: "hljs-light.css",
-      path: `${cssBasePath}/hljs-light.css`,
-      outputPath: "css/hljs-light.css",
+      name: "hljs.css",
+      path: `${cssBasePath}/hljs.css`,
+      outputPath: "css/hljs.css",
     },
   ];
 
