@@ -17,8 +17,16 @@ export const initGenerator = async ({
   websiteHandle,
   watchArticle = false,
 }) => {
+  const projectConfig = await getData(topHandle);
+
   await initStaticFile({
     websiteHandle,
+    logoImgName: projectConfig.logoImg
+      ? projectConfig.logoImg.split("/").pop()
+      : "",
+    logoPath: projectConfig.logoImg
+      ? `/${topHandle.path}/${projectConfig.logoImg.replace("./", "")}`
+      : "",
   });
 
   const { languages } = websiteConfig;
@@ -224,7 +232,7 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
 
 let indexHTML = "";
 
-const initStaticFile = async ({ websiteHandle }) => {
+const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
   const templateBasePath = `${getBasePath()}template/default`;
   const cssBasePath = `${getBasePath()}css`;
 
@@ -245,6 +253,15 @@ const initStaticFile = async ({ websiteHandle }) => {
       outputPath: "css/github-markdown.css",
     },
   ];
+
+  if (logoImgName) {
+    // 拷贝logo图片到img目录
+    staticFiles.push({
+      name: logoImgName,
+      path: logoPath,
+      outputPath: "img/" + logoImgName,
+    });
+  }
 
   const _files = await fetch(`${templateBasePath}/_files.json`).then((e) =>
     e.json(),
