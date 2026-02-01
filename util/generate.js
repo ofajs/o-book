@@ -176,12 +176,12 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
       `<link rel="stylesheet" href="${pathPrefix}css/theme.css" />`,
     )
     .replace(
-      `<link rel="stylesheet" href="../../css/github-markdown.css" />`,
-      `<link rel="stylesheet" href="${pathPrefix}css/github-markdown.css" />`,
-    )
-    .replace(
       '<l-m src="./comps/center-block.html"></l-m>',
       `<l-m src="${pathPrefix}comps/center-block.html"></l-m>`,
+    )
+    .replace(
+      /href="\.\.\/\.\.\/css\/github-markdown\.css"/g,
+      `href="${pathPrefix}css/github-markdown.css"`,
     );
 
   await outputHandle.write(

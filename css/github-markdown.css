@@ -1,3 +1,4 @@
+/* 亮色主题 */
 body {
   color-scheme: light;
   --color-prettylights-syntax-comment: var(--md-sys-color-normal40);
@@ -36,7 +37,7 @@ body {
   --color-canvas-default: var(--md-sys-color-surface);
   --color-canvas-subtle: rgb(from var(--md-sys-color-surface) r g b / 0.5);
   --color-border-default: var(--md-sys-color-normal);
-  --color-border-muted: rgb(from var(--md-sys-color-normal) r g b / 0.5);
+  --color-border-muted: rgb(from var(--md-sys-color-normal) r g b / 0.3);
   --color-neutral-muted: rgb(from var(--md-sys-color-normal) r g b / 0.2);
   --color-accent-fg: var(--md-sys-color-primary);
   --color-accent-emphasis: var(--md-sys-color-primary);
@@ -44,50 +45,18 @@ body {
   --color-danger-fg: var(--md-sys-color-error);
 }
 
-html.dark body {
+/* 暗色主题：仅覆盖差异值 */
+html.theme-light-mode body {
   color-scheme: dark;
-  --color-prettylights-syntax-comment: var(--md-sys-color-normal40);
-  --color-prettylights-syntax-constant: var(--md-sys-color-primary);
-  --color-prettylights-syntax-entity: rgb(from var(--md-sys-color-primary) r g b / 1);
-  --color-prettylights-syntax-storage-modifier-import: var(--md-sys-color-on-surface);
-  --color-prettylights-syntax-entity-tag: var(--md-sys-color-success);
-  --color-prettylights-syntax-keyword: var(--md-sys-color-error);
   --color-prettylights-syntax-string: rgb(from var(--md-sys-color-primary) r g b / 0.9);
   --color-prettylights-syntax-variable: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 1);
-  --color-prettylights-syntax-brackethighlighter-unmatched: var(--md-sys-color-error);
-  --color-prettylights-syntax-invalid-illegal-text: var(--md-sys-color-surface);
-  --color-prettylights-syntax-invalid-illegal-bg: var(--md-sys-color-error);
-  --color-prettylights-syntax-carriage-return-text: var(--md-sys-color-surface);
-  --color-prettylights-syntax-carriage-return-bg: var(--md-sys-color-error);
-  --color-prettylights-syntax-string-regexp: var(--md-sys-color-success);
-  --color-prettylights-syntax-markup-list: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 1);
-  --color-prettylights-syntax-markup-heading: var(--md-sys-color-primary);
-  --color-prettylights-syntax-markup-italic: var(--md-sys-color-on-surface);
-  --color-prettylights-syntax-markup-bold: var(--md-sys-color-on-surface);
-  --color-prettylights-syntax-markup-deleted-text: var(--md-sys-color-error);
   --color-prettylights-syntax-markup-deleted-bg: rgb(from var(--md-sys-color-error) r g b / 0.3);
-  --color-prettylights-syntax-markup-inserted-text: var(--md-sys-color-success);
   --color-prettylights-syntax-markup-inserted-bg: rgb(from var(--md-sys-color-success) r g b / 0.3);
   --color-prettylights-syntax-markup-changed-text: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 1);
   --color-prettylights-syntax-markup-changed-bg: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 0.3);
-  --color-prettylights-syntax-markup-ignored-text: var(--md-sys-color-surface);
-  --color-prettylights-syntax-markup-ignored-bg: var(--md-sys-color-primary);
-  --color-prettylights-syntax-meta-diff-range: rgb(from var(--md-sys-color-primary) r g b / 1);
-  --color-prettylights-syntax-brackethighlighter-angle: var(--md-sys-color-normal40);
-  --color-prettylights-syntax-sublimelinter-gutter-mark: var(--md-sys-color-normal30);
-  --color-prettylights-syntax-constant-other-reference-link: rgb(from var(--md-sys-color-primary) r g b / 0.9);
-  --color-fg-default: var(--md-sys-color-on-surface);
-  --color-fg-muted: var(--md-sys-color-normal40);
-  --color-fg-subtle: var(--md-sys-color-normal30);
-  --color-canvas-default: var(--md-sys-color-surface);
-  --color-canvas-subtle: rgb(from var(--md-sys-color-surface) r g b / 0.5);
-  --color-border-default: var(--md-sys-color-normal);
-  --color-border-muted: rgb(from var(--md-sys-color-normal) r g b / 0.5);
   --color-neutral-muted: rgb(from var(--md-sys-color-normal) r g b / 0.4);
-  --color-accent-fg: var(--md-sys-color-primary);
-  --color-accent-emphasis: var(--md-sys-color-primary);
   --color-attention-subtle: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 0.2);
-  --color-danger-fg: var(--md-sys-color-error);
+  --color-prettylights-syntax-constant-other-reference-link: rgb(from var(--md-sys-color-primary) r g b / 0.9);
 }
 
 .markdown-body {
