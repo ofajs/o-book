@@ -186,7 +186,7 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
 
   // 获取title内容
   {
-    const tempEl = $(`<template>${content}</template>`);
+    let tempEl = $(`<template>${content}</template>`);
 
     // 获取标题
     const titleEl = tempEl.$("title,h1,h2,h3,h4");
@@ -198,6 +198,29 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
     // 不应该在正文出现 title
     if (titleEl && titleEl.is("title")) {
       titleEl.remove();
+
+      content = tempEl.html;
+      tempEl = $(`<template>${content}</template>`);
+    }
+
+    // 替换链接
+    const aEls = tempEl.all("a");
+
+    if (aEls.length > 0) {
+      aEls.forEach((aEl) => {
+        let href = aEl.attr("href");
+
+        if (/^http/.test(href)) {
+          // 外部链接，不处理
+          aEl.attr("target", "_blank");
+          return;
+        }
+
+        href = href.replace(/\.md$/, ".html");
+
+        aEl.attr("href", href);
+        aEl.attr("olink", "");
+      });
 
       content = tempEl.html;
     }
