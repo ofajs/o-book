@@ -65,8 +65,16 @@
           export const parent = "{pathPrefix}/layout.html";
 
           export default async ({ load }) => {
+            const { init, revoke } = await load("{pathPrefix}/js/init.js");
+
             return {
               data: {},
+              attached() {
+                init(this);
+              },
+              detached() {
+                revoke(this);
+              },
             };
           };
         </script>
