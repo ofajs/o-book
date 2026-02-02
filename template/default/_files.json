@@ -6,5 +6,6 @@
   "js/init.js",
   "comps/center-block.html",
   "comps/article-menu.html",
-  "comps/header-menu.html"
+  "comps/header-menu.html",
+  "comps/article-code.html"
 ]

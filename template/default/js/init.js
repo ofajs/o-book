@@ -15,6 +15,13 @@ export const init = async (page) => {
       }, 300);
     });
   }
+
+  {
+    // 给所有code包裹article-code组件
+    page.shadow.all("pre code").forEach(($el) => {
+      $el.parent.wrap(`<article-code></article-code>`);
+    });
+  }
 };
 
 export const revoke = async (page) => {
