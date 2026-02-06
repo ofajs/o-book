@@ -127,7 +127,7 @@
       }
     }
   </style>
-  <div class="container">
+  <div class="container" on:clicked-item="clickArticleItem($event)">
     <div class="header">
       <o-page src="./header.html" id="header">
         <p-button
@@ -153,10 +153,7 @@
       on:click="showMobileMenu = false"
     >
       <div class="mask-content" on:click="$event.stopPropagation()">
-        <div
-          style="padding: 8px 8px 0 0"
-          on:clicked-item="showMobileMenu = false"
-        >
+        <div style="padding: 8px 8px 0 0">
           <header-menu></header-menu>
           <hr />
           <article-menu></article-menu>
@@ -186,7 +183,11 @@
           hideLeft: sessionStorage.getItem("_old_hide_left") === "1",
           showMobileMenu: false,
         },
-        proto: {},
+        proto: {
+          clickArticleItem(e) {
+            this.showMobileMenu = false;
+          },
+        },
         attached() {},
       };
     };

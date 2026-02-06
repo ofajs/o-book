@@ -56,7 +56,10 @@ export const init = async (page) => {
 
   {
     // 复原
-    if (sessionStorage.getItem("page_scrollTop")) {
+    if (
+      sessionStorage.getItem("page_scrollTop") &&
+      sessionStorage.getItem("page_scroll_src") === page.src
+    ) {
       page.ele.scrollTop = parseInt(sessionStorage.getItem("page_scrollTop"));
     }
 
@@ -64,6 +67,7 @@ export const init = async (page) => {
       clearTimeout(scrollTimer);
       scrollTimer = setTimeout(() => {
         sessionStorage.setItem("page_scrollTop", e.target.scrollTop);
+        sessionStorage.setItem("page_scroll_src", page.src);
       }, 300);
     });
   }
