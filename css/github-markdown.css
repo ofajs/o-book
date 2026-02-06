@@ -1,36 +1,64 @@
 /* 亮色主题 */
 body {
-  color-scheme: light;
+  color-scheme: auto;
   --color-prettylights-syntax-comment: var(--md-sys-color-normal40);
   --color-prettylights-syntax-constant: var(--md-sys-color-primary);
-  --color-prettylights-syntax-entity: rgb(from var(--md-sys-color-primary) r g b / 1);
-  --color-prettylights-syntax-storage-modifier-import: var(--md-sys-color-on-surface);
+  --color-prettylights-syntax-entity: rgb(
+    from var(--md-sys-color-primary) r g b / 1
+  );
+  --color-prettylights-syntax-storage-modifier-import: var(
+    --md-sys-color-on-surface
+  );
   --color-prettylights-syntax-entity-tag: var(--md-sys-color-success);
   --color-prettylights-syntax-keyword: var(--md-sys-color-error);
-  --color-prettylights-syntax-string: rgb(from var(--md-sys-color-primary) r g b / 0.8);
-  --color-prettylights-syntax-variable: rgb(from var(--md-sys-color-error) r g b / 0.6);
-  --color-prettylights-syntax-brackethighlighter-unmatched: var(--md-sys-color-error);
+  --color-prettylights-syntax-string: rgb(
+    from var(--md-sys-color-primary) r g b / 0.8
+  );
+  --color-prettylights-syntax-variable: rgb(
+    from var(--md-sys-color-error) r g b / 0.6
+  );
+  --color-prettylights-syntax-brackethighlighter-unmatched: var(
+    --md-sys-color-error
+  );
   --color-prettylights-syntax-invalid-illegal-text: var(--md-sys-color-surface);
   --color-prettylights-syntax-invalid-illegal-bg: var(--md-sys-color-error);
   --color-prettylights-syntax-carriage-return-text: var(--md-sys-color-surface);
   --color-prettylights-syntax-carriage-return-bg: var(--md-sys-color-error);
   --color-prettylights-syntax-string-regexp: var(--md-sys-color-success);
-  --color-prettylights-syntax-markup-list: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 1);
+  --color-prettylights-syntax-markup-list: rgb(
+    from var(--md-sys-color-warning, #d4a106) r g b / 1
+  );
   --color-prettylights-syntax-markup-heading: var(--md-sys-color-primary);
   --color-prettylights-syntax-markup-italic: var(--md-sys-color-on-surface);
   --color-prettylights-syntax-markup-bold: var(--md-sys-color-on-surface);
   --color-prettylights-syntax-markup-deleted-text: var(--md-sys-color-error);
-  --color-prettylights-syntax-markup-deleted-bg: rgb(from var(--md-sys-color-error) r g b / 0.15);
+  --color-prettylights-syntax-markup-deleted-bg: rgb(
+    from var(--md-sys-color-error) r g b / 0.15
+  );
   --color-prettylights-syntax-markup-inserted-text: var(--md-sys-color-success);
-  --color-prettylights-syntax-markup-inserted-bg: rgb(from var(--md-sys-color-success) r g b / 0.15);
-  --color-prettylights-syntax-markup-changed-text: rgb(from var(--md-sys-color-error) r g b / 0.6);
-  --color-prettylights-syntax-markup-changed-bg: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 0.2);
+  --color-prettylights-syntax-markup-inserted-bg: rgb(
+    from var(--md-sys-color-success) r g b / 0.15
+  );
+  --color-prettylights-syntax-markup-changed-text: rgb(
+    from var(--md-sys-color-error) r g b / 0.6
+  );
+  --color-prettylights-syntax-markup-changed-bg: rgb(
+    from var(--md-sys-color-warning, #d4a106) r g b / 0.2
+  );
   --color-prettylights-syntax-markup-ignored-text: var(--md-sys-color-surface);
   --color-prettylights-syntax-markup-ignored-bg: var(--md-sys-color-primary);
-  --color-prettylights-syntax-meta-diff-range: rgb(from var(--md-sys-color-primary) r g b / 1);
-  --color-prettylights-syntax-brackethighlighter-angle: var(--md-sys-color-normal40);
-  --color-prettylights-syntax-sublimelinter-gutter-mark: var(--md-sys-color-normal30);
-  --color-prettylights-syntax-constant-other-reference-link: rgb(from var(--md-sys-color-primary) r g b / 0.8);
+  --color-prettylights-syntax-meta-diff-range: rgb(
+    from var(--md-sys-color-primary) r g b / 1
+  );
+  --color-prettylights-syntax-brackethighlighter-angle: var(
+    --md-sys-color-normal40
+  );
+  --color-prettylights-syntax-sublimelinter-gutter-mark: var(
+    --md-sys-color-normal30
+  );
+  --color-prettylights-syntax-constant-other-reference-link: rgb(
+    from var(--md-sys-color-primary) r g b / 0.8
+  );
   --color-fg-default: var(--md-sys-color-on-surface);
   --color-fg-muted: var(--md-sys-color-normal40);
   --color-fg-subtle: var(--md-sys-color-normal30);
@@ -41,22 +69,44 @@ body {
   --color-neutral-muted: rgb(from var(--md-sys-color-normal) r g b / 0.2);
   --color-accent-fg: var(--md-sys-color-primary);
   --color-accent-emphasis: var(--md-sys-color-primary);
-  --color-attention-subtle: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 0.15);
+  --color-attention-subtle: rgb(
+    from var(--md-sys-color-warning, #d4a106) r g b / 0.15
+  );
   --color-danger-fg: var(--md-sys-color-error);
+}
+
+html.theme-dark-mode body {
+  color-scheme: dark;
 }
 
 /* 暗色主题：仅覆盖差异值 */
 html.theme-light-mode body {
-  color-scheme: dark;
-  --color-prettylights-syntax-string: rgb(from var(--md-sys-color-primary) r g b / 0.9);
-  --color-prettylights-syntax-variable: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 1);
-  --color-prettylights-syntax-markup-deleted-bg: rgb(from var(--md-sys-color-error) r g b / 0.3);
-  --color-prettylights-syntax-markup-inserted-bg: rgb(from var(--md-sys-color-success) r g b / 0.3);
-  --color-prettylights-syntax-markup-changed-text: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 1);
-  --color-prettylights-syntax-markup-changed-bg: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 0.3);
+  color-scheme: light;
+  --color-prettylights-syntax-string: rgb(
+    from var(--md-sys-color-primary) r g b / 0.9
+  );
+  --color-prettylights-syntax-variable: rgb(
+    from var(--md-sys-color-warning, #d4a106) r g b / 1
+  );
+  --color-prettylights-syntax-markup-deleted-bg: rgb(
+    from var(--md-sys-color-error) r g b / 0.3
+  );
+  --color-prettylights-syntax-markup-inserted-bg: rgb(
+    from var(--md-sys-color-success) r g b / 0.3
+  );
+  --color-prettylights-syntax-markup-changed-text: rgb(
+    from var(--md-sys-color-warning, #d4a106) r g b / 1
+  );
+  --color-prettylights-syntax-markup-changed-bg: rgb(
+    from var(--md-sys-color-warning, #d4a106) r g b / 0.3
+  );
   --color-neutral-muted: rgb(from var(--md-sys-color-normal) r g b / 0.4);
-  --color-attention-subtle: rgb(from var(--md-sys-color-warning, #d4a106) r g b / 0.2);
-  --color-prettylights-syntax-constant-other-reference-link: rgb(from var(--md-sys-color-primary) r g b / 0.9);
+  --color-attention-subtle: rgb(
+    from var(--md-sys-color-warning, #d4a106) r g b / 0.2
+  );
+  --color-prettylights-syntax-constant-other-reference-link: rgb(
+    from var(--md-sys-color-primary) r g b / 0.9
+  );
 }
 
 .markdown-body {
@@ -65,8 +115,9 @@ html.theme-light-mode body {
   margin: 0;
   color: var(--color-fg-default);
   /* background-color: var(--color-canvas-default); */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
-    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   font-size: 16px;
   line-height: 1.5;
   word-wrap: break-word;
@@ -311,8 +362,14 @@ html.theme-light-mode body {
 .markdown-body kbd {
   display: inline-block;
   padding: 3px 5px;
-  font: 11px ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-    Liberation Mono, monospace;
+  font:
+    11px ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    Liberation Mono,
+    monospace;
   line-height: 10px;
   color: var(--color-fg-default);
   vertical-align: middle;
@@ -401,16 +458,28 @@ html.theme-light-mode body {
 .markdown-body tt,
 .markdown-body code,
 .markdown-body samp {
-  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-    Liberation Mono, monospace;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    Liberation Mono,
+    monospace;
   font-size: 12px;
 }
 
 .markdown-body pre {
   margin-top: 0;
   margin-bottom: 0;
-  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-    Liberation Mono, monospace;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    Liberation Mono,
+    monospace;
   font-size: 12px;
   word-wrap: normal;
 }
@@ -1071,8 +1140,7 @@ html.theme-light-mode body {
   filter: invert(50%);
 }
 
-
-code{
+code {
   white-space: break-spaces !important;
   word-break: break-all !important;
 }

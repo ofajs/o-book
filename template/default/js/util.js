@@ -6,5 +6,6 @@ export const getCurrentLang = () => {
     return lang;
   }
 
-  return "en";
+  return location.pathname.split("/")[1];
+  // return "en";
 };

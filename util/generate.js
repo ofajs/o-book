@@ -324,6 +324,15 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
   );
 
   _files.forEach((path) => {
+    if (path.startsWith("/gh/") || path.startsWith("/nos/")) {
+      staticFiles.push({
+        name: path.split("/").pop(),
+        path,
+        outputPath: path.replace(/^\//, ""),
+      });
+      return;
+    }
+
     staticFiles.push({
       name: path.split("/").pop(),
       path: `${templateBasePath}/${path}`,

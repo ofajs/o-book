@@ -7,5 +7,16 @@
   "comps/center-block.html",
   "comps/article-menu.html",
   "comps/header-menu.html",
-  "comps/article-code.html"
+  "comps/article-code.html",
+  "/gh/ofajs/Punch-UI/packages/public/init.js",
+  "/gh/ofajs/Punch-UI/packages/button/button.html",
+  "/gh/ofajs/Punch-UI/packages/wave/wave.html",
+  "/gh/ofajs/Punch-UI/packages/list/list.html",
+  "/gh/ofajs/Punch-UI/packages/list/list-item.html",
+  "/gh/ofajs/Punch-UI/packages/public/util.js",
+  "/gh/ofajs/Punch-UI/packages/css/palette.css",
+  "/gh/ofajs/Punch-UI/packages/css/theme.css",
+  "/gh/ofajs/Punch-UI/packages/css/public.css",
+  "/gh/ofajs/Punch-UI/packages/aide/collapse/collapse.html",
+  "/nos/n-icon/n-icon.html"
 ]
