@@ -39,6 +39,19 @@
       o-app {
         height: 100%;
       }
+
+      @keyframes fadein {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      o-app {
+        animation: fadein 0.1s ease-in-out;
+      }
     </style>
   </head>
   <body>
