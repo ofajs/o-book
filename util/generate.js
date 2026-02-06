@@ -110,6 +110,7 @@ export const initGenerator = async ({
             inputHandle: originHandle,
             outputHandle: targetHandle,
             languageDirHandle: websiteLangHandle,
+            logoFileName: projectConfig.logoImg.split("/").pop(),
           });
         }),
       );
@@ -158,6 +159,7 @@ export const initGenerator = async ({
       sourceHandle: articleHandle,
       targetHandle: websiteLangHandle,
       languageDirHandle: websiteLangHandle,
+      logoFileName: projectConfig.logoImg.split("/").pop(),
     });
   }
 
@@ -168,6 +170,7 @@ const traverseFiles = async ({
   sourceHandle, // 原始markdown文件目录
   targetHandle, // 需要输出网页到这个目录上
   languageDirHandle, // 对应语言网页的首个目录
+  logoFileName,
 }) => {
   for await (const handle of sourceHandle.values()) {
     if (handle.kind === "file") {
@@ -180,6 +183,7 @@ const traverseFiles = async ({
             create: "file",
           }),
           languageDirHandle,
+          logoFileName,
         });
       }
     } else {
@@ -189,12 +193,18 @@ const traverseFiles = async ({
           create: "dir",
         }),
         languageDirHandle,
+        logoFileName,
       });
     }
   }
 };
 
-const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
+const formatPage = async ({
+  inputHandle,
+  outputHandle,
+  languageDirHandle,
+  logoFileName,
+}) => {
   let content = await inputHandle.text();
 
   // 产看是否ofa.js的组件或页面
@@ -268,6 +278,13 @@ const formatPage = async ({ inputHandle, outputHandle, languageDirHandle }) => {
     finalHtml = finalHtml.replace(
       "<title>Document</title>",
       `<title>${titleText}</title>`,
+    );
+  }
+
+  if (logoFileName) {
+    finalHtml = finalHtml.replace(
+      '<link rel="icon" href="https://ofajs.com/publics/logo.svg" />',
+      `<link rel=\"icon\" href=\"${pathPrefix}/img/${logoFileName}\" />`,
     );
   }
 
