@@ -32,7 +32,25 @@
       collapse-childs="open"
     >
       <x-if :value="$data.finalUrl">
-        <a attr:href="$data.finalUrl" olink on:click="$host.emit('clicked-item')">
+        <n-icon
+          icon="material-symbols:article-rounded"
+          slot="prefix"
+          style="margin: 0 8px 0 0; font-size: 16px"
+        ></n-icon>
+      </x-if>
+      <x-else>
+        <n-icon
+          icon="material-symbols:list-rounded"
+          slot="prefix"
+          style="margin: 0 8px 0 0; font-size: 16px"
+        ></n-icon>
+      </x-else>
+      <x-if :value="$data.finalUrl">
+        <a
+          attr:href="$data.finalUrl"
+          olink
+          on:click="$host.emit('clicked-item')"
+        >
           {{$data.name}}
         </a>
       </x-if>
