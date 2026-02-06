@@ -20,6 +20,10 @@ export const init = async (page) => {
       currentSrc.startsWith(e.prefix),
     );
 
+    if (!targetHeaderItem) {
+      return;
+    }
+
     const flatedList = targetHeaderItem.data.flatMap((e) => e.content || [e]);
 
     const currentIndex = flatedList.findIndex(
