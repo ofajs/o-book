@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.html",
   "scripts": {
-    "static": "http-server -p 30021 -c-1"
+    "static": "http-server -p 30021 -c-1 --cors"
   },
   "author": "YAO",
   "license": "MIT",

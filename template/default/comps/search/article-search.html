@@ -1,0 +1,61 @@
+<template component>
+  <style>
+    :host {
+      display: block;
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      width: 200px;
+      height: 32px;
+      border-radius: 21px;
+      user-select: none;
+      /* border: 1px solid var(--md-sys-color-primary); */
+      color: var(--md-sys-color-primary);
+      background-color: var(--md-sys-color-on-primary);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .search-container:hover {
+      box-shadow: 0 0 5px var(--md-sys-color-primary);
+    }
+
+    .search-btn {
+      display: none;
+    }
+
+    @media screen and (max-width: 768px) {
+      .search-container {
+        display: none;
+      }
+      .search-btn {
+        display: block;
+      }
+    }
+  </style>
+  <div class="search-container">
+    <n-icon
+      icon="material-symbols:search-rounded"
+      style="margin-left: 10px; font-size: 20px; display: block"
+    ></n-icon>
+    <span style="margin-left: 8px; display: block">搜索</span>
+  </div>
+  <p-button class="search-btn" icon variant="text" style="margin-left: 8px">
+    <n-icon
+      icon="material-symbols:search-rounded"
+      style="font-size: 22px"
+    ></n-icon>
+  </p-button>
+  <script>
+    export default async ({ load, url: searchUrl }) => {
+      return {
+        tag: "article-search",
+        data: {},
+        proto: {},
+      };
+    };
+  </script>
+</template>

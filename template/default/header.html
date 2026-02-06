@@ -1,5 +1,9 @@
 <template page>
   <l-m src="./comps/header-menu.html"></l-m>
+  <!-- <l-m src="./comps/search/article-search.html"></l-m> -->
+  <l-m
+    src="http://localhost:30021/template/default/comps/search/article-search.html"
+  ></l-m>
   <style>
     :host {
       display: flex;
@@ -26,11 +30,14 @@
     .header-btn-group {
       display: flex;
       align-items: center;
-      margin-left: 16px;
+      margin-left: 4px;
     }
 
     .header-btn-group p-button {
       margin-left: 4px;
+      &:first-child {
+        margin-left: 0;
+      }
     }
 
     @media (max-width: 768px) {
@@ -47,9 +54,9 @@
     <div class="logo-text">ofa.js</div>
   </a>
 
-  <div style="margin-left: auto">
-    <header-menu></header-menu>
-  </div>
+  <article-search style="margin-left: auto"></article-search>
+
+  <header-menu style="margin-right: 4px"></header-menu>
 
   <div class="header-btn-group">
     <p-button variant="text" icon on:click="clickMode">
