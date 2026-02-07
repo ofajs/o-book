@@ -7,6 +7,7 @@
   "comps/center-block.html",
   "comps/article-menu.html",
   "comps/search/article-search.html",
+  "comps/search/search-worker.js",
   "comps/header-menu.html",
   "comps/article-code.html",
   "/gh/ofajs/Punch-UI/packages/public/init.js",

@@ -193,19 +193,22 @@ const traverseFiles = async ({
           create: "file",
         });
 
-        const content = await formatPage({
+        const pageData = await formatPage({
           inputFileHandle: handle,
           outputFileHandle,
           langRootDirHandle,
           logoImageFileName,
         });
 
-        dataList.push({
-          url: outputFileHandle.path
-            .replace(langRootDirHandle.path, "")
-            .replace(/^\//, ""),
-          content,
-        });
+        if (pageData) {
+          dataList.push({
+            url: outputFileHandle.path
+              .replace(langRootDirHandle.path, "")
+              .replace(/^\//, ""),
+            title: pageData.title,
+            content: pageData.content,
+          });
+        }
       }
     } else {
       const subDataList = await traverseFiles({
@@ -246,9 +249,10 @@ const formatPage = async ({
   }
 
   let titleText = "";
+  let contentText = "";
 
-  // 获取title内容
   {
+    // 获取title内容
     let tempEl = $(`<template>${content}</template>`);
 
     // 获取标题
@@ -286,6 +290,7 @@ const formatPage = async ({
       });
 
       content = tempEl.html;
+      contentText = tempEl.ele.content.textContent;
     }
   }
 
@@ -325,7 +330,10 @@ const formatPage = async ({
     }),
   );
 
-  return content;
+  return {
+    title: titleText,
+    content: contentText,
+  };
 };
 
 let indexHTML = "";
