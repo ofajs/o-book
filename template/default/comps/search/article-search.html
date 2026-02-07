@@ -271,10 +271,20 @@
             this.app.goto(url);
             this.showDialog = false;
 
-            this.historyList.push({
+            const finalItem = {
               search: this.searchValue,
               ...item,
-            });
+            };
+
+            // 判断是否已经有旧的存在，有的话删除旧的
+            const oldIndex = this.historyList.findIndex(
+              (item) => JSON.stringify(item) === JSON.stringify(finalItem),
+            );
+            if (oldIndex !== -1) {
+              this.historyList.splice(oldIndex, 1);
+            }
+
+            this.historyList.unshift(finalItem);
 
             // 记录搜索历史
             localStorage.setItem(
