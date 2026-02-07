@@ -254,9 +254,11 @@
                 let lineIndex = 0;
                 for (let line of pageItem.content) {
                   lineIndex++;
-                  if (line.c.includes(val)) {
+                  if (line.c.toLowerCase().includes(val.toLowerCase())) {
                     // 获取那个附近的文本
-                    const startIndex = line.c.indexOf(val);
+                    const startIndex = line.c
+                      .toLowerCase()
+                      .indexOf(val.toLowerCase());
                     const endIndex = startIndex + val.length;
 
                     let aroundText = line.c.slice(

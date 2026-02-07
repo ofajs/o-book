@@ -82,9 +82,10 @@ export const init = async (page, query) => {
   {
     // 锚点修正
     if (query.index) {
-      const target = page.shadow.$("article")[query.index];
+      const target = page.shadow.$("article")[query.index - 1];
       if (target) {
         target.ele.scrollIntoView({ behavior: "smooth" });
+        target.classList.add("focus-index");
       }
     }
   }
