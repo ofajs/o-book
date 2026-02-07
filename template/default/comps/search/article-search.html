@@ -227,6 +227,14 @@
             const url = `${prefixUrl}/${lang}/${item.url}?index=${item.lineIndex}&search=${this.searchValue}`;
             this.app.goto(url);
             this.showDialog = false;
+
+            // 记录搜索历史
+            localStorage.setItem(
+              "search_history",
+              JSON.stringify(this.historyList),
+            );
+
+            this.historyList.push(item);
           },
           changeSearch() {
             this.loading = true;
