@@ -176,12 +176,28 @@
             <p-list>
               <o-fill :value="$data.result">
                 <p-list-item button on:click="$host.clickItem($data,$index)">
-                  <div
-                    slot="prefix"
-                    style="width: 20px; font-weight: bold; text-align: center"
-                  >
-                    {{ $data.tag }}
-                  </div>
+                  <o-if :value="$data.tag === 'blockquote'" slot="prefix">
+                    <div
+                      style="
+                        margin-right: 8px;
+                        font-weight: bold;
+                        text-align: center;
+                      "
+                    >
+                      <n-icon icon="tabler:blockquote"></n-icon>
+                    </div>
+                  </o-if>
+                  <o-else slot="prefix">
+                    <div
+                      style="
+                        margin-right: 8px;
+                        font-weight: bold;
+                        text-align: center;
+                      "
+                    >
+                      {{ $data.tag }}
+                    </div>
+                  </o-else>
                   <div>{{ $data.aroundText }}</div>
                 </p-list-item>
               </o-fill>

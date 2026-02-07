@@ -3,7 +3,7 @@ import { getCurrentLang } from "./util.js";
 // 保存滚动位置
 let scrollTimer = null;
 
-export const init = async (page) => {
+export const init = async (page, query) => {
   const lang = getCurrentLang();
 
   const articleConfigData = await fetch(
@@ -77,6 +77,16 @@ export const init = async (page) => {
     page.shadow.all("pre code").forEach(($el) => {
       $el.parent.wrap(`<article-code></article-code>`);
     });
+  }
+
+  {
+    // 锚点修正
+    if (query.index) {
+      const target = page.shadow.$("article")[query.index];
+      if (target) {
+        target.ele.scrollIntoView({ behavior: "smooth" });
+      }
+    }
   }
 };
 
