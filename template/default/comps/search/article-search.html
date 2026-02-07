@@ -152,7 +152,7 @@
             <div class="spinner"></div>
           </div>
         </o-if>
-        <o-else-if :value="!list.length && !loading && searchValue">
+        <o-else-if :value="(!list.length && !loading && searchValue) || (!historyList.length && !list.length && !searchValue)">
           <div
             style="
               display: flex;
