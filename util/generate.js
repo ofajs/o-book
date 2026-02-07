@@ -155,12 +155,18 @@ export const initGenerator = async ({
 
     await configHandle.write(JSON.stringify(siteConfig));
 
-    await traverseFiles({
+    const alldatas = await traverseFiles({
       sourceHandle: articleHandle,
       targetHandle: websiteLangHandle,
       languageDirHandle: websiteLangHandle,
       logoFileName: projectConfig.logoImg.split("/").pop(),
     });
+
+    const dbHandle = await websiteLangHandle.get("db.json", {
+      create: "file",
+    });
+
+    await dbHandle.write(JSON.stringify(alldatas));
   }
 
   return cancels;
@@ -172,22 +178,32 @@ const traverseFiles = async ({
   languageDirHandle, // 对应语言网页的首个目录
   logoFileName,
 }) => {
+  const datas = [];
+
   for await (const handle of sourceHandle.values()) {
     if (handle.kind === "file") {
       if (handle.name.endsWith(".html") || handle.name.endsWith(".md")) {
         const outputName = handle.name.replace(/\.(html|md)$/, ".html");
+        const outputHandle = await targetHandle.get(outputName, {
+          create: "file",
+        });
 
-        await formatPage({
+        const content = await formatPage({
           inputHandle: handle,
-          outputHandle: await targetHandle.get(outputName, {
-            create: "file",
-          }),
+          outputHandle,
           languageDirHandle,
           logoFileName,
         });
+
+        datas.push({
+          url: outputHandle.path
+            .replace(languageDirHandle.path, "")
+            .replace(/^\//, ""),
+          content,
+        });
       }
     } else {
-      await traverseFiles({
+      const subdatas = await traverseFiles({
         sourceHandle: handle,
         targetHandle: await targetHandle.get(handle.name, {
           create: "dir",
@@ -195,8 +211,12 @@ const traverseFiles = async ({
         languageDirHandle,
         logoFileName,
       });
+
+      datas.push(...subdatas);
     }
   }
+
+  return datas;
 };
 
 const formatPage = async ({
@@ -296,6 +316,8 @@ const formatPage = async ({
       preserve_newlines: false,
     }),
   );
+
+  return content;
 };
 
 let indexHTML = "";
