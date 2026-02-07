@@ -58,9 +58,9 @@ export const initGenerator = async ({
 
   // 修正 header 的logo路径
   if (projectConfig.logoImg || projectConfig.logoName) {
-    const headerHandle = await websiteHandle.get("header.html");
+    const headerFileHandle = await websiteHandle.get("header.html");
 
-    const headerContent = await headerHandle.text();
+    const headerContent = await headerFileHandle.text();
 
     const fixedHeaderContent = headerContent
       .replace(
@@ -73,7 +73,7 @@ export const initGenerator = async ({
       );
 
     // 写回header文件
-    await headerHandle.write(fixedHeaderContent);
+    await headerFileHandle.write(fixedHeaderContent);
   }
 
   const { languages } = websiteConfig;
@@ -90,27 +90,29 @@ export const initGenerator = async ({
     if (watchArticle) {
       // 监听文章变化，及时生成对应的html文件
       cancels.push(
-        articleHandle.observe(async (e) => {
-          const relatePath = e.path.replace(articleHandle.path + "/", "");
+        articleHandle.observe(async (event) => {
+          const relativePath = event.path.replace(articleHandle.path + "/", "");
 
-          if (!(relatePath.endsWith(".md") || relatePath.endsWith(".html"))) {
+          if (
+            !(relativePath.endsWith(".md") || relativePath.endsWith(".html"))
+          ) {
             // 必须是文章才监听
             return;
           }
 
-          const originHandle = await articleHandle.get(relatePath);
-          const targetHandle = await websiteLangHandle.get(
-            relatePath.replace(/\.(html|md)$/, ".html"),
+          const sourceFileHandle = await articleHandle.get(relativePath);
+          const targetFileHandle = await websiteLangHandle.get(
+            relativePath.replace(/\.(html|md)$/, ".html"),
             {
               create: "file",
             },
           );
 
           await formatPage({
-            inputHandle: originHandle,
-            outputHandle: targetHandle,
-            languageDirHandle: websiteLangHandle,
-            logoFileName: projectConfig.logoImg.split("/").pop(),
+            inputFileHandle: sourceFileHandle,
+            outputFileHandle: targetFileHandle,
+            langRootDirHandle: websiteLangHandle,
+            logoImageFileName: projectConfig.logoImg.split("/").pop(),
           });
         }),
       );
@@ -149,92 +151,95 @@ export const initGenerator = async ({
       headerItem.prefix = prefix;
     }
 
-    const configHandle = await websiteLangHandle.get("article-config.json", {
+    const configFileHandle = await websiteLangHandle.get(
+      "article-config.json",
+      {
+        create: "file",
+      },
+    );
+
+    await configFileHandle.write(JSON.stringify(siteConfig));
+
+    const allArticleData = await traverseFiles({
+      sourceDirHandle: articleHandle,
+      targetDirHandle: websiteLangHandle,
+      langRootDirHandle: websiteLangHandle,
+      logoImageFileName: projectConfig.logoImg.split("/").pop(),
+    });
+
+    const dbFileHandle = await websiteLangHandle.get("db.json", {
       create: "file",
     });
 
-    await configHandle.write(JSON.stringify(siteConfig));
-
-    const alldatas = await traverseFiles({
-      sourceHandle: articleHandle,
-      targetHandle: websiteLangHandle,
-      languageDirHandle: websiteLangHandle,
-      logoFileName: projectConfig.logoImg.split("/").pop(),
-    });
-
-    const dbHandle = await websiteLangHandle.get("db.json", {
-      create: "file",
-    });
-
-    await dbHandle.write(JSON.stringify(alldatas));
+    await dbFileHandle.write(JSON.stringify(allArticleData));
   }
 
   return cancels;
 };
 
 const traverseFiles = async ({
-  sourceHandle, // 原始markdown文件目录
-  targetHandle, // 需要输出网页到这个目录上
-  languageDirHandle, // 对应语言网页的首个目录
-  logoFileName,
+  sourceDirHandle, // 原始markdown文件目录
+  targetDirHandle, // 需要输出网页到这个目录上
+  langRootDirHandle, // 对应语言网页的首个目录
+  logoImageFileName,
 }) => {
-  const datas = [];
+  const dataList = [];
 
-  for await (const handle of sourceHandle.values()) {
+  for await (const handle of sourceDirHandle.values()) {
     if (handle.kind === "file") {
       if (handle.name.endsWith(".html") || handle.name.endsWith(".md")) {
         const outputName = handle.name.replace(/\.(html|md)$/, ".html");
-        const outputHandle = await targetHandle.get(outputName, {
+        const outputFileHandle = await targetDirHandle.get(outputName, {
           create: "file",
         });
 
         const content = await formatPage({
-          inputHandle: handle,
-          outputHandle,
-          languageDirHandle,
-          logoFileName,
+          inputFileHandle: handle,
+          outputFileHandle,
+          langRootDirHandle,
+          logoImageFileName,
         });
 
-        datas.push({
-          url: outputHandle.path
-            .replace(languageDirHandle.path, "")
+        dataList.push({
+          url: outputFileHandle.path
+            .replace(langRootDirHandle.path, "")
             .replace(/^\//, ""),
           content,
         });
       }
     } else {
-      const subdatas = await traverseFiles({
-        sourceHandle: handle,
-        targetHandle: await targetHandle.get(handle.name, {
+      const subDataList = await traverseFiles({
+        sourceDirHandle: handle,
+        targetDirHandle: await targetDirHandle.get(handle.name, {
           create: "dir",
         }),
-        languageDirHandle,
-        logoFileName,
+        langRootDirHandle,
+        logoImageFileName,
       });
 
-      datas.push(...subdatas);
+      dataList.push(...subDataList);
     }
   }
 
-  return datas;
+  return dataList;
 };
 
 const formatPage = async ({
-  inputHandle,
-  outputHandle,
-  languageDirHandle,
-  logoFileName,
+  inputFileHandle,
+  outputFileHandle,
+  langRootDirHandle,
+  logoImageFileName,
 }) => {
-  let content = await inputHandle.text();
+  let content = await inputFileHandle.text();
 
   // 产看是否ofa.js的组件或页面
   if (content.trim().startsWith("<template ")) {
     // 不做转换，直接输出
-    await outputHandle.write(content);
+    await outputFileHandle.write(content);
     return;
   }
 
-  if (inputHandle.name.endsWith("md")) {
+  if (inputFileHandle.name.endsWith("md")) {
     content = marked.parse(content);
 
     content = `<article class="markdown-body">${content}</article>`;
@@ -286,7 +291,10 @@ const formatPage = async ({
 
   let finalHtml = indexHTML.replace("<!-- main content -->", content);
 
-  const relativePath = outputHandle.path.replace(languageDirHandle.path, "");
+  const relativePath = outputFileHandle.path.replace(
+    langRootDirHandle.path,
+    "",
+  );
   const directoryDepth = relativePath.split("/").length - 1;
 
   // 根据目录深度生成相对路径前缀
@@ -301,14 +309,14 @@ const formatPage = async ({
     );
   }
 
-  if (logoFileName) {
+  if (logoImageFileName) {
     finalHtml = finalHtml.replace(
       '<link rel="icon" href="https://ofajs.com/publics/logo.svg" />',
-      `<link rel=\"icon\" href=\"${pathPrefix}/img/${logoFileName}\" />`,
+      `<link rel=\"icon\" href=\"${pathPrefix}/img/${logoImageFileName}\" />`,
     );
   }
 
-  await outputHandle.write(
+  await outputFileHandle.write(
     jsBeautify.html(finalHtml, {
       indent_size: 2,
       indent_char: " ",
@@ -326,7 +334,7 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
   const templateBasePath = `${getBasePath()}template/default`;
   const cssBasePath = `${getBasePath()}css`;
 
-  const staticFiles = [
+  const staticFileList = [
     {
       name: "palette.css",
       path: `${cssBasePath}/palette.css`,
@@ -351,37 +359,39 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
 
   if (logoImgName) {
     // 拷贝logo图片到img目录
-    staticFiles.push({
+    staticFileList.push({
       name: logoImgName,
       path: logoPath,
       outputPath: "img/" + logoImgName,
     });
   }
 
-  const _files = await fetch(`${templateBasePath}/_files.json`).then((e) =>
-    e.json(),
+  const templateFileList = await fetch(`${templateBasePath}/_files.json`).then(
+    (response) => response.json(),
   );
 
-  _files.forEach((path) => {
-    if (path.startsWith("/gh/") || path.startsWith("/nos/")) {
-      staticFiles.push({
-        name: path.split("/").pop(),
-        path,
-        outputPath: path.replace(/^\//, ""),
+  templateFileList.forEach((filePath) => {
+    if (filePath.startsWith("/gh/") || filePath.startsWith("/nos/")) {
+      staticFileList.push({
+        name: filePath.split("/").pop(),
+        path: filePath,
+        outputPath: filePath.replace(/^\//, ""),
       });
       return;
     }
 
-    staticFiles.push({
-      name: path.split("/").pop(),
-      path: `${templateBasePath}/${path}`,
-      outputPath: path,
+    staticFileList.push({
+      name: filePath.split("/").pop(),
+      path: `${templateBasePath}/${filePath}`,
+      outputPath: filePath,
     });
   });
 
   await Promise.all(
-    staticFiles.map(async ({ name, path, outputPath }) => {
-      const fileContent = await fetch(path).then((e) => e.text());
+    staticFileList.map(async ({ name, path: filePath, outputPath }) => {
+      const fileContent = await fetch(filePath).then((response) =>
+        response.text(),
+      );
       const fileHandle = await websiteHandle.get(outputPath || name, {
         create: "file",
       });
@@ -389,7 +399,7 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
     }),
   );
 
-  indexHTML = await fetch(`${templateBasePath}/index.html`).then((e) =>
-    e.text(),
+  indexHTML = await fetch(`${templateBasePath}/index.html`).then((response) =>
+    response.text(),
   );
 };
