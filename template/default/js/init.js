@@ -87,6 +87,40 @@ export const init = async (page, query) => {
         target.ele.scrollIntoView({ behavior: "smooth" });
         target.classList.add("focus-index");
       }
+      if (query.search) {
+        const searchText = query.search.trim();
+        if (searchText && target.ele) {
+          const escapedText = searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const regex = new RegExp(`(${escapedText})`, "gi");
+
+          const walker = document.createTreeWalker(
+            target.ele,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false,
+          );
+
+          const textNodes = [];
+          let node;
+          while ((node = walker.nextNode())) {
+            if (node.textContent.trim()) {
+              textNodes.push(node);
+            }
+          }
+
+          textNodes.forEach((textNode) => {
+            if (regex.test(textNode.textContent)) {
+              const span = document.createElement("span");
+              span.className = "search-highlight";
+              span.innerHTML = textNode.textContent.replace(
+                regex,
+                '<mark class="search-highlight-mark">$1</mark>',
+              );
+              textNode.parentNode.replaceChild(span, textNode);
+            }
+          });
+        }
+      }
     }
   }
 };
