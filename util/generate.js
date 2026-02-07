@@ -357,13 +357,15 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
     });
   });
 
-  for (const { name, path, outputPath } of staticFiles) {
-    const fileContent = await fetch(path).then((e) => e.text());
-    const fileHandle = await websiteHandle.get(outputPath || name, {
-      create: "file",
-    });
-    await fileHandle.write(fileContent);
-  }
+  await Promise.all(
+    staticFiles.map(async ({ name, path, outputPath }) => {
+      const fileContent = await fetch(path).then((e) => e.text());
+      const fileHandle = await websiteHandle.get(outputPath || name, {
+        create: "file",
+      });
+      await fileHandle.write(fileContent);
+    }),
+  );
 
   indexHTML = await fetch(`${templateBasePath}/index.html`).then((e) =>
     e.text(),

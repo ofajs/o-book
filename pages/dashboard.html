@@ -32,6 +32,19 @@
     .hide {
       display: none !important;
     }
+
+    .rotate-anime {
+      animation: rotate 1s linear infinite;
+    }
+
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
   </style>
   <div class="container">
     <div style="width: 100%; display: flex; align-items: center">
@@ -42,7 +55,11 @@
         style="margin-left: 8px"
         attr:disabled="refreshing"
       >
-        <n-icon icon="material-symbols:refresh" slot="prefix"></n-icon>
+        <n-icon
+          icon="material-symbols:refresh"
+          slot="prefix"
+          class:rotate-anime="refreshing"
+        ></n-icon>
         重新生成
       </p-button>
       <span
@@ -135,7 +152,7 @@
             // 从模板复制文件到
             toast({
               color: "success",
-              content: "刷新完成",
+              content: "重新生成完毕",
             });
           },
           async clickHeaderItem(url) {
@@ -180,7 +197,7 @@
 
             this.clickHeaderItem(this.header[0].url);
 
-            this._cancels = initGenerator({
+            this._cancels = await initGenerator({
               websiteConfig: config,
               topHandle: this._topHandle,
               websiteHandle: await this._topHandle.get("website", {
