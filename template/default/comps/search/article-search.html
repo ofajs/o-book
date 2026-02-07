@@ -167,6 +167,40 @@
             </locale-text>
           </div>
         </o-else-if>
+        <o-else-if :value="historyList.length && !searchValue">
+          <div>
+            <h5 style="font-size: 14px; padding: 16px 0 8px; margin: 0">
+              <n-icon icon="material-symbols:history"></n-icon>
+              搜索历史
+            </h5>
+            <p-list>
+              <o-fill :value="historyList">
+                <p-list-item button on:click="$host.clickItem($data)">
+                  <n-icon
+                    icon="material-symbols:search-rounded"
+                    slot="prefix"
+                  ></n-icon>
+                  {{ $data.search }}
+                  <div secondary>{{$data.aroundText}}</div>
+                  <p-button
+                    variant="text"
+                    color="error"
+                    size="small"
+                    icon
+                    slot="suffix"
+                    style="z-index: 3"
+                    on:click="$host.removeSearchHistoryItem($index,$event)"
+                  >
+                    <n-icon
+                      icon="material-symbols:delete"
+                      style="margin-right: 0"
+                    ></n-icon>
+                  </p-button>
+                </p-list-item>
+              </o-fill>
+            </p-list>
+          </div>
+        </o-else-if>
         <o-fill :value="list">
           <div>
             <h5 style="font-size: 14px; padding: 16px 0 8px; margin: 0">
@@ -175,7 +209,7 @@
             </h5>
             <p-list>
               <o-fill :value="$data.result">
-                <p-list-item button on:click="$host.clickItem($data,$index)">
+                <p-list-item button on:click="$host.clickItem($data)">
                   <o-if :value="$data.tag === 'blockquote'" slot="prefix">
                     <div
                       style="
@@ -217,24 +251,36 @@
         data: {
           showDialog: false,
           list: [],
-          historyList: [],
+          historyList: JSON.parse(localStorage.getItem("search_history")) || [],
           searchValue: "",
           loading: false,
         },
         proto: {
-          clickItem(item, index) {
+          removeSearchHistoryItem(index, event) {
+            event.stopPropagation();
+            this.historyList.splice(index, 1);
+            // 记录搜索历史
+            localStorage.setItem(
+              "search_history",
+              JSON.stringify(this.historyList),
+            );
+          },
+          clickItem(item) {
             const prefixUrl = this.app.current.src.split(`/${lang}/`)[0];
-            const url = `${prefixUrl}/${lang}/${item.url}?index=${item.lineIndex}&search=${this.searchValue}`;
+            const url = `${prefixUrl}/${lang}/${item.url}?index=${item.lineIndex}&search=${item.search || this.searchValue}`;
             this.app.goto(url);
             this.showDialog = false;
+
+            this.historyList.push({
+              search: this.searchValue,
+              ...item,
+            });
 
             // 记录搜索历史
             localStorage.setItem(
               "search_history",
               JSON.stringify(this.historyList),
             );
-
-            this.historyList.push(item);
           },
           changeSearch() {
             this.loading = true;
