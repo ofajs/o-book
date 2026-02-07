@@ -1,5 +1,8 @@
 <template component>
   <l-m src="/nos/locale-text/locale-text.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
+  <!-- <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m> -->
   <style>
     :host {
       display: block;
@@ -13,8 +16,8 @@
       border-radius: 21px;
       user-select: none;
       /* border: 1px solid var(--md-sys-color-primary); */
-      color: var(--md-sys-color-primary);
-      background-color: var(--md-sys-color-on-primary);
+      color: var(--md-sys-color-normal);
+      background-color: var(--md-sys-color-on-normal);
       font-size: 12px;
       cursor: pointer;
       transition: all 0.1s ease-in-out;
@@ -37,7 +40,7 @@
       }
     }
   </style>
-  <div class="search-container">
+  <div class="search-container" on:click="showDialog = true">
     <n-icon
       icon="material-symbols:search-rounded"
       style="margin-left: 10px; font-size: 20px; display: block"
@@ -47,17 +50,53 @@
       <span lang="en"> Search </span>
     </locale-text>
   </div>
-  <p-button class="search-btn" icon variant="text" style="margin-left: 8px">
+  <p-button
+    class="search-btn"
+    icon
+    variant="text"
+    on:click="showDialog = true"
+    style="margin-left: 8px"
+  >
     <n-icon
       icon="material-symbols:search-rounded"
       style="font-size: 22px"
     ></n-icon>
   </p-button>
+
+  <style>
+    .dialog-container {
+      width: 80vw;
+      max-width: 600px;
+      height: 80vh;
+    }
+
+    @media screen and (max-width: 540px) {
+      .dialog-container {
+        width: 100%;
+      }
+    }
+  </style>
+
+  <p-dialog :open="showDialog" on:click-mask="showDialog = false">
+    <div class="dialog-container">
+      <p-input placeholder="Search docs" autofocus>
+        <n-icon
+          icon="material-symbols:search-rounded"
+          style="font-size: 22px"
+          slot="prefix"
+        ></n-icon>
+      </p-input>
+    </div>
+  </p-dialog>
   <script>
     export default async ({ load, url: searchUrl }) => {
       return {
         tag: "article-search",
-        data: {},
+        data: {
+          showDialog: false,
+          list: [],
+          historyList: [],
+        },
         proto: {},
       };
     };
