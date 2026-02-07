@@ -89,6 +89,27 @@
         margin-right: 8px;
       }
     }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border-top: 2px solid var(--md-sys-color-primary, #3498db);
+      border-radius: 50%;
+      animation: spin 0.5s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hide {
+      display: none !important;
+    }
   </style>
 
   <p-dialog :open="showDialog" on:click-mask="showDialog = false">
@@ -103,9 +124,34 @@
           icon="material-symbols:search-rounded"
           style="font-size: 22px"
           slot="prefix"
+          class:hide="loading"
         ></n-icon>
+        <div
+          slot="prefix"
+          class:hide="!loading"
+          style="
+            display: flex;
+            width: 22px;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          <div class="spinner"></div>
+        </div>
       </p-input>
       <div>
+        <o-if :value="!list.length && loading">
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 200px;
+            "
+          >
+            <div class="spinner"></div>
+          </div>
+        </o-if>
         <o-fill :value="list">
           <div>
             <h5 style="font-size: 14px; padding: 16px 0 8px; margin: 0">
@@ -150,6 +196,12 @@
             this._search_timer = setTimeout(async () => {
               // 获取db文件
               const val = this.searchValue.trim();
+
+              if (!val) {
+                this.list = [];
+                this.loading = false;
+                return;
+              }
               const currentPageSrc = this.app.current.src;
               const prefixUrl = currentPageSrc.split(`/${lang}/`)[0];
               const dbUrl = `${prefixUrl}/${lang}/db.json`;
@@ -171,10 +223,18 @@
                       // 获取那个附近的文本
                       const startIndex = line.indexOf(val);
                       const endIndex = startIndex + val.length;
-                      const aroundText = line.slice(
+
+                      let aroundText = line.slice(
                         endIndex - 20 < 0 ? 0 : endIndex - 20,
                         endIndex + 20,
                       );
+
+                      if (endIndex - 20 > 0) {
+                        aroundText = "..." + aroundText;
+                      }
+                      if (endIndex + 20 < line.length) {
+                        aroundText += "...";
+                      }
 
                       result.push({
                         lineIndex,
