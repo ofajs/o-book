@@ -152,6 +152,21 @@
             <div class="spinner"></div>
           </div>
         </o-if>
+        <o-else-if :value="!list.length && !loading && searchValue">
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 200px;
+            "
+          >
+            <locale-text>
+              <span lang="cn"> 暂无搜索结果 </span>
+              <span lang="en"> No search results </span>
+            </locale-text>
+          </div>
+        </o-else-if>
         <o-fill :value="list">
           <div>
             <h5 style="font-size: 14px; padding: 16px 0 8px; margin: 0">
@@ -160,8 +175,13 @@
             </h5>
             <p-list>
               <o-fill :value="$data.result">
-                <p-list-item button on:click="$host.clickItem($data)">
-                  <n-icon icon="uim:paragraph" slot="prefix"></n-icon>
+                <p-list-item button on:click="$host.clickItem($data,$index)">
+                  <div
+                    slot="prefix"
+                    style="width: 20px; font-weight: bold; text-align: center"
+                  >
+                    {{ $data.tag }}
+                  </div>
                   <div>{{ $data.aroundText }}</div>
                 </p-list-item>
               </o-fill>
@@ -186,9 +206,11 @@
           loading: false,
         },
         proto: {
-          clickItem(item) {
-            debugger;
-            // window.open(item.url, "_blank");
+          clickItem(item, index) {
+            const prefixUrl = this.app.current.src.split(`/${lang}/`)[0];
+            const url = `${prefixUrl}/${lang}/${item.url}?index=${item.lineIndex}&search=${this.searchValue}`;
+            this.app.goto(url);
+            this.showDialog = false;
           },
           changeSearch() {
             this.loading = true;
@@ -210,39 +232,39 @@
               const list = [];
 
               for (let pageItem of jsonData) {
-                if (pageItem.content.includes(val)) {
-                  const lines = pageItem.content.split("\n");
+                const result = [];
 
-                  const result = [];
+                // 逐行进行查找
+                let lineIndex = 0;
+                for (let line of pageItem.content) {
+                  lineIndex++;
+                  if (line.c.includes(val)) {
+                    // 获取那个附近的文本
+                    const startIndex = line.c.indexOf(val);
+                    const endIndex = startIndex + val.length;
 
-                  // 逐行进行查找
-                  let lineIndex = 0;
-                  for (let line of lines) {
-                    lineIndex++;
-                    if (line.includes(val)) {
-                      // 获取那个附近的文本
-                      const startIndex = line.indexOf(val);
-                      const endIndex = startIndex + val.length;
+                    let aroundText = line.c.slice(
+                      endIndex - 20 < 0 ? 0 : endIndex - 20,
+                      endIndex + 20,
+                    );
 
-                      let aroundText = line.slice(
-                        endIndex - 20 < 0 ? 0 : endIndex - 20,
-                        endIndex + 20,
-                      );
-
-                      if (endIndex - 20 > 0) {
-                        aroundText = "..." + aroundText;
-                      }
-                      if (endIndex + 20 < line.length) {
-                        aroundText += "...";
-                      }
-
-                      result.push({
-                        lineIndex,
-                        aroundText,
-                      });
+                    if (endIndex - 20 > 0) {
+                      aroundText = "..." + aroundText;
                     }
-                  }
+                    if (endIndex + 20 < line.length) {
+                      aroundText += "...";
+                    }
 
+                    result.push({
+                      tag: line.t,
+                      url: pageItem.url,
+                      lineIndex,
+                      aroundText,
+                    });
+                  }
+                }
+
+                if (result.length) {
                   list.push({
                     title: pageItem.title,
                     url: pageItem.url,

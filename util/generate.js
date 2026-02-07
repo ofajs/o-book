@@ -249,7 +249,7 @@ const formatPage = async ({
   }
 
   let titleText = "";
-  let contentText = "";
+  const paragraphContent = [];
 
   {
     // 获取title内容
@@ -290,7 +290,12 @@ const formatPage = async ({
       });
 
       content = tempEl.html;
-      contentText = tempEl.ele.content.textContent;
+      tempEl.$("article").forEach((p) => {
+        paragraphContent.push({
+          t: p.tag,
+          c: p.text.trim(),
+        });
+      });
     }
   }
 
@@ -332,7 +337,8 @@ const formatPage = async ({
 
   return {
     title: titleText,
-    content: contentText,
+    // content: contentText,
+    content: paragraphContent,
   };
 };
 
