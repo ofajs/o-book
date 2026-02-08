@@ -55,7 +55,26 @@ export const init = async (page, query) => {
   }
 
   {
-    // 复原
+    // 给所有a标签添加icon
+    page.shadow.all("article a").forEach(($el) => {
+      const href = $el.attr("href");
+      const urlObj = new URL(href);
+
+      if (location.host !== urlObj.host) {
+        $el.push(`<n-icon icon="majesticons:open"></n-icon>`);
+      } else {
+        const icon = $(
+          `<n-icon icon="material-symbols:article-rounded"></n-icon>`,
+        );
+
+        // 内部的文章
+        $el.ele.prepend(icon.ele);
+      }
+    });
+  }
+
+  {
+    // 刷新后复原滚动位置
     if (
       sessionStorage.getItem("page_scrollTop") &&
       sessionStorage.getItem("page_scroll_src") === page.src
