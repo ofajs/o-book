@@ -60,7 +60,19 @@
           slot="prefix"
           class:rotate-anime="refreshing"
         ></n-icon>
-        重新生成
+        彻底重新生成
+      </p-button>
+      <p-button
+        on:click="refreshPreview('content')"
+        attr:disabled="refreshing"
+        style="margin-left: 8px"
+      >
+        <n-icon
+          icon="material-symbols:refresh"
+          slot="prefix"
+          class:rotate-anime="refreshing"
+        ></n-icon>
+        只转换内容（更快）
       </p-button>
       <span
         style="
@@ -146,8 +158,8 @@
           clickPreview() {
             window.open(`/${query.path}/website/cn/index.html`, "_blank");
           },
-          async refreshPreview() {
-            await this.init(false);
+          async refreshPreview(type) {
+            await this.init(false, type);
 
             // 从模板复制文件到
             toast({
@@ -172,7 +184,7 @@
               debugger;
             }
           },
-          async init(watchArticle = true) {
+          async init(watchArticle = true, type) {
             this.refreshing = true;
 
             const handle = await get(query.path);
@@ -204,6 +216,7 @@
                 create: "dir",
               }),
               watchArticle,
+              refreshType: type,
             });
 
             this.refreshing = false;

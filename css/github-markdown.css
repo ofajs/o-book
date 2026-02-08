@@ -545,7 +545,7 @@ html.theme-light-mode body {
 .markdown-body table,
 .markdown-body pre,
 .markdown-body details {
-  margin-top: 0;
+  margin-top: 16px;
   margin-bottom: 16px;
 }
 

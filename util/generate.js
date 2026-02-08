@@ -43,37 +43,40 @@ export const initGenerator = async ({
   topHandle,
   websiteHandle,
   watchArticle = false,
+  refreshType,
 }) => {
   const projectConfig = await getData(topHandle);
 
-  await initStaticFile({
-    websiteHandle,
-    logoImgName: projectConfig.logoImg
-      ? projectConfig.logoImg.split("/").pop()
-      : "",
-    logoPath: projectConfig.logoImg
-      ? `/${topHandle.path}/${projectConfig.logoImg.replace("./", "")}`
-      : "",
-  });
+  if (refreshType != "content") {
+    await initStaticFile({
+      websiteHandle,
+      logoImgName: projectConfig.logoImg
+        ? projectConfig.logoImg.split("/").pop()
+        : "",
+      logoPath: projectConfig.logoImg
+        ? `/${topHandle.path}/${projectConfig.logoImg.replace("./", "")}`
+        : "",
+    });
 
-  // 修正 header 的logo路径
-  if (projectConfig.logoImg || projectConfig.logoName) {
-    const headerFileHandle = await websiteHandle.get("header.html");
+    // 修正 header 的logo路径
+    if (projectConfig.logoImg || projectConfig.logoName) {
+      const headerFileHandle = await websiteHandle.get("header.html");
 
-    const headerContent = await headerFileHandle.text();
+      const headerContent = await headerFileHandle.text();
 
-    const fixedHeaderContent = headerContent
-      .replace(
-        `<img class="logo" src="https://ofajs.com/publics/logo.svg" />`,
-        `<img class="logo" src="./img/${projectConfig.logoImg.split("/").pop()}" />`,
-      )
-      .replace(
-        `<div class="logo-text">ofa.js</div>`,
-        `<div class="logo-text">${projectConfig.logoName || ""}</div>`,
-      );
+      const fixedHeaderContent = headerContent
+        .replace(
+          `<img class="logo" src="https://ofajs.com/publics/logo.svg" />`,
+          `<img class="logo" src="./img/${projectConfig.logoImg.split("/").pop()}" />`,
+        )
+        .replace(
+          `<div class="logo-text">ofa.js</div>`,
+          `<div class="logo-text">${projectConfig.logoName || ""}</div>`,
+        );
 
-    // 写回header文件
-    await headerFileHandle.write(fixedHeaderContent);
+      // 写回header文件
+      await headerFileHandle.write(fixedHeaderContent);
+    }
   }
 
   const { languages } = websiteConfig;
