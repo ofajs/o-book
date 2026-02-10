@@ -293,13 +293,15 @@ const formatPage = async ({
       });
 
       content = tempEl.html;
+    }
+
+    tempEl.$("article") &&
       tempEl.$("article").forEach((p) => {
         paragraphContent.push({
           t: p.tag,
           c: p.text.trim(),
         });
       });
-    }
   }
 
   let finalHtml = indexHTML.replace("<!-- main content -->", content);
