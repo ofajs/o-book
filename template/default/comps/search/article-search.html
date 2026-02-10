@@ -152,7 +152,9 @@
             <div class="spinner"></div>
           </div>
         </o-if>
-        <o-else-if :value="(!list.length && !loading && searchValue) || (!historyList.length && !list.length && !searchValue)">
+        <o-else-if
+          :value="(!list.length && !loading && searchValue) || (!historyList.length && !list.length && !searchValue)"
+        >
           <div
             style="
               display: flex;
@@ -295,8 +297,7 @@
           changeSearch() {
             this.loading = true;
             clearTimeout(this._search_timer);
-            this._search_timer = setTimeout(async () => {
-              // 获取db文件
+            this._search_timer = setTimeout(() => {
               const val = this.searchValue.trim();
 
               if (!val) {
@@ -304,78 +305,37 @@
                 this.loading = false;
                 return;
               }
+
               const currentPageSrc = this.app.current.src;
               const prefixUrl = currentPageSrc.split(`/${lang}/`)[0];
               const dbUrl = `${prefixUrl}/${lang}/db.json`;
-              const jsonData = await fetch(dbUrl).then((res) => res.json());
 
-              const list = [];
-
-              for (let pageItem of jsonData) {
-                const result = [];
-
-                // 逐行进行查找
-                let lineIndex = 0;
-                for (let line of pageItem.content) {
-                  lineIndex++;
-                  if (line.c.toLowerCase().includes(val.toLowerCase())) {
-                    // 获取那个附近的文本
-                    const startIndex = line.c
-                      .toLowerCase()
-                      .indexOf(val.toLowerCase());
-                    const endIndex = startIndex + val.length;
-
-                    let aroundText = line.c.slice(
-                      endIndex - 20 < 0 ? 0 : endIndex - 20,
-                      endIndex + 20,
-                    );
-
-                    if (endIndex - 20 > 0) {
-                      aroundText = "..." + aroundText;
-                    }
-                    if (endIndex + 20 < line.length) {
-                      aroundText += "...";
-                    }
-
-                    result.push({
-                      tag: line.t,
-                      url: pageItem.url,
-                      lineIndex,
-                      aroundText,
-                    });
-                  }
-                }
-
-                if (result.length) {
-                  list.push({
-                    title: pageItem.title,
-                    url: pageItem.url,
-                    result,
-                  });
-                }
-              }
-
-              this.loading = false;
-
-              console.log(list);
-              this.list = list;
+              this._worker.postMessage({
+                type: "search",
+                dbUrl,
+                searchValue: val,
+                lang,
+              });
             }, 300);
           },
           init() {
-            // const workerUrl = new URL("./search-worker.js", searchUrl);
-            // const worker = new Worker(workerUrl, {
-            //   type: "module",
-            // });
-            // worker.postMessage({
-            //   type: "init",
-            // });
-            // worker.onmessage = (e) => {
-            //   console.log(e);
-            // };
+            const workerUrl = new URL("./search-worker.js", searchUrl);
+            this._worker = new Worker(workerUrl, {
+              type: "module",
+            });
           },
         },
         attached() {
           this.init();
+          this._worker.onmessage = (e) => {
+            if (e.data.type === "searchResult") {
+              this.loading = false;
+              this.list = e.data.data;
+            }
+          };
+        },
+        detached() {
+          this._worker.terminate();
         },
       };
     };
