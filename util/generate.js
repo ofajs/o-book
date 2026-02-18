@@ -96,6 +96,12 @@ export const initGenerator = async ({
         articleHandle.observe(async (event) => {
           const relativePath = event.path.replace(articleHandle.path + "/", "");
 
+          // 如果是_config.yaml文件，则更新文章配置
+          if (relativePath.endsWith("_config.yaml")) {
+            await saveArticleConfig(articleHandle, websiteLangHandle);
+            return;
+          }
+
           if (
             !(relativePath.endsWith(".md") || relativePath.endsWith(".html"))
           ) {
