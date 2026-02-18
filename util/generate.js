@@ -121,47 +121,7 @@ export const initGenerator = async ({
       );
     }
 
-    const siteConfig = await getData(articleHandle);
-
-    for (const headerItem of siteConfig.header) {
-      const headerItemData = await getData(articleHandle, headerItem.url);
-
-      headerItem.data = headerItemData;
-
-      const prefix = headerItem.url
-        .replace(/^\.\//, "")
-        .replace("_config.yaml", "");
-
-      const fixContentUrl = (data) => {
-        if (data.url) {
-          data.url = data.url.replace(/^\.\//, "").replace(/\.md/, ".html");
-        }
-        if (data.content) {
-          data.content.forEach(fixContentUrl);
-        }
-      };
-
-      fixContentUrl({ content: headerItemData });
-
-      const flattenedItems = headerItemData.flatMap((item) => {
-        return item.content || [item];
-      });
-
-      const firstNavItem = flattenedItems[0];
-
-      headerItem.firstUrl = prefix + firstNavItem.url;
-
-      headerItem.prefix = prefix;
-    }
-
-    const configFileHandle = await websiteLangHandle.get(
-      "article-config.json",
-      {
-        create: "file",
-      },
-    );
-
-    await configFileHandle.write(JSON.stringify(siteConfig));
+    await saveArticleConfig(articleHandle, websiteLangHandle);
 
     const allArticleData = await traverseFiles({
       sourceDirHandle: articleHandle,
@@ -421,4 +381,45 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
   indexHTML = await fetch(`${templateBasePath}/index.html`).then((response) =>
     response.text(),
   );
+};
+
+const saveArticleConfig = async (articleHandle, websiteLangHandle) => {
+  const siteConfig = await getData(articleHandle);
+
+  for (const headerItem of siteConfig.header) {
+    const headerItemData = await getData(articleHandle, headerItem.url);
+
+    headerItem.data = headerItemData;
+
+    const prefix = headerItem.url
+      .replace(/^\.\//, "")
+      .replace("_config.yaml", "");
+
+    const fixContentUrl = (data) => {
+      if (data.url) {
+        data.url = data.url.replace(/^\.\//, "").replace(/\.md/, ".html");
+      }
+      if (data.content) {
+        data.content.forEach(fixContentUrl);
+      }
+    };
+
+    fixContentUrl({ content: headerItemData });
+
+    const flattenedItems = headerItemData.flatMap((item) => {
+      return item.content || [item];
+    });
+
+    const firstNavItem = flattenedItems[0];
+
+    headerItem.firstUrl = prefix + firstNavItem.url;
+
+    headerItem.prefix = prefix;
+  }
+
+  const configFileHandle = await websiteLangHandle.get("article-config.json", {
+    create: "file",
+  });
+
+  await configFileHandle.write(JSON.stringify(siteConfig));
 };
