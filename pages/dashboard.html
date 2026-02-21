@@ -159,7 +159,7 @@
             window.open(`/${query.path}/website/cn/index.html`, "_blank");
           },
           async refreshPreview(type) {
-            await this.init(false, type);
+            await this.init({ watchArticle: false, type });
 
             // 从模板复制文件到
             toast({
@@ -184,12 +184,10 @@
               debugger;
             }
           },
-          async init(watchArticle = true, type) {
+          async init({ watchArticle = true, type }) {
+            const handle = this._topHandle;
+
             this.refreshing = true;
-
-            const handle = await get(query.path);
-
-            this._topHandle = handle;
 
             // 读取配置文件
             const config = await getData(handle);
@@ -222,7 +220,10 @@
             this.refreshing = false;
           },
         },
-        attached() {
+        async attached() {
+          const handle = await get(query.path);
+          this._topHandle = handle;
+
           this.emit("set-active-id", {
             composed: true,
             data: {
@@ -230,7 +231,7 @@
             },
           });
 
-          this.init();
+          this.init({ watchArticle: true, type: "all" });
         },
         detached() {
           this._cancels && this._cancels.forEach((cancel) => cancel());
