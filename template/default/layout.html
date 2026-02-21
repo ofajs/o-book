@@ -32,8 +32,7 @@
     .left-side {
       position: absolute;
       left: 0;
-      margin-top: 16px;
-      height: calc(100% - 16px);
+      height: 100%;
       overflow: auto;
       width: 240px;
       padding-right: 8px;
@@ -54,6 +53,8 @@
 
     .left-side-inner {
       width: 240px;
+      height: 100%;
+      overflow: auto;
     }
 
     .hide-left {
@@ -84,6 +85,7 @@
       .left-side {
         width: 0;
         opacity: 0;
+        display: none;
       }
 
       .mobile-menu-button {
@@ -153,7 +155,7 @@
       on:click="showMobileMenu = false"
     >
       <div class="mask-content" on:click="$event.stopPropagation()">
-        <div style="padding: 8px 8px 0 0">
+        <div style="padding: 8px 8px 0 0; height: 100%; overflow: auto">
           <header-menu></header-menu>
           <hr />
           <article-menu></article-menu>
@@ -163,7 +165,9 @@
     <div class="main">
       <div class="left-side" class:hide-left="hideLeft">
         <div class="left-side-inner">
+          <div style="height: 16px"></div>
           <article-menu on:hide-left="hideLeft = $event.data"></article-menu>
+          <div style="height: 16px"></div>
         </div>
       </div>
       <div class="article">
