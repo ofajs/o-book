@@ -45,44 +45,63 @@
         transform: rotate(360deg);
       }
     }
+
+    .article-item {
+      color: var(--md-sys-color-primary);
+    }
+
+    n-icon[slot="prefix"] {
+      margin-right: 4px;
+      font-size: 16px;
+    }
+
+    .toolbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .toolbar-btn {
+      margin-left: 8px;
+    }
+
+    .toolbar-label {
+      color: var(--md-sys-color-normal);
+      font-size: 13px;
+      margin-left: 8px;
+    }
   </style>
   <div class="container">
-    <div style="width: 100%; display: flex; align-items: center">
+    <div class="toolbar">
       <p-button on:click="clickPreview"> 预览网页 </p-button>
       <p-button
-        on:click="refreshPreview"
+        class="toolbar-btn"
+        on:click="refreshPreview('all')"
         variant="outlined"
-        style="margin-left: 8px"
         attr:disabled="refreshing"
       >
         <n-icon
+          class="rotate-anime"
+          class:rotate-anime="refreshing"
           icon="material-symbols:refresh"
           slot="prefix"
-          class:rotate-anime="refreshing"
         ></n-icon>
         彻底重新生成
       </p-button>
       <p-button
+        class="toolbar-btn"
         on:click="refreshPreview('content')"
         attr:disabled="refreshing"
-        style="margin-left: 8px"
       >
         <n-icon
+          class="rotate-anime"
+          class:rotate-anime="refreshing"
           icon="material-symbols:refresh"
           slot="prefix"
-          class:rotate-anime="refreshing"
         ></n-icon>
         只转换内容（更快）
       </p-button>
-      <span
-        style="
-          color: var(--md-sys-color-normal);
-          font-size: 13px;
-          margin-left: 8px;
-        "
-      >
-        写作语言 </span
-      >: {{writingLang}}
+      <span class="toolbar-label">写作语言</span>: {{writingLang}}
     </div>
     <div class="list-content">
       <h2>顶部导航</h2>
@@ -105,17 +124,6 @@
         <o-fill :value="documentList" name="document-item"> </o-fill>
       </p-list>
     </div>
-
-    <style>
-      .article-item {
-        color: var(--md-sys-color-primary);
-      }
-
-      n-icon[slot="prefix"] {
-        margin-right: 4px;
-        font-size: 16px;
-      }
-    </style>
 
     <template name="document-item">
       <p-list-item collapse-childs="open" attr:button="$data.url">
@@ -146,12 +154,12 @@
 
       return {
         data: {
-          header: [], // 导航内容
-          documentList: [], // 目标导航下的文档列表
+          header: [],
+          documentList: [],
           activeHeader: "",
-          _topHandle: null, // 顶部目录句柄
-          _documentHandle: null, // 主语言文档所在的目录句柄
-          writingLang: "", // 主语言
+          _topHandle: null,
+          _documentHandle: null,
+          writingLang: "",
           refreshing: false,
         },
         proto: {
@@ -160,8 +168,6 @@
           },
           async refreshPreview(type) {
             await this.init({ watchArticle: false, type });
-
-            // 从模板复制文件到
             toast({
               color: "success",
               content: "重新生成完毕",
@@ -171,41 +177,36 @@
             this.activeHeader = url;
             const targetItem = this.header.find((item) => item.url === url);
 
+            if (!targetItem) {
+              this.documentList = [];
+              return;
+            }
+
             const documentList = await getData(
               this._documentHandle,
               `${targetItem.url}`,
             );
 
-            if (Array.isArray(documentList)) {
-              console.log(documentList);
-              this.documentList = documentList;
-            } else {
-              this.documentList = [];
-              debugger;
-            }
+            this.documentList = Array.isArray(documentList) ? documentList : [];
           },
-          async init({ watchArticle = true, type }) {
-            const handle = this._topHandle;
-
+          async init({ watchArticle = true, type = "all" }) {
             this.refreshing = true;
 
-            // 读取配置文件
-            const config = await getData(handle);
+            const config = await getData(this._topHandle);
             const writingLang = config.writingLang || "en";
 
             this.writingLang = writingLang;
 
-            // 读取主语言文件
             const writingLangConfig = await getData(
-              handle,
+              this._topHandle,
               `${writingLang}/_config.yaml`,
             );
 
-            this._documentHandle = await handle.get(writingLang);
+            this._documentHandle = await this._topHandle.get(writingLang);
 
             this.header = writingLangConfig.header || [];
 
-            this.clickHeaderItem(this.header[0].url);
+            this.clickHeaderItem(this.header[0]?.url);
 
             this._cancels = await initGenerator({
               websiteConfig: config,
@@ -221,8 +222,7 @@
           },
         },
         async attached() {
-          const handle = await get(query.path);
-          this._topHandle = handle;
+          this._topHandle = await get(query.path);
 
           this.emit("set-active-id", {
             composed: true,
@@ -231,10 +231,10 @@
             },
           });
 
-          this.init({ watchArticle: true, type: "all" });
+          this.init({ watchArticle: true });
         },
         detached() {
-          this._cancels && this._cancels.forEach((cancel) => cancel());
+          this._cancels?.forEach((cancel) => cancel());
         },
       };
     };
