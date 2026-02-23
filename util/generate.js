@@ -303,6 +303,7 @@ const formatPage = async ({
       indent_char: " ",
       eol: "\n",
       preserve_newlines: false,
+      unformatted: ["code"],
     }),
   );
 
