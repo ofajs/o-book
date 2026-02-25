@@ -75,6 +75,15 @@
           list: [],
           activeLeftUrl: "",
         },
+        watch: {
+          activeLeftUrl() {
+            clearTimeout(this._leftScrollTimer);
+            this._leftScrollTimer = setTimeout(() => {
+              const targetEl = this.shadow.$("[active-item]");
+              targetEl && scrollIntoViewIfNeeded(targetEl.ele);
+            }, 800);
+          },
+        },
         proto: {
           async refreshList() {
             const { header } = await load(`../${lang}/article-config.json`);
@@ -149,5 +158,37 @@
         },
       };
     };
+
+    function isInViewport(element, partial = true) {
+      const rect = element.getBoundingClientRect();
+      const viewHeight =
+        window.innerHeight || document.documentElement.clientHeight;
+      const viewWidth =
+        window.innerWidth || document.documentElement.clientWidth;
+
+      const fullyVisible =
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= viewHeight &&
+        rect.right <= viewWidth;
+
+      const partiallyVisible =
+        rect.top < viewHeight &&
+        rect.bottom > 0 &&
+        rect.left < viewWidth &&
+        rect.right > 0;
+
+      return partial ? partiallyVisible : fullyVisible;
+    }
+
+    function scrollIntoViewIfNeeded(element, options = {}) {
+      if (!isInViewport(element, options.partial)) {
+        element.scrollIntoView({
+          behavior: options.behavior || "smooth",
+          block: options.block || "center",
+          inline: options.inline || "nearest",
+        });
+      }
+    }
   </script>
 </template>
