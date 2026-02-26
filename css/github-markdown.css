@@ -172,6 +172,7 @@ html.theme-light-mode body {
 .markdown-body b,
 .markdown-body strong {
   font-weight: var(--base-text-weight-semibold, 600);
+  color: var(--md-sys-color-primary);
 }
 
 .markdown-body dfn {
