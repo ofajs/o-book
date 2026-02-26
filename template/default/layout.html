@@ -9,6 +9,18 @@
       --max-container-width: 900px;
     }
 
+    @media screen and (min-width: 2000px) {
+      :host {
+        --max-container-width: 1200px;
+      }
+    }
+
+    @media screen and (max-width: 1700px) {
+      :host {
+        --max-container-width: 1000px;
+      }
+    }
+
     .container {
       display: flex;
       flex-direction: column;
