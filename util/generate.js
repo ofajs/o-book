@@ -74,8 +74,14 @@ export const initGenerator = async ({
           `<div class="logo-text">${projectConfig.logoName || ""}</div>`,
         );
 
-      // 写回header文件
-      await headerFileHandle.write(fixedHeaderContent);
+      {
+        const currentHeaderContent = await headerFileHandle.text();
+
+        // 写回header文件
+        if (currentHeaderContent !== fixedHeaderContent) {
+          await headerFileHandle.write(fixedHeaderContent);
+        }
+      }
     }
   }
 
@@ -140,7 +146,13 @@ export const initGenerator = async ({
       create: "file",
     });
 
-    await dbFileHandle.write(JSON.stringify(allArticleData));
+    {
+      const currentContent = await dbFileHandle.text();
+      const dbContent = JSON.stringify(allArticleData);
+      if (currentContent !== dbContent) {
+        await dbFileHandle.write(dbContent);
+      }
+    }
   }
 
   return cancels;
@@ -207,7 +219,13 @@ const formatPage = async ({
   // 产看是否ofa.js的组件或页面
   if (content.trim().startsWith("<template ")) {
     // 不做转换，直接输出
-    await outputFileHandle.write(content);
+    const currentContent = await outputFileHandle.text();
+
+    // 内容未改变，不写回文件
+    if (currentContent !== content) {
+      await outputFileHandle.write(content);
+    }
+
     return;
   }
 
@@ -297,15 +315,20 @@ const formatPage = async ({
     );
   }
 
-  await outputFileHandle.write(
-    jsBeautify.html(finalHtml, {
-      indent_size: 2,
-      indent_char: " ",
-      eol: "\n",
-      preserve_newlines: false,
-      unformatted: ["code"],
-    }),
-  );
+  finalHtml = jsBeautify.html(finalHtml, {
+    indent_size: 2,
+    indent_char: " ",
+    eol: "\n",
+    preserve_newlines: false,
+    unformatted: ["code"],
+  });
+
+  {
+    const content = await outputFileHandle.text();
+    if (content !== finalHtml) {
+      await outputFileHandle.write(finalHtml);
+    }
+  }
 
   return {
     title: titleText,
@@ -381,7 +404,13 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
       const fileHandle = await websiteHandle.get(outputPath || name, {
         create: "file",
       });
-      await fileHandle.write(fileContent);
+
+      {
+        const currentContent = await fileHandle.text();
+        if (currentContent !== fileContent) {
+          await fileHandle.write(fileContent);
+        }
+      }
     }),
   );
 
@@ -428,5 +457,11 @@ const saveArticleConfig = async (articleHandle, websiteLangHandle) => {
     create: "file",
   });
 
-  await configFileHandle.write(JSON.stringify(siteConfig));
+  {
+    const currentContent = await configFileHandle.text();
+    const configContent = JSON.stringify(siteConfig);
+    if (currentContent !== configContent) {
+      await configFileHandle.write(configContent);
+    }
+  }
 };
