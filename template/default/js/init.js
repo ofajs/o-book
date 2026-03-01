@@ -143,6 +143,49 @@ export const init = async (page, query) => {
       }
     }
   }
+
+  {
+    // 添加地址引用的标识
+    const markdownBody = page.shadow.$(".markdown-body");
+
+    const markBtn =
+      $(`<p-button icon variant="text" size="small" class="octicon-link-mark">
+        <n-icon icon="material-symbols:link"></n-icon>
+      </p-button>`);
+
+    if (markdownBody) {
+      markdownBody.push(markBtn);
+    }
+
+    markBtn.on("click", () => {
+      markBtn.html = `<n-icon icon="mdi:success"></n-icon>`;
+      markBtn.attr("variant", "contained");
+      markBtn.attr("color", "success");
+
+      setTimeout(() => {
+        markBtn.html = `<n-icon icon="material-symbols:link"></n-icon>`;
+        markBtn.attr("variant", "text");
+        markBtn.attr("color", null);
+      }, 1000);
+    });
+
+    const bodyChilds = markdownBody.slice();
+
+    markdownBody.on("mouseover", (e) => {
+      let isChild = false;
+
+      for (const child of bodyChilds) {
+        if (child.ele === e.target) {
+          isChild = true;
+          break;
+        }
+      }
+
+      if (isChild) {
+        markBtn.style.top = e.target.offsetTop + "px";
+      }
+    });
+  }
 };
 
 export const revoke = async (page) => {

@@ -1,5 +1,6 @@
 article,
 article.markdown-body {
+  position: relative;
   max-width: var(--max-container-width, 1200px);
   margin: 0 auto;
 }
@@ -53,4 +54,10 @@ article a {
 o-playground {
   display: block !important;
   min-height: var(--editor-height, 200px);
+}
+
+.octicon-link-mark {
+  position: absolute;
+  left: -36px;
+  cursor: pointer;
 }
