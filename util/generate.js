@@ -270,7 +270,8 @@ const formatPage = async ({
           return;
         }
 
-        href = href.replace(/\.md$/, ".html");
+        // 修正带参数的情况
+        href = href.replace(/\.md(\?.*)?$/, ".html$1");
 
         aEl.attr("href", href);
         aEl.attr("olink", "");
