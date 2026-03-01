@@ -158,19 +158,22 @@ export const init = async (page, query) => {
     }
 
     let hoverIndex = 0;
+    let isSuccess = false;
 
     markBtn.on("click", () => {
       markBtn.html = `<n-icon icon="mdi:success"></n-icon>`;
       markBtn.attr("variant", "contained");
       markBtn.attr("color", "success");
+      isSuccess = true;
 
-      let finalUrl = location.href;
+      let finalUrl = new URL(location.href);
 
-      finalUrl += `?L=${hoverIndex + 1}`;
+      finalUrl.searchParams.set("L", hoverIndex + 1);
 
-      navigator.clipboard.writeText(finalUrl);
+      navigator.clipboard.writeText(finalUrl.toString());
 
       setTimeout(() => {
+        isSuccess = false;
         markBtn.html = `<n-icon icon="material-symbols:link"></n-icon>`;
         markBtn.attr("variant", "text");
         markBtn.attr("color", null);
@@ -181,6 +184,9 @@ export const init = async (page, query) => {
 
     markdownBody.on("mouseover", (e) => {
       let isChild = false;
+      if(isSuccess){
+        return;
+      }
 
       for (const child of bodyChilds) {
         if (child.ele === e.target) {
