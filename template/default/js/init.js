@@ -99,9 +99,10 @@ export const init = async (page, query) => {
   }
 
   {
+    const line = query.index || query.L;
     // 锚点修正
-    if (query.index) {
-      const target = page.shadow.$("article")[query.index - 1];
+    if (line) {
+      const target = page.shadow.$("article")[line - 1];
       if (target) {
         target.ele.scrollIntoView({ behavior: "smooth" });
         target.classList.add("focus-index");

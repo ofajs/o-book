@@ -4,6 +4,7 @@
   "js/app-config.js",
   "js/util.js",
   "js/init.js",
+  "css/page.css",
   "comps/center-block.html",
   "comps/article-menu.html",
   "comps/search/article-search.html",
