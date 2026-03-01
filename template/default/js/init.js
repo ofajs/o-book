@@ -157,10 +157,18 @@ export const init = async (page, query) => {
       markdownBody.push(markBtn);
     }
 
+    let hoverIndex = 0;
+
     markBtn.on("click", () => {
       markBtn.html = `<n-icon icon="mdi:success"></n-icon>`;
       markBtn.attr("variant", "contained");
       markBtn.attr("color", "success");
+
+      let finalUrl = location.href;
+
+      finalUrl += `?L=${hoverIndex + 1}`;
+
+      navigator.clipboard.writeText(finalUrl);
 
       setTimeout(() => {
         markBtn.html = `<n-icon icon="material-symbols:link"></n-icon>`;
@@ -181,7 +189,13 @@ export const init = async (page, query) => {
         }
       }
 
+      if (markBtn.ele === e.target) {
+        return;
+      }
+
       if (isChild) {
+        hoverIndex = $(e.target).index;
+        console.log("hoverIndex: ", hoverIndex);
         markBtn.style.top = e.target.offsetTop + "px";
       }
     });
