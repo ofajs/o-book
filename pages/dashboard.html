@@ -124,7 +124,7 @@
           display: flex;
           flex-direction: column;
           flex-wrap: wrap;
-          max-height: 80vh;
+          max-height: calc(100vh - 80px);
         }
 
         .navi-list p-list-item {
@@ -183,11 +183,15 @@
             if (!url) {
               return;
             }
+            // 统一去掉前缀 ./ 和后缀 _config.yaml，得到目录名
             const dirName = this.activeHeader
               .replace(/^\.\//, "")
-              .replace(/\/_config.yaml/, "");
+              .replace(/\/_config\.yaml$/, "");
 
+            // 去掉前缀 ./ 和后缀 .md，得到文件名
             const suffixName = url.replace(/^\.\//, "").replace(/\.md$/, "");
+
+            // 拼接并打开预览地址
             window.open(
               `/${query.path}/website/cn/${dirName}/${suffixName}.html`,
               "_blank",
