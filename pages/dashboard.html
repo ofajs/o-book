@@ -138,7 +138,11 @@
     </div>
 
     <template name="document-item">
-      <p-list-item collapse-childs="open" attr:button="$data.url">
+      <p-list-item
+        collapse-childs="open"
+        attr:button="$data.url"
+        on:click="$host.clickDocumentItem($data.url)"
+      >
         <n-icon
           class="article-item"
           class:hide="!$data.url"
@@ -175,6 +179,20 @@
           refreshing: false,
         },
         proto: {
+          clickDocumentItem(url) {
+            if (!url) {
+              return;
+            }
+            const dirName = this.activeHeader
+              .replace(/^\.\//, "")
+              .replace(/\/_config.yaml/, "");
+
+            const suffixName = url.replace(/^\.\//, "").replace(/\.md$/, "");
+            window.open(
+              `/${query.path}/website/cn/${dirName}/${suffixName}.html`,
+              "_blank",
+            );
+          },
           clickPreview() {
             window.open(`/${query.path}/website/cn/index.html`, "_blank");
           },
