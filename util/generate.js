@@ -2,7 +2,7 @@ import { getData } from "./yaml-handle.js";
 import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
 import hljs from "/npm/highlight.js@11.9.0/+esm";
 import jsBeautify from "/npm/js-beautify@1.15.1/+esm";
-import { genRag } from "./gen-rag.js";
+// import { genRag } from "./gen-rag.js";
 
 marked.use({
   renderer: {
@@ -90,7 +90,7 @@ export const initGenerator = async ({
   websiteHandle,
 }) => {
   // 生成 rag 索引文件内容
-  genRag({ topHandle, lang, websiteHandle });
+  // genRag({ topHandle, lang, websiteHandle });
 
   const projectConfig = await getData(topHandle);
 
