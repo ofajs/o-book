@@ -13,7 +13,7 @@
     }
 
     .list-content {
-      width: 240px;
+      min-width: 240px;
       padding: 4px;
     }
 
@@ -119,8 +119,20 @@
       </p-list>
     </div>
     <div class="list-content">
+      <style>
+        .navi-list {
+          display: flex;
+          flex-direction: column;
+          flex-wrap: wrap;
+          max-height: 80vh;
+        }
+
+        .navi-list p-list-item {
+          min-width: 200px;
+        }
+      </style>
       <h2>导航对应列表</h2>
-      <p-list>
+      <p-list class="navi-list">
         <o-fill :value="documentList" name="document-item"> </o-fill>
       </p-list>
     </div>
@@ -209,13 +221,14 @@
             this.clickHeaderItem(this.header[0]?.url);
 
             this._cancels = await initGenerator({
-              websiteConfig: config,
+              // websiteConfig: config,
               topHandle: this._topHandle,
               websiteHandle: await this._topHandle.get("website", {
                 create: "dir",
               }),
               watchArticle,
               refreshType: type,
+              lang: this.writingLang, // 翻译哪个语言的文件夹
             });
 
             this.refreshing = false;

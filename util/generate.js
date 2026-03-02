@@ -39,11 +39,12 @@ export const getBasePath = () => {
 };
 
 export const initGenerator = async ({
-  websiteConfig,
+  // websiteConfig,
   topHandle,
   websiteHandle,
   watchArticle = false,
   refreshType,
+  lang,
 }) => {
   const projectConfig = await getData(topHandle);
 
@@ -85,75 +86,73 @@ export const initGenerator = async ({
     }
   }
 
-  const { languages } = websiteConfig;
+  // const { languages } = websiteConfig;
 
   let cancels = []; // 取消监听函数
 
-  for (const lang of languages) {
-    const websiteLangHandle = await websiteHandle.get(lang, {
-      create: "dir",
-    });
+  // for (const lang of languages) {
+  const websiteLangHandle = await websiteHandle.get(lang, {
+    create: "dir",
+  });
 
-    const articleHandle = await topHandle.get(lang);
+  const articleHandle = await topHandle.get(lang);
 
-    if (watchArticle) {
-      // 监听文章变化，及时生成对应的html文件
-      cancels.push(
-        articleHandle.observe(async (event) => {
-          const relativePath = event.path.replace(articleHandle.path + "/", "");
+  if (watchArticle) {
+    // 监听文章变化，及时生成对应的html文件
+    cancels.push(
+      articleHandle.observe(async (event) => {
+        const relativePath = event.path.replace(articleHandle.path + "/", "");
 
-          // 如果是_config.yaml文件，则更新文章配置
-          if (relativePath.endsWith("_config.yaml")) {
-            await saveArticleConfig(articleHandle, websiteLangHandle);
-            return;
-          }
+        // 如果是_config.yaml文件，则更新文章配置
+        if (relativePath.endsWith("_config.yaml")) {
+          await saveArticleConfig(articleHandle, websiteLangHandle);
+          return;
+        }
 
-          if (
-            !(relativePath.endsWith(".md") || relativePath.endsWith(".html"))
-          ) {
-            // 必须是文章才监听
-            return;
-          }
+        if (!(relativePath.endsWith(".md") || relativePath.endsWith(".html"))) {
+          // 必须是文章才监听
+          return;
+        }
 
-          const sourceFileHandle = await articleHandle.get(relativePath);
-          const targetFileHandle = await websiteLangHandle.get(
-            relativePath.replace(/\.(html|md)$/, ".html"),
-            {
-              create: "file",
-            },
-          );
+        const sourceFileHandle = await articleHandle.get(relativePath);
+        const targetFileHandle = await websiteLangHandle.get(
+          relativePath.replace(/\.(html|md)$/, ".html"),
+          {
+            create: "file",
+          },
+        );
 
-          await formatPage({
-            inputFileHandle: sourceFileHandle,
-            outputFileHandle: targetFileHandle,
-            langRootDirHandle: websiteLangHandle,
-            logoImageFileName: projectConfig.logoImg.split("/").pop(),
-          });
-        }),
-      );
-    }
+        await formatPage({
+          inputFileHandle: sourceFileHandle,
+          outputFileHandle: targetFileHandle,
+          langRootDirHandle: websiteLangHandle,
+          logoImageFileName: projectConfig.logoImg.split("/").pop(),
+        });
+      }),
+    );
+  }
 
-    await saveArticleConfig(articleHandle, websiteLangHandle);
+  await saveArticleConfig(articleHandle, websiteLangHandle);
 
-    const allArticleData = await traverseFiles({
-      sourceDirHandle: articleHandle,
-      targetDirHandle: websiteLangHandle,
-      langRootDirHandle: websiteLangHandle,
-      logoImageFileName: projectConfig.logoImg.split("/").pop(),
-    });
+  const allArticleData = await traverseFiles({
+    sourceDirHandle: articleHandle,
+    targetDirHandle: websiteLangHandle,
+    langRootDirHandle: websiteLangHandle,
+    logoImageFileName: projectConfig.logoImg.split("/").pop(),
+  });
 
-    const dbFileHandle = await websiteLangHandle.get("db.json", {
-      create: "file",
-    });
+  const dbFileHandle = await websiteLangHandle.get("db.json", {
+    create: "file",
+  });
 
-    {
-      const currentContent = await dbFileHandle.text();
-      const dbContent = JSON.stringify(allArticleData);
-      if (currentContent !== dbContent) {
-        await dbFileHandle.write(dbContent);
-      }
+  {
+    const currentContent = await dbFileHandle.text();
+    const dbContent = JSON.stringify(allArticleData);
+    if (currentContent !== dbContent) {
+      await dbFileHandle.write(dbContent);
     }
   }
+  // }
 
   return cancels;
 };
