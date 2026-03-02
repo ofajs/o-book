@@ -176,7 +176,7 @@ export const initGenerator = async ({
   await saveArticleConfig(articleHandle, websiteLangHandle);
 
   // 遍历所有文章文件并生成 HTML
-  const allArticleData = await traverseFiles({
+  const { dataList: allArticleData, markdownContents } = await traverseFiles({
     sourceDirHandle: articleHandle,
     targetDirHandle: websiteLangHandle,
     langRootDirHandle: websiteLangHandle,
@@ -189,6 +189,17 @@ export const initGenerator = async ({
   });
 
   await writeFileIfChanged(dbFileHandle, JSON.stringify(allArticleData));
+
+  // 生成 llms-full.txt 文件（所有 markdown 合并文件）
+  const llmsFullHandle = await websiteLangHandle.get("llms-full.txt", {
+    create: "file",
+  });
+
+  const llmsFullContent = markdownContents
+    .map((item) => `<!-- ${item.url} -->\n\n${item.content}`)
+    .join("\n\n---\n\n");
+
+  await writeFileIfChanged(llmsFullHandle, llmsFullContent);
 
   return cancels;
 };
@@ -204,6 +215,7 @@ const traverseFiles = async ({
   logoImageFileName,
 }) => {
   const dataList = [];
+  const markdownContents = [];
   const entries = [];
 
   // 收集所有文件和目录
@@ -233,6 +245,15 @@ const traverseFiles = async ({
         logoImageFileName,
       });
 
+      if (handle.name.endsWith(".md")) {
+        const originalContent = await handle.text();
+        const relativePath = handle.path.replace(sourceDirHandle.path + "/", "");
+        markdownContents.push({
+          url: fixUrlPath(relativePath),
+          content: originalContent,
+        });
+      }
+
       return pageData
         ? {
             url: fixUrlPath(
@@ -253,17 +274,18 @@ const traverseFiles = async ({
       create: "dir",
     });
 
-    const subDataList = await traverseFiles({
+    const subResult = await traverseFiles({
       sourceDirHandle: handle,
       targetDirHandle: subTargetHandle,
       langRootDirHandle,
       logoImageFileName,
     });
 
-    dataList.push(...subDataList);
+    dataList.push(...subResult.dataList);
+    markdownContents.push(...subResult.markdownContents);
   }
 
-  return dataList;
+  return { dataList, markdownContents };
 };
 
 /**
