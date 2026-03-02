@@ -13,11 +13,21 @@
       text-align: center;
       margin: 0 auto;
     }
-
-    :host(:nth-child(2n)) {
-      background-color: var(--md-sys-color-primary-container);
-    }
   </style>
+  <match-var pui-real-theme="dark">
+    <style>
+      :host(:nth-child(2n)) {
+        background-color: var(--md-ref-palette-primary20);
+      }
+    </style>
+  </match-var>
+  <match-var pui-real-theme="light">
+    <style>
+      :host(:nth-child(2n)) {
+        background-color: var(--md-ref-palette-primary90);
+      }
+    </style>
+  </match-var>
   <div class="container">
     <slot></slot>
   </div>
