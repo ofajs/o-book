@@ -39,58 +39,51 @@ export const getBasePath = () => {
 };
 
 export const initGenerator = async ({
-  // websiteConfig,
-  topHandle,
-  websiteHandle,
-  watchArticle = false,
-  refreshType,
-  lang,
+  topHandle, // 项目目录
+  lang, // 文档的写作语言
+  watchArticle = false, // 监听文章变动，实时更新
+  websiteHandle, // 导出网站目录
 }) => {
   const projectConfig = await getData(topHandle);
 
-  if (refreshType != "content") {
-    await initStaticFile({
-      websiteHandle,
-      logoImgName: projectConfig.logoImg
-        ? projectConfig.logoImg.split("/").pop()
-        : "",
-      logoPath: projectConfig.logoImg
-        ? `/${topHandle.path}/${projectConfig.logoImg.replace("./", "")}`
-        : "",
-    });
+  await initStaticFile({
+    websiteHandle,
+    logoImgName: projectConfig.logoImg
+      ? projectConfig.logoImg.split("/").pop()
+      : "",
+    logoPath: projectConfig.logoImg
+      ? `/${topHandle.path}/${projectConfig.logoImg.replace("./", "")}`
+      : "",
+  });
 
-    // 修正 header 的logo路径
-    if (projectConfig.logoImg || projectConfig.logoName) {
-      const headerFileHandle = await websiteHandle.get("header.html");
+  // 修正 header 的logo路径
+  if (projectConfig.logoImg || projectConfig.logoName) {
+    const headerFileHandle = await websiteHandle.get("header.html");
 
-      const headerContent = await headerFileHandle.text();
+    const headerContent = await headerFileHandle.text();
 
-      const fixedHeaderContent = headerContent
-        .replace(
-          `<img class="logo" src="https://ofajs.com/publics/logo.svg" />`,
-          `<img class="logo" src="./img/${projectConfig.logoImg.split("/").pop()}" />`,
-        )
-        .replace(
-          `<div class="logo-text">ofa.js</div>`,
-          `<div class="logo-text">${projectConfig.logoName || ""}</div>`,
-        );
+    const fixedHeaderContent = headerContent
+      .replace(
+        `<img class="logo" src="https://ofajs.com/publics/logo.svg" />`,
+        `<img class="logo" src="./img/${projectConfig.logoImg.split("/").pop()}" />`,
+      )
+      .replace(
+        `<div class="logo-text">ofa.js</div>`,
+        `<div class="logo-text">${projectConfig.logoName || ""}</div>`,
+      );
 
-      {
-        const currentHeaderContent = await headerFileHandle.text();
+    {
+      const currentHeaderContent = await headerFileHandle.text();
 
-        // 写回header文件
-        if (currentHeaderContent !== fixedHeaderContent) {
-          await headerFileHandle.write(fixedHeaderContent);
-        }
+      // 写回header文件
+      if (currentHeaderContent !== fixedHeaderContent) {
+        await headerFileHandle.write(fixedHeaderContent);
       }
     }
   }
 
-  // const { languages } = websiteConfig;
-
   let cancels = []; // 取消监听函数
 
-  // for (const lang of languages) {
   const websiteLangHandle = await websiteHandle.get(lang, {
     create: "dir",
   });
@@ -152,7 +145,6 @@ export const initGenerator = async ({
       await dbFileHandle.write(dbContent);
     }
   }
-  // }
 
   return cancels;
 };

@@ -76,7 +76,7 @@
       <p-button on:click="clickPreview"> 预览网页 </p-button>
       <p-button
         class="toolbar-btn"
-        on:click="refreshPreview('all')"
+        on:click="refreshPreview"
         variant="outlined"
         attr:disabled="refreshing"
       >
@@ -86,20 +86,7 @@
           icon="material-symbols:refresh"
           slot="prefix"
         ></n-icon>
-        彻底重新生成
-      </p-button>
-      <p-button
-        class="toolbar-btn"
-        on:click="refreshPreview('content')"
-        attr:disabled="refreshing"
-      >
-        <n-icon
-          class="rotate-anime"
-          class:rotate-anime="refreshing"
-          icon="material-symbols:refresh"
-          slot="prefix"
-        ></n-icon>
-        只转换内容（更快）
+        重新生成
       </p-button>
       <span class="toolbar-label">写作语言</span>: {{writingLang}}
     </div>
@@ -200,8 +187,9 @@
           clickPreview() {
             window.open(`/${query.path}/website/cn/index.html`, "_blank");
           },
-          async refreshPreview(type) {
-            await this.init({ watchArticle: false, type });
+          async refreshPreview() {
+            await this.init({ watchArticle: false });
+
             toast({
               color: "success",
               content: "重新生成完毕",
@@ -223,7 +211,7 @@
 
             this.documentList = Array.isArray(documentList) ? documentList : [];
           },
-          async init({ watchArticle = true, type = "all" }) {
+          async init({ watchArticle = true }) {
             this.refreshing = true;
 
             const config = await getData(this._topHandle);
@@ -249,7 +237,6 @@
                 create: "dir",
               }),
               watchArticle,
-              refreshType: type,
               lang: this.writingLang, // 翻译哪个语言的文件夹
             });
 
