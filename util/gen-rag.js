@@ -78,21 +78,19 @@ const traverseAndCopy = async ({
 
   for (const handle of fileEntries) {
     const relativePath = basePath ? `${basePath}/${handle.name}` : handle.name;
-    const outputName = handle.name.replace(/\.(html|md)$/, ".md");
+    const isHtml = handle.name.endsWith(".html");
+    const outputName = isHtml ? handle.name : handle.name.replace(/\.md$/, ".md");
     const outputHandle = await targetHandle.get(outputName, { create: "file" });
 
     let content = await handle.text();
 
-    if (
-      handle.name.endsWith(".html") &&
-      content.trim().startsWith("<template ")
-    ) {
+    if (isHtml && content.trim().startsWith("<template ")) {
       continue;
     }
 
     await outputHandle.write(content);
 
-    const fileMeta = await extractMetadata(content, relativePath);
+    const fileMeta = extractMetadata(content, relativePath);
     manifestData.files.push(fileMeta);
   }
 
@@ -112,7 +110,7 @@ const traverseAndCopy = async ({
 /**
  * 从文件中提取元数据用于 RAG 索引
  */
-const extractMetadata = async (content, relativePath) => {
+const extractMetadata = (content, relativePath) => {
   let title = "";
   let description = "";
   let tags = [];
@@ -135,8 +133,9 @@ const extractMetadata = async (content, relativePath) => {
     tags = tagsMatch[1].split(",").map((t) => t.trim());
   }
 
-  const pathParts = relativePath.replace(/\.(html|md)$/, "").split("/");
-  if (pathParts.length > 1) {
+  const isHtml = relativePath.endsWith(".html");
+  const pathParts = relativePath.split("/");
+  if (pathParts.length > 1 && !isHtml) {
     tags.push(pathParts[0]);
   }
 
@@ -144,12 +143,12 @@ const extractMetadata = async (content, relativePath) => {
   const charsCount = content.length;
 
   return {
-    path: relativePath.replace(/\.(html|md)$/, ".md"),
-    title: title || pathParts[pathParts.length - 1],
+    path: relativePath,
+    title: title || pathParts[pathParts.length - 1].replace(/\.(html|md)$/, ""),
     description: description.substring(0, 200),
     tags,
     wordsCount,
     charsCount,
-    category: pathParts.length > 1 ? pathParts[0] : "root",
+    category: !isHtml && pathParts.length > 1 ? pathParts[0] : "root",
   };
 };
