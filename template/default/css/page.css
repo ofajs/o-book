@@ -5,6 +5,10 @@ article.markdown-body {
   margin: 0 auto;
 }
 
+article {
+  padding: 0 16px;
+}
+
 article.markdown-body > o-playground {
   width: calc(126%);
 }

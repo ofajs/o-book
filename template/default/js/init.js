@@ -144,18 +144,16 @@ export const init = async (page, query) => {
     }
   }
 
-  {
-    // 添加地址引用的标识
-    const markdownBody = page.shadow.$(".markdown-body");
+  // 添加地址引用的标识
+  const markdownBody = page.shadow.$(".markdown-body");
 
+  if (markdownBody) {
     const markBtn =
       $(`<p-button icon variant="text" size="small" class="octicon-link-mark">
         <n-icon icon="material-symbols:link"></n-icon>
       </p-button>`);
 
-    if (markdownBody) {
-      markdownBody.push(markBtn);
-    }
+    markdownBody.push(markBtn);
 
     let hoverIndex = 0;
     let isSuccess = false;
@@ -184,7 +182,7 @@ export const init = async (page, query) => {
 
     markdownBody.on("mouseover", (e) => {
       let isChild = false;
-      if(isSuccess){
+      if (isSuccess) {
         return;
       }
 

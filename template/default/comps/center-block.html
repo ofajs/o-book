@@ -13,6 +13,10 @@
       text-align: center;
       margin: 0 auto;
     }
+
+    :host(:nth-child(2n)) {
+      background-color: var(--md-sys-color-primary-container);
+    }
   </style>
   <div class="container">
     <slot></slot>
