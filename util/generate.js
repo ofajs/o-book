@@ -106,6 +106,7 @@ export const initGenerator = async ({
   });
 
   {
+    // 拷贝publics目录到网站目录的根目录
     const publicsHandle = await topHandle.get("publics");
 
     if (publicsHandle && publicsHandle.kind === "dir") {

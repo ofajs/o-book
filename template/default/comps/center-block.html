@@ -12,18 +12,27 @@
       align-items: center;
       text-align: center;
       margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    ::slotted(p) {
+      font-size: 18px;
+    }
+
+    ::slotted(h2) {
+      font-size: 36px;
     }
   </style>
   <match-var pui-real-theme="dark">
     <style>
-      :host(:nth-child(2n)) {
+      :host(:nth-child(2n + 1)) {
         background-color: var(--md-ref-palette-primary20);
       }
     </style>
   </match-var>
   <match-var pui-real-theme="light">
     <style>
-      :host(:nth-child(2n)) {
+      :host(:nth-child(2n + 1)) {
         background-color: var(--md-ref-palette-primary90);
       }
     </style>
