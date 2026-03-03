@@ -106,12 +106,28 @@ export const initGenerator = async ({
   });
 
   {
-    // 拷贝publics目录到网站目录的根目录
+    // 拷贝publics目录到网站目录的根目录（只复制有改动的文件）
     const publicsHandle = await topHandle.get("publics");
 
     if (publicsHandle && publicsHandle.kind === "dir") {
-      // 将 publics 目录下的所有文件复制到网站目录的根目录
-      await publicsHandle.copyTo(websiteHandle);
+      const copyDir = async (srcHandle, destHandle) => {
+        for await (const item of srcHandle.values()) {
+          if (item.kind === "file") {
+            const destFileHandle = await destHandle.get(item.name, {
+              create: "file",
+            });
+            const content = await item.text();
+            await writeFileIfChanged(destFileHandle, content);
+          } else if (item.kind === "dir") {
+            const subDirHandle = await destHandle.get(item.name, {
+              create: "dir",
+            });
+            await copyDir(item, subDirHandle);
+          }
+        }
+      };
+
+      await copyDir(publicsHandle, websiteHandle);
     }
   }
 
