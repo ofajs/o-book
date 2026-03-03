@@ -116,8 +116,17 @@ export const initGenerator = async ({
             const destFileHandle = await destHandle.get(item.name, {
               create: "file",
             });
-            const content = await item.text();
-            await writeFileIfChanged(destFileHandle, content);
+            const isBinary =
+              /\.(png|jpg|jpeg|gif|webp|ico|mp4|webm|avi|mov|zip|tar|gz|rar|7z|pdf|woff|woff2|ttf|eot)$/i.test(
+                item.name,
+              );
+            if (isBinary) {
+              const blob = await item.file();
+              await destFileHandle.write(blob);
+            } else {
+              const content = await item.text();
+              await writeFileIfChanged(destFileHandle, content);
+            }
           } else if (item.kind === "dir") {
             const subDirHandle = await destHandle.get(item.name, {
               create: "dir",
