@@ -105,6 +105,15 @@ export const initGenerator = async ({
       : "",
   });
 
+  {
+    const publicsHandle = await topHandle.get("publics");
+
+    if (publicsHandle && publicsHandle.kind === "dir") {
+      // 将 publics 目录下的所有文件复制到网站目录的根目录
+      await publicsHandle.copyTo(websiteHandle);
+    }
+  }
+
   // 修正 header 的 logo 路径和文字
   if (projectConfig.logoImg || projectConfig.logoName) {
     const headerFileHandle = await websiteHandle.get("header.html");
@@ -247,7 +256,10 @@ const traverseFiles = async ({
 
       if (handle.name.endsWith(".md")) {
         const originalContent = await handle.text();
-        const relativePath = handle.path.replace(sourceDirHandle.path + "/", "");
+        const relativePath = handle.path.replace(
+          sourceDirHandle.path + "/",
+          "",
+        );
         markdownContents.push({
           url: fixUrlPath(relativePath),
           content: originalContent,
