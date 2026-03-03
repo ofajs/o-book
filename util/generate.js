@@ -136,7 +136,12 @@ export const initGenerator = async ({
         }
       };
 
-      await copyDir(publicsHandle, websiteHandle);
+      await copyDir(
+        publicsHandle,
+        await websiteHandle.get("publics", {
+          create: "dir",
+        }),
+      );
     }
   }
 
