@@ -87,6 +87,9 @@
               data: {},
               attached() {
                 init(this, query);
+                setTimeout(() => {
+                  this.style.transform = "";
+                }, 300);
               },
               detached() {
                 revoke(this);
