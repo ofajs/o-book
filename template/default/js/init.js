@@ -20,36 +20,34 @@ export const init = async (page, query) => {
       currentSrc.startsWith(e.prefix),
     );
 
-    if (!targetHeaderItem) {
-      return;
-    }
+    if (targetHeaderItem) {
+      const flatedList = targetHeaderItem.data.flatMap((e) => e.content || [e]);
 
-    const flatedList = targetHeaderItem.data.flatMap((e) => e.content || [e]);
+      const currentIndex = flatedList.findIndex(
+        (e) => targetHeaderItem.prefix + e.url === currentSrc,
+      );
 
-    const currentIndex = flatedList.findIndex(
-      (e) => targetHeaderItem.prefix + e.url === currentSrc,
-    );
+      if (currentIndex !== -1) {
+        const leftItem = flatedList[currentIndex - 1];
+        const rightItem = flatedList[currentIndex + 1];
 
-    if (currentIndex !== -1) {
-      const leftItem = flatedList[currentIndex - 1];
-      const rightItem = flatedList[currentIndex + 1];
+        const footer = page.shadow.$(".footer");
 
-      const footer = page.shadow.$(".footer");
-
-      if (leftItem) {
-        footer.push(
-          `<p-button variant="text" class="prev-item">
+        if (leftItem) {
+          footer.push(
+            `<p-button variant="text" class="prev-item">
           <n-icon icon="mdi:page-previous" slot="prefix"></n-icon>
           <a href="${prefixSrc + lang}/${targetHeaderItem.prefix + leftItem.url}" olink>${leftItem.name}</a></p-button>`,
-        );
-      }
+          );
+        }
 
-      if (rightItem) {
-        footer.push(
-          `<p-button variant="text" class="next-item">
+        if (rightItem) {
+          footer.push(
+            `<p-button variant="text" class="next-item">
           <n-icon icon="mdi:page-next" slot="suffix"></n-icon>
           <a href="${prefixSrc + lang}/${targetHeaderItem.prefix + rightItem.url}" olink>${rightItem.name}</a></p-button>`,
-        );
+          );
+        }
       }
     }
   }
