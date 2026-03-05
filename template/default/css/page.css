@@ -19,7 +19,7 @@ article.markdown-body > o-playground {
   }
 }
 
-article a {
+a {
   display: inline-flex;
   align-items: center;
   vertical-align: bottom;
