@@ -197,7 +197,6 @@ export const init = async (page, query) => {
 
       if (isChild) {
         hoverIndex = $(e.target).index;
-        console.log("hoverIndex: ", hoverIndex);
         markBtn.style.top = e.target.offsetTop + "px";
       }
     });
