@@ -534,18 +534,25 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
 const saveArticleConfig = async (articleHandle, websiteLangHandle) => {
   const siteConfig = await getData(articleHandle);
 
-  // 处理每个顶部导航项
-  for (const headerItem of siteConfig.header) {
-    // 读取该分类的配置
+  const processHeaderItem = async (headerItem) => {
+    if (headerItem.content && !headerItem.url) {
+      for (const childItem of headerItem.content) {
+        await processHeaderItem(childItem);
+      }
+      return;
+    }
+
+    if (!headerItem.url) {
+      return;
+    }
+
     const headerItemData = await getData(articleHandle, headerItem.url);
     headerItem.data = headerItemData;
 
-    // 生成路径前缀
     const prefix = headerItem.url
       .replace(/^\.\//, "")
       .replace("_config.yaml", "");
 
-    // 递归修正所有内容项的 URL
     const fixContentUrl = (data) => {
       if (data.url) {
         data.url = fixUrlPath(data.url);
@@ -557,18 +564,19 @@ const saveArticleConfig = async (articleHandle, websiteLangHandle) => {
 
     fixContentUrl({ content: headerItemData });
 
-    // 扁平化获取第一个导航项的 URL
     const flattenedItems = headerItemData.flatMap(
       (item) => item.content || [item],
     );
     const firstNavItem = flattenedItems[0];
 
-    // 存储第一个 URL 和前缀
     headerItem.firstUrl = prefix + firstNavItem?.url;
     headerItem.prefix = prefix;
+  };
+
+  for (const headerItem of siteConfig.header) {
+    await processHeaderItem(headerItem);
   }
 
-  // 写入配置文件
   const configFileHandle = await websiteLangHandle.get("article-config.json", {
     create: "file",
   });
