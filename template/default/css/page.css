@@ -30,7 +30,6 @@ a {
   max-width: var(--max-container-width, 1200px);
   margin: 0 auto;
   height: 80px;
-  padding-bottom: 100px;
 }
 
 .next-item {

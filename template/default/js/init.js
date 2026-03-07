@@ -3,12 +3,31 @@ import { getCurrentLang } from "./util.js";
 // 保存滚动位置
 let scrollTimer = null;
 
+// 是否有 footer 模块
+let hasFooter = null;
+
 export const init = async (page, query) => {
   const lang = getCurrentLang();
 
   const articleConfigData = await fetch(
     import.meta.resolve(`../${lang}/article-config.json`),
   ).then((res) => res.json());
+
+  {
+    const footerSrc = import.meta.resolve(`../${lang}/footer.html`);
+
+    if (hasFooter === null) {
+      // 判断是否有footer文件
+      await fetch(footerSrc)
+        .then((e) => (hasFooter = true))
+        .catch(() => (hasFooter = false));
+    }
+
+    if (hasFooter) {
+      // 填充footer
+      page.shadow.$(".footer").after(`<o-page src="${footerSrc}"></o-page>`);
+    }
+  }
 
   {
     // 获取上一页下一页的内容
