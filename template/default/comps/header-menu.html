@@ -4,12 +4,12 @@
       display: block;
     }
 
-    .menu-list {
+    .header-menu-list {
       display: flex;
       margin-left: auto;
     }
 
-    .menu-item {
+    .header-menu-item {
       position: relative;
       display: flex;
       align-items: center;
@@ -22,22 +22,16 @@
       color: inherit;
       text-decoration: none;
     }
-    .menu-item:hover {
+    .header-menu-item:hover {
       color: var(--md-sys-color-primary);
     }
 
-    .menu-item.active {
+    .header-menu-item--active {
       color: var(--md-sys-color-primary);
       background-color: var(--md-sys-color-primary-container);
     }
 
-    .header-menus {
-      position: absolute;
-      left: 0;
-      top: 0;
-    }
-
-    .header-sub-menus {
+    .header-menu-sublist {
       position: absolute;
       top: calc(100% + 4px);
       left: 50%;
@@ -58,13 +52,13 @@
         visibility 0.2s;
     }
 
-    .menu-item:hover > .header-sub-menus {
+    .header-menu-item:hover > .header-menu-sublist {
       display: block;
       opacity: 1;
       visibility: visible;
     }
 
-    .header-sub-menu-item {
+    .header-menu-subitem {
       display: block;
       padding: 10px 14px;
       margin: 4px 0;
@@ -79,45 +73,47 @@
         color 0.15s ease;
     }
 
-    .header-sub-menu-item:hover {
+    .header-menu-subitem:hover {
       background: var(--md-sys-color-primary-container);
       color: var(--md-sys-color-primary);
     }
 
-    .header-sub-menu-item.active {
+    .header-menu-subitem--active {
       background: var(--md-sys-color-primary-container);
       color: var(--md-sys-color-primary);
     }
 
-    .menu-item-has-children {
+    .header-menu-item--has-children {
       display: flex;
       align-items: center;
       gap: 4px;
     }
 
-    .menu-item-has-children::after {
+    .header-menu-item--has-children::after {
       content: "";
-      display: inline-block;
+      margin-top: 5px;
       width: 0;
       height: 0;
       margin-left: 4px;
       border: 4px solid transparent;
       border-top-color: currentColor;
       transition: transform 0.2s ease;
+      align-self: center;
+      transform-origin: 4px 2px;
     }
 
-    .menu-item-has-children:hover::after {
+    .header-menu-item--has-children:hover::after {
       transform: rotate(180deg);
     }
   </style>
 
-  <div class="menu-list">
+  <div class="header-menu-list">
     <o-fill :value="header">
       <div style="display: contents">
         <o-if :value="$data.url">
           <a
-            class="menu-item"
-            class:active="$data.active"
+            class="header-menu-item"
+            class:header-menu-item--active="$data.active"
             attr:href="$data.url"
             on:click="$host.emit('clicked-item')"
             olink
@@ -127,16 +123,16 @@
         </o-if>
         <o-else-if :value="$data.children">
           <div
-            class="menu-item menu-item-has-children"
-            class:active="$data.active"
+            class="header-menu-item header-menu-item--has-children"
+            class:header-menu-item--active="$data.active"
           >
             {{$data.name}}
 
-            <div class="header-sub-menus">
+            <div class="header-menu-sublist">
               <o-fill :value="$data.children">
                 <a
-                  class="header-sub-menu-item"
-                  class:active="$data.active"
+                  class="header-menu-subitem"
+                  class:header-menu-subitem--active="$data.active"
                   on:click="$host.emit('clicked-item')"
                   attr:href="$data.url"
                   olink
