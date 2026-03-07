@@ -89,17 +89,24 @@
             const { header } = await load(`../${lang}/article-config.json`);
 
             let targetItem = null;
+            const baseUrl = menuUrl.replace(/\/comps\/article-menu\.html$/, "");
 
-            for (const e of header) {
-              const activePrefix = `${menuUrl.replace(/\/comps\/article-menu\.html$/, "")}/${lang}/${e.prefix}`; // 导航前缀
-
-              // 判断是否当前的前缀
-              const currentSrc = this.app.current.src;
-              if (currentSrc.startsWith(activePrefix)) {
-                targetItem = e;
-                break;
+            const findTargetItem = (items) => {
+              for (const e of items) {
+                const activePrefix = `${baseUrl}/${lang}/${e.prefix}`;
+                const currentSrc = this.app.current.src;
+                if (currentSrc.startsWith(activePrefix)) {
+                  return e;
+                }
+                if (e.content) {
+                  const found = findTargetItem(e.content);
+                  if (found) return found;
+                }
               }
-            }
+              return null;
+            };
+
+            targetItem = findTargetItem(header);
 
             if (!targetItem) {
               this.emit("hide-left", {
