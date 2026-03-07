@@ -91,7 +91,9 @@ export const init = async (page, query) => {
   }
 
   {
-    // 记录滚动位置，用于返回时恢复滚动位置，避免重复滚动
+    const routerLength = page.app.routers.length;
+    const ROUTER_LENGTH_KEY = "page_scroll_router_length";
+
     const SCROLL_KEY = "page_scroll_all";
 
     const getScrollMap = () => {
@@ -106,8 +108,13 @@ export const init = async (page, query) => {
       sessionStorage.setItem(SCROLL_KEY, JSON.stringify(map));
     };
 
+    const savedRouterLength =
+      parseInt(sessionStorage.getItem(ROUTER_LENGTH_KEY)) || 0;
     const scrollMap = getScrollMap();
-    if (scrollMap[page.src] !== undefined) {
+    if (
+      scrollMap[page.src] !== undefined &&
+      routerLength <= savedRouterLength
+    ) {
       page.ele.scrollTop = parseInt(scrollMap[page.src]);
     }
 
@@ -117,6 +124,7 @@ export const init = async (page, query) => {
         const currentMap = getScrollMap();
         currentMap[page.src] = e.target.scrollTop;
         setScrollMap(currentMap);
+        sessionStorage.setItem(ROUTER_LENGTH_KEY, routerLength);
       }, 300);
     });
   }
