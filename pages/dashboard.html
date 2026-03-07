@@ -92,18 +92,21 @@
     </div>
     <div class="list-content">
       <h2>顶部导航</h2>
-      <p-list>
-        <o-fill :value="header">
-          <p-list-item
-            button
-            on:click="$host.clickHeaderItem($data.url)"
-            attr:active-item="$host.activeHeader === $data.url"
-          >
-            {{$data.name}}
-            <!-- <div secondary>{{$data.url}}</div> -->
-          </p-list-item>
-        </o-fill>
+      <p-list style="--ladder-left: 8px">
+        <o-fill :value="header" name="header-list-item"> </o-fill>
       </p-list>
+      <template name="header-list-item">
+        <p-list-item
+          attr:button="!!$data.url"
+          on:click="$host.clickHeaderItem($data)"
+          attr:active-item="$host.activeHeader === $data.url"
+        >
+          {{$data.name}}
+          <p-list slot="childs">
+            <o-fill :value="$data.content" name="header-list-item"></o-fill>
+          </p-list>
+        </p-list-item>
+      </template>
     </div>
     <div class="list-content">
       <style>
@@ -195,14 +198,11 @@
               content: "重新生成完毕",
             });
           },
-          async clickHeaderItem(url) {
-            this.activeHeader = url;
-            const targetItem = this.header.find((item) => item.url === url);
-
-            if (!targetItem) {
-              this.documentList = [];
+          async clickHeaderItem(targetItem) {
+            if (!targetItem.url) {
               return;
             }
+            this.activeHeader = targetItem.url;
 
             const documentList = await getData(
               this._documentHandle,
@@ -228,7 +228,11 @@
 
             this.header = writingLangConfig.header || [];
 
-            this.clickHeaderItem(this.header[0]?.url);
+            if (this.header[0]?.url) {
+              this.clickHeaderItem(this.header[0]);
+            } else {
+              debugger;
+            }
 
             this._cancels = await initGenerator({
               // websiteConfig: config,
