@@ -91,19 +91,32 @@ export const init = async (page, query) => {
   }
 
   {
-    // 刷新后复原滚动位置
-    if (
-      sessionStorage.getItem("page_scrollTop") &&
-      sessionStorage.getItem("page_scroll_src") === page.src
-    ) {
-      page.ele.scrollTop = parseInt(sessionStorage.getItem("page_scrollTop"));
+    // 记录滚动位置，用于返回时恢复滚动位置，避免重复滚动
+    const SCROLL_KEY = "page_scroll_all";
+
+    const getScrollMap = () => {
+      try {
+        return JSON.parse(sessionStorage.getItem(SCROLL_KEY)) || {};
+      } catch {
+        return {};
+      }
+    };
+
+    const setScrollMap = (map) => {
+      sessionStorage.setItem(SCROLL_KEY, JSON.stringify(map));
+    };
+
+    const scrollMap = getScrollMap();
+    if (scrollMap[page.src] !== undefined) {
+      page.ele.scrollTop = parseInt(scrollMap[page.src]);
     }
 
     page.on("scroll", (e) => {
       clearTimeout(scrollTimer);
       scrollTimer = setTimeout(() => {
-        sessionStorage.setItem("page_scrollTop", e.target.scrollTop);
-        sessionStorage.setItem("page_scroll_src", page.src);
+        const currentMap = getScrollMap();
+        currentMap[page.src] = e.target.scrollTop;
+        setScrollMap(currentMap);
       }, 300);
     });
   }
