@@ -43,7 +43,7 @@
       left: 50%;
       transform: translateX(-50%);
       min-width: 180px;
-      background: var(--md-sys-color-normal-container);
+      background: var(--md-sys-color-on-normal);
       border-radius: 12px;
       box-shadow:
         0 8px 24px rgba(0, 0, 0, 0.12),
@@ -67,6 +67,7 @@
     .header-sub-menu-item {
       display: block;
       padding: 10px 14px;
+      margin: 4px 0;
       font-size: 14px;
       cursor: pointer;
       white-space: nowrap;
@@ -79,6 +80,11 @@
     }
 
     .header-sub-menu-item:hover {
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-primary);
+    }
+
+    .header-sub-menu-item.active {
       background: var(--md-sys-color-primary-container);
       color: var(--md-sys-color-primary);
     }
@@ -120,12 +126,20 @@
           </a>
         </o-if>
         <o-else-if :value="$data.children">
-          <div class="menu-item menu-item-has-children">
+          <div
+            class="menu-item menu-item-has-children"
+            class:active="$data.active"
+          >
             {{$data.name}}
 
             <div class="header-sub-menus">
               <o-fill :value="$data.children">
-                <a class="header-sub-menu-item" attr:href="$data.url" olink
+                <a
+                  class="header-sub-menu-item"
+                  class:active="$data.active"
+                  on:click="$host.emit('clicked-item')"
+                  attr:href="$data.url"
+                  olink
                   >{{$data.name}}</a
                 >
               </o-fill>
@@ -180,6 +194,23 @@
 
             // 修复激活态
             this.header.forEach((item) => {
+              if (item.children) {
+                // 子项激活时，父项也激活
+                let isActive = false;
+                item.children.forEach((child) => {
+                  if (current.src.startsWith(child.activePrefix)) {
+                    child.active = true;
+                    isActive = true;
+                  } else {
+                    child.active = false;
+                  }
+                });
+                if (isActive) {
+                  item.active = true;
+                  return;
+                }
+              }
+
               if (current.src.startsWith(item.activePrefix)) {
                 item.active = true;
               } else {
