@@ -32,6 +32,10 @@
             const handle = await get(query.path);
 
             this.config = await getData(handle);
+
+            const data = await getArticleData(
+              await handle.get(this.config.writingLang),
+            );
           },
         },
         attached() {
@@ -46,6 +50,43 @@
           });
         },
       };
+    };
+
+    // 获取每个段落的数据
+    const getArticleData = async (handle) => {
+      if (handle.kind === "dir") {
+        const data = [];
+        for await (const item of handle.values()) {
+          data.push(await getArticleData(item));
+        }
+        return data;
+      }
+
+      if (handle.name.endsWith(".md")) {
+        const content = await handle.text();
+        const blocks = await getBlockWithMD(content);
+
+        return {
+          path: handle.path,
+          blocks,
+        };
+      }
+
+      if (handle.name.endsWith(".html")) {
+        debugger;
+        return;
+      }
+
+      {
+        // 其他文件类型
+        debugger;
+      }
+    };
+
+    const getBlockWithMD = async (content) => {
+      const blocks = content.split("\n\n");
+      debugger;
+      return blocks;
     };
   </script>
 </template>
