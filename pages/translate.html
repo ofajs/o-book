@@ -3,11 +3,11 @@
     :host {
       display: block;
     }
-    .contianer {
+    .container {
       padding: 16px;
     }
   </style>
-  <div class="contianer">
+  <div class="container">
     <div>写作语言: <span>{{config.writingLang}}</span></div>
     <p>{{config}}</p>
   </div>
@@ -27,6 +27,7 @@
             writingLang: "cn",
             languages: ["cn", "en"],
           },
+          articleData: [],
         },
         proto: {
           // 读取文章数据
@@ -37,9 +38,14 @@
 
             const data = await getArticleData(
               await handle.get(this.config.writingLang),
+              {
+                isRoot: true,
+              },
             );
 
             debugger;
+
+            this.articleData = data;
           },
         },
         attached() {
@@ -57,18 +63,30 @@
     };
 
     // 获取每个段落的数据
-    const getArticleData = async (handle) => {
+    const getArticleData = async (handle, opts) => {
+      let reOpts = {};
+      if (opts.isRoot) {
+        reOpts.rootPath = handle.path;
+      }
+
       if (handle.kind === "dir") {
         const data = [];
         for await (const item of handle.values()) {
-          data.push({
-            name: item.name,
-            path: item.path,
-            isDir: true,
-            data,
-          });
+          const dd = await getArticleData(item, reOpts);
+          dd && data.push(dd);
         }
-        return data;
+
+        if (opts.isRoot) {
+          return data;
+        }
+
+        return {
+          name: handle.name,
+          path: handle.path.replace(opts.rootPath + "/", ""),
+          realPath: handle.path,
+          isDir: true,
+          data,
+        };
       }
 
       const content = await handle.text();
@@ -78,7 +96,8 @@
 
         return {
           name: handle.name,
-          path: handle.path,
+          path: handle.path.replace(opts.rootPath + "/", ""),
+          realPath: handle.path,
           blocks,
         };
       }
@@ -86,7 +105,8 @@
       if (handle.name.endsWith(".html")) {
         return {
           name: handle.name,
-          path: handle.path,
+          path: handle.path.replace(opts.rootPath + "/", ""),
+          realPath: handle.path,
           content,
         };
       }
