@@ -14,6 +14,8 @@
   <script>
     export const parent = "./layout.html";
 
+    import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
+
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/main.js");
       const { getData } = await load("../util/yaml-handle.js");
@@ -36,6 +38,8 @@
             const data = await getArticleData(
               await handle.get(this.config.writingLang),
             );
+
+            debugger;
           },
         },
         attached() {
@@ -57,36 +61,35 @@
       if (handle.kind === "dir") {
         const data = [];
         for await (const item of handle.values()) {
-          data.push(await getArticleData(item));
+          data.push({
+            name: item.name,
+            path: item.path,
+            isDir: true,
+            data,
+          });
         }
         return data;
       }
 
+      const content = await handle.text();
+
       if (handle.name.endsWith(".md")) {
-        const content = await handle.text();
-        const blocks = await getBlockWithMD(content);
+        const blocks = marked.lexer(content);
 
         return {
+          name: handle.name,
           path: handle.path,
           blocks,
         };
       }
 
       if (handle.name.endsWith(".html")) {
-        debugger;
-        return;
+        return {
+          name: handle.name,
+          path: handle.path,
+          content,
+        };
       }
-
-      {
-        // 其他文件类型
-        debugger;
-      }
-    };
-
-    const getBlockWithMD = async (content) => {
-      const blocks = content.split("\n\n");
-      debugger;
-      return blocks;
     };
   </script>
 </template>
