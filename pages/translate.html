@@ -3,17 +3,40 @@
     :host {
       display: block;
     }
+    .contianer {
+      padding: 16px;
+    }
   </style>
-  翻译
+  <div class="contianer">
+    <div>写作语言: <span>{{config.writingLang}}</span></div>
+    <p>{{config}}</p>
+  </div>
   <script>
     export const parent = "./layout.html";
 
     export default async ({ load, query }) => {
+      const { get } = await load("/nos/fs/main.js");
+      const { getData } = await load("../util/yaml-handle.js");
+
       return {
         data: {
           activeId: "AI",
+          config: {
+            writingLang: "cn",
+            languages: ["cn", "en"],
+          },
+        },
+        proto: {
+          // 读取文章数据
+          async loadArticle() {
+            const handle = await get(query.path);
+
+            this.config = await getData(handle);
+          },
         },
         attached() {
+          this.loadArticle();
+
           this.emit("set-active-id", {
             composed: true,
             data: {

@@ -182,7 +182,7 @@ export const initGenerator = async ({
   if (watchArticle) {
     // 监听文章变化，及时生成对应的 html 文件
     cancels.push(
-      articleHandle.observe(async (event) => {
+      await articleHandle.observe(async (event) => {
         const relativePath = event.path.replace(articleHandle.path + "/", "");
 
         // 如果是 _config.yaml 文件，则更新文章配置
