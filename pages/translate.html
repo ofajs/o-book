@@ -1,0 +1,28 @@
+<template page>
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  翻译
+  <script>
+    export const parent = "./layout.html";
+
+    export default async ({ load, query }) => {
+      return {
+        data: {
+          activeId: "AI",
+        },
+        attached() {
+          this.emit("set-active-id", {
+            composed: true,
+            data: {
+              name: "translate",
+              query: { ...query },
+            },
+          });
+        },
+      };
+    };
+  </script>
+</template>

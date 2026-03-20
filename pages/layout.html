@@ -13,12 +13,15 @@
     <p-nav-bar slot="nav">
       <o-if :value="activeId === 'start'">
         <p-nav-item attr:active-item="activeId === 'start'">
-          Start
+          开始
           <n-icon icon="material-symbols:start-rounded" slot="icon"></n-icon>
         </p-nav-item>
       </o-if>
       <o-if :value="activeId !== 'start'">
-        <p-nav-item attr:active-item="activeId === 'dashboard'">
+        <p-nav-item
+          attr:active-item="activeId === 'dashboard'"
+          on:click="goto('./dashboard.html?path='+query.path)"
+        >
           总揽
           <n-icon
             icon="material-symbols:dashboard-outline-rounded"
@@ -27,7 +30,10 @@
         </p-nav-item>
       </o-if>
       <o-if :value="activeId !== 'start'">
-        <p-nav-item attr:active-item="activeId === 'AI'">
+        <p-nav-item
+          attr:active-item="activeId === 'translate'"
+          on:click="goto('./translate.html?path='+query.path)"
+        >
           AI翻译
           <n-icon icon="mingcute:ai-line" slot="icon"></n-icon>
         </p-nav-item>
@@ -47,10 +53,17 @@
       return {
         data: {
           activeId: "",
+          query: {
+            path: "",
+          },
         },
         ready() {
           this.on("set-active-id", (e) => {
-            this.activeId = e.data.name;
+            const { name, query } = e.data;
+            this.activeId = name;
+            if (query.path) {
+              this.query = query;
+            }
           });
         },
       };

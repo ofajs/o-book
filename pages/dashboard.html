@@ -179,7 +179,9 @@
               .replace(/\/_config\.yaml$/, "");
 
             // 去掉前缀 ./ 和后缀 .md，得到文件名
-            const suffixName = url.replace(/^\.\//, "").replace(/\.md$/, ".html");
+            const suffixName = url
+              .replace(/^\.\//, "")
+              .replace(/\.md$/, ".html");
 
             // 拼接并打开预览地址
             window.open(
@@ -254,6 +256,7 @@
             composed: true,
             data: {
               name: "dashboard",
+              query: { ...query },
             },
           });
 
