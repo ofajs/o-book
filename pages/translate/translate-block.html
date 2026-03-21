@@ -12,18 +12,64 @@
     .right {
       flex: 1;
       flex-shrink: 0;
+      border-radius: 8px;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .left {
+      padding: 16px;
+      background-color: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-primary);
+      border-left-width: 4px;
+      color: var(--md-sys-color-on-surface);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .right {
+      position: relative;
+      background-color: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-success);
+      border-left-width: 4px;
+      color: var(--md-sys-color-on-surface);
+    }
+    .right textarea {
+      box-sizing: border-box;
+      padding: 16px;
+      width: 100%;
+      height: 100%;
+      border: none;
+      resize: none;
+      color: var(--md-sys-color-on-surface);
+      background-color: transparent;
     }
   </style>
   <div class="container">
     <div class="left">{{item.raw}}</div>
-    <div class="right">aa</div>
+    <div class="right">
+      <textarea> aa </textarea>
+    </div>
   </div>
   <script>
     export default async function ({ load }) {
+      const { get } = await load("/nos/fs/main.js");
+
       return {
         tag: "translate-block",
         data: {
           item: {},
+        },
+        watch: {
+          item() {
+            this.init();
+          },
+        },
+        proto: {
+          async init() {
+            if (this.item.type === "space") {
+              this.style.display = "none";
+              return;
+            }
+          },
         },
       };
     }
