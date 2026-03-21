@@ -39,10 +39,15 @@
             <n-icon icon="mingcute:ai-line" slot="icon"></n-icon>
           </p-nav-item>
         </o-if>
-        <p-nav-item attr:active-item="activeId === 'movies'">
-          <n-icon icon="uil:setting" slot="icon"></n-icon>
-          设置
-        </p-nav-item>
+        <o-if :value="activeId !== 'start'">
+          <p-nav-item
+            attr:active-item="activeId === 'config'"
+            on:click="goto('./config/config.html?path='+query.path)"
+          >
+            配置
+            <n-icon icon="material-symbols:settings-outline-rounded" slot="icon"></n-icon>
+          </p-nav-item>
+        </o-if>
       </p-nav-bar>
       <div style="position: relative; height: 100%">
         <slot></slot>

@@ -1,0 +1,37 @@
+<template page>
+  <style>
+    :host {
+      display: block;
+    }
+
+    .container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-size: 24px;
+      color: var(--md-sys-color-primary);
+    }
+  </style>
+  <div class="container">
+    Hello World
+  </div>
+  <script>
+    export const parent = "../layout.html";
+
+    export default async ({ load, query }) => {
+      return {
+        data: {},
+        async attached() {
+          this.emit("set-active-id", {
+            composed: true,
+            data: {
+              name: "config",
+              query: { ...query },
+            },
+          });
+        },
+      };
+    };
+  </script>
+</template>
