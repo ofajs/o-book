@@ -24,7 +24,7 @@ const processMarkdownFile = async (handle, relativePath, content) => {
   }
 };
 
-const createBlock = async (element) => {
+const createBlockFromElement = async (element) => {
   return {
     tag: element.tagName.toLowerCase(),
     raw: element.outerHTML,
@@ -33,28 +33,12 @@ const createBlock = async (element) => {
   };
 };
 
-const processSingleArticle = async (article, content) => {
+const processElementsToBlocks = async (elements) => {
   const blocks = [];
-  for (const e of Array.from(article)) {
-    blocks.push({
-      tag: e.tag.toLowerCase(),
-      raw: e.ele.outerHTML,
-      rawHash: await getHash(e.ele.outerHTML),
-      content: e.html,
-    });
+  for (const element of Array.from(elements)) {
+    blocks.push(await createBlockFromElement(element));
   }
-  return {
-    blocks,
-    replaceContent: content.replace(article.html, "${temp}"),
-  };
-};
-
-const processMultipleArticles = async (children) => {
-  const blocks = [];
-  for (const child of children) {
-    blocks.push(await createBlock(child));
-  }
-  return { blocks };
+  return blocks;
 };
 
 const processHtmlFile = async (handle, relativePath, content) => {
@@ -73,29 +57,37 @@ const processHtmlFile = async (handle, relativePath, content) => {
     const temp = $(`<template>${content}</template>`);
     const article = temp.$("article");
 
-    // 是否在一级子元素
-    let isSub = false;
-
-    for (let ele of temp.ele.content.children) {
-      if (ele === article.ele) {
-        isSub = true;
-        break;
-      }
+    if (!article) {
+      const blocks = await processElementsToBlocks(temp.ele.content.children);
+      return {
+        name: handle.name,
+        path: relativePath,
+        realPath: handle.path,
+        blocks,
+      };
     }
 
-    let result;
-    if (isSub) {
-      result = await processSingleArticle(article, content);
-    } else {
-      const children = temp.ele.content.children;
-      result = await processMultipleArticles(children);
+    const isTopLevel = Array.from(temp.ele.content.children).some(
+      (child) => child === article.ele,
+    );
+
+    if (isTopLevel) {
+      const blocks = await processElementsToBlocks(article.map((e) => e.ele));
+      return {
+        name: handle.name,
+        path: relativePath,
+        realPath: handle.path,
+        blocks,
+        replaceContent: content.replace(article.html, "${temp}"),
+      };
     }
 
+    const blocks = await processElementsToBlocks(temp.ele.content.children);
     return {
       name: handle.name,
       path: relativePath,
       realPath: handle.path,
-      ...result,
+      blocks,
     };
   } catch (error) {
     console.error(`Error processing HTML file ${handle.name}:`, error);
