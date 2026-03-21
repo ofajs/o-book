@@ -3,25 +3,58 @@
   <style>
     :host {
       display: block;
+      height: 100%;
     }
     .container {
-      padding: 16px;
+      height: 100%;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      height: 50px;
+    }
+    .layout {
+      display: flex;
+      gap: 16px;
+      height: calc(100% - 60px);
+    }
+    .left {
+      margin-left: 16px;
+      width: 300px;
+      height: 100%;
+      flex-shrink: 0;
+      overflow: auto;
+    }
+    .article-content {
+      flex: 1;
+    }
+    p-list-item {
+      border-radius: 30px;
+    }
+    p-list-item[active-item] {
+      background-color: var(--md-sys-color-primary-container);
     }
   </style>
   <div class="container">
-    <div>写作语言: <span>{{config.writingLang}}</span></div>
-    <p>{{config}}</p>
-    <p-list style="max-height: 60vh; width: 300px; overflow: auto">
-      <o-fill :value="articleData">
-        <p-list-item
-          button
-          on:click="$host.clickItem($data)"
-          attr:active-item="$host.activeArticlePath === $data.path"
-        >
-          {{$data.name}}
-        </p-list-item>
-      </o-fill>
-    </p-list>
+    <div class="top">写作语言: <span>{{config.writingLang}}</span></div>
+    <!-- <p>{{config}}</p> -->
+    <div class="layout">
+      <div class="left">
+        <p-list>
+          <o-fill :value="articleData">
+            <p-list-item
+              button
+              on:click="$host.clickItem($data)"
+              attr:active-item="$host.activeArticlePath === $data.path"
+            >
+              {{$data.name}}
+            </p-list-item>
+          </o-fill>
+        </p-list>
+      </div>
+      <div class="article-content">asd</div>
+    </div>
   </div>
   <script>
     export const parent = "../layout.html";
