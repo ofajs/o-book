@@ -24,19 +24,15 @@ const processMarkdownFile = async (handle, relativePath, content) => {
   }
 };
 
-const createBlockFromElement = async (element) => {
-  return {
-    tag: element.tagName.toLowerCase(),
-    raw: element.outerHTML,
-    rawHash: await getHash(element.outerHTML),
-    content: element.innerHTML,
-  };
-};
-
 const processElementsToBlocks = async (elements) => {
   const blocks = [];
   for (const element of Array.from(elements)) {
-    blocks.push(await createBlockFromElement(element));
+    blocks.push({
+      tag: element.tagName.toLowerCase(),
+      raw: element.outerHTML,
+      rawHash: await getHash(element.outerHTML),
+      content: element.innerHTML,
+    });
   }
   return blocks;
 };
