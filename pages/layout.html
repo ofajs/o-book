@@ -32,7 +32,7 @@
       <o-if :value="activeId !== 'start'">
         <p-nav-item
           attr:active-item="activeId === 'translate'"
-          on:click="goto('./translate.html?path='+query.path)"
+          on:click="goto('./translate/translate.html?path='+query.path)"
         >
           AI翻译
           <n-icon icon="mingcute:ai-line" slot="icon"></n-icon>

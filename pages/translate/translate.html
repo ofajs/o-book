@@ -1,0 +1,61 @@
+<template page>
+  <style>
+    :host {
+      display: block;
+    }
+    .container {
+      padding: 16px;
+    }
+  </style>
+  <div class="container">
+    <div>写作语言: <span>{{config.writingLang}}</span></div>
+    <p>{{config}}</p>
+  </div>
+  <script>
+    export const parent = "../layout.html";
+
+    import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
+    import { getArticleData } from "./util.js";
+
+    export default async ({ load, query }) => {
+      const { get } = await load("/nos/fs/main.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+
+      return {
+        data: {
+          activeId: "AI",
+          config: {
+            writingLang: "cn",
+            languages: ["cn", "en"],
+          },
+          articleData: [],
+        },
+        proto: {
+          async loadArticle() {
+            try {
+              const handle = await get(query.path);
+              this.config = await getData(handle);
+              const articleData = await getArticleData(
+                await handle.get(this.config.writingLang),
+                { isRoot: true },
+              );
+              this.articleData = articleData;
+            } catch (error) {
+              console.error("Failed to load article:", error);
+            }
+          },
+        },
+        attached() {
+          this.loadArticle();
+          this.emit("set-active-id", {
+            composed: true,
+            data: {
+              name: "translate",
+              query: { ...query },
+            },
+          });
+        },
+      };
+    };
+  </script>
+</template>
