@@ -1,33 +1,13 @@
 import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
 import { getHash } from "/nos/util/hash/get-hash.js";
 
-export const getArticleData = async (handle, options = {}) => {
-  let resultOptions = options;
-  if (options.isRoot) {
-    resultOptions = {
-      rootPath: handle.path,
-    };
-  }
+const FILE_EXTENSIONS = {
+  MARKDOWN: ".md",
+  HTML: ".html",
+};
 
-  if (handle.kind === "dir") {
-    const children = [];
-    for await (const item of handle.values()) {
-      const childData = await getArticleData(item, resultOptions);
-
-      if (item.kind === "dir") {
-        children.push(...childData);
-      } else if (childData) {
-        children.push(childData);
-      }
-    }
-
-    return children;
-  }
-
-  const content = await handle.text();
-  const relativePath = handle.path.replace(resultOptions.rootPath + "/", "");
-
-  if (handle.name.endsWith(".md")) {
+const processMarkdownFile = async (handle, relativePath, content) => {
+  try {
     const blocks = marked.lexer(content);
     for (const block of blocks) {
       block.rawHash = await getHash(block.raw);
@@ -38,74 +18,134 @@ export const getArticleData = async (handle, options = {}) => {
       realPath: handle.path,
       blocks,
     };
+  } catch (error) {
+    console.error(`Error processing markdown file ${handle.name}:`, error);
+    return null;
   }
+};
 
-  if (handle.name.endsWith(".html")) {
+const createBlock = async (element) => {
+  return {
+    tag: element.tagName.toLowerCase(),
+    raw: element.outerHTML,
+    rawHash: await getHash(element.outerHTML),
+    content: element.innerHTML,
+  };
+};
+
+const processSingleArticle = async (article, content) => {
+  const blocks = [];
+  for (const e of Array.from(article)) {
+    blocks.push({
+      tag: e.tag.toLowerCase(),
+      raw: e.ele.outerHTML,
+      rawHash: await getHash(e.ele.outerHTML),
+      content: e.html,
+    });
+  }
+  return {
+    blocks,
+    replaceContent: content.replace(article.html, "${temp}"),
+  };
+};
+
+const processMultipleArticles = async (children) => {
+  const blocks = [];
+  for (const child of children) {
+    blocks.push(await createBlock(child));
+  }
+  return { blocks };
+};
+
+const processHtmlFile = async (handle, relativePath, content) => {
+  try {
     if (content.startsWith("<template ")) {
-      // 组件或页面模块，直接返回内容
       return {
         name: handle.name,
         path: relativePath,
         realPath: handle.path,
-        isTemp: true, // 属于页面或组件模块
+        isTemp: true,
         content,
         contentHash: await getHash(content),
       };
     }
 
-    // 抽取子内容
     const temp = $(`<template>${content}</template>`);
-
-    const blocks = [];
-
     const articles = temp.all("article");
 
-    let article = null;
+    let result;
     if (articles.length === 1) {
-      article = articles[0];
-    }
-
-    if (article) {
-      // 拆分子区域内容
-      for (const e of Array.from(article)) {
-        blocks.push({
-          tag: e.tag.toLowerCase(),
-          raw: e.ele.outerHTML,
-          rawHash: await getHash(e.ele.outerHTML),
-          content: e.html,
-        });
-      }
-
-      const replaceContent = content.replace(article.html, "${temp}");
-
-      return {
-        name: handle.name,
-        path: relativePath,
-        realPath: handle.path,
-        blocks,
-        replaceContent,
-      };
-    }
-
-    // 多个 article 或者没有 article，直接将子元素进行分割
-    const children = temp.ele.content.children;
-
-    for (const child of children) {
-      blocks.push({
-        tag: child.tagName.toLowerCase(),
-        raw: child.outerHTML,
-        rawHash: await getHash(child.outerHTML),
-        content: child.innerHTML,
-      });
+      result = await processSingleArticle(articles[0], content);
+    } else {
+      const children = temp.ele.content.children;
+      result = await processMultipleArticles(children);
     }
 
     return {
       name: handle.name,
       path: relativePath,
       realPath: handle.path,
-      blocks,
+      ...result,
     };
+  } catch (error) {
+    console.error(`Error processing HTML file ${handle.name}:`, error);
+    return null;
+  }
+};
+
+const processFile = async (handle, rootPath) => {
+  const content = await handle.text();
+  const relativePath = handle.path.replace(rootPath + "/", "");
+
+  if (handle.name.endsWith(FILE_EXTENSIONS.MARKDOWN)) {
+    return await processMarkdownFile(handle, relativePath, content);
+  }
+
+  if (handle.name.endsWith(FILE_EXTENSIONS.HTML)) {
+    return await processHtmlFile(handle, relativePath, content);
   }
 
   return null;
+};
+
+const processDirectory = async (handle, rootPath) => {
+  const children = [];
+  for await (const item of handle.values()) {
+    try {
+      const childData = await getArticleData(item, { rootPath });
+
+      if (item.kind === "dir") {
+        children.push(...childData);
+      } else if (childData) {
+        children.push(childData);
+      }
+    } catch (error) {
+      console.error(`Error processing item ${item.name}:`, error);
+    }
+  }
+  return children;
+};
+
+export const getArticleData = async (handle, options = {}) => {
+  try {
+    let rootPath;
+    if (options.isRoot) {
+      rootPath = handle.path;
+    } else {
+      rootPath = options.rootPath;
+    }
+
+    if (!rootPath) {
+      throw new Error("rootPath is required");
+    }
+
+    if (handle.kind === "dir") {
+      return await processDirectory(handle, rootPath);
+    }
+
+    return await processFile(handle, rootPath);
+  } catch (error) {
+    console.error(`Error in getArticleData for ${handle.name}:`, error);
+    return null;
+  }
 };
