@@ -1,27 +1,186 @@
 <template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/icon/icon.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/radio/group.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/radio/radio.html"></l-m>
   <style>
     :host {
       display: block;
     }
 
     .container {
+      padding: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-size: 18px;
+      padding: 8px 0;
+      margin: 0 0 16px 0;
+      color: var(--md-ref-palette-normal40);
+    }
+
+    .form-item {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      color: var(--md-sys-color-normal);
+      margin-bottom: 8px;
+    }
+
+    .toolbar {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      font-size: 24px;
-      color: var(--md-sys-color-primary);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .key-list {
+      margin-top: 24px;
+    }
+
+    .provider-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+    }
+
+    .provider-selector {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    p-list-item {
+      &:hover {
+        background: rgb(from var(--md-sys-color-on-primary) r g b / 0.4);
+      }
     }
   </style>
   <div class="container">
-    Hello World
+    <h2>AI API Key 配置</h2>
+    <div class="form-item">
+      <label class="form-label">选择服务提供商</label>
+      <div class="provider-selector">
+        <p-radio-group sync:value="selectedProvider">
+          <p-radio value="deepseek">DeepSeek</p-radio>
+          <p-radio value="kimi">Kimi</p-radio>
+          <p-radio value="glm">GLM</p-radio>
+          <p-radio value="minimax">MiniMax</p-radio>
+        </p-radio-group>
+      </div>
+    </div>
+    <div class="form-item">
+      <label class="form-label">API Key</label>
+      <p-input sync:value="newKey" attr:placeholder="placeholder"></p-input>
+    </div>
+    <div class="form-item">
+      <label class="form-label">并发次数</label>
+      <p-input
+        sync:value="concurrency"
+        type="number"
+        min="1"
+        placeholder="请输入并发次数（默认为1）"
+      ></p-input>
+    </div>
+    <div class="toolbar">
+      <p-button on:click="saveKey" attr:disabled="!newKey.trim()"
+        >保存</p-button
+      >
+    </div>
+
+    <div class="key-list">
+      <h2>已保存的 API Keys</h2>
+      <p-list>
+        <o-fill :value="aiKeys" name="key-item"></o-fill>
+      </p-list>
+      <template name="key-item">
+        <p-list-item>
+          <span class="provider-tag" slot="prefix">{{$data.provider}}</span>
+          <div>{{$data.key}}</div>
+          <div secondary>并发: {{$data.concurrency || 1}}</div>
+
+          <p-button
+            variant="outlined"
+            on:click="$host.deleteKey($data,$index)"
+            slot="suffix"
+            size="small"
+          >
+            删除
+          </p-button>
+        </p-list-item>
+      </template>
+      <x-if :value="aiKeys.length === 0">
+        <p-list-item>暂无保存的 API Keys</p-list-item>
+      </x-if>
+    </div>
   </div>
   <script>
     export const parent = "../layout.html";
 
+    import { storage } from "/gh/kirakiray/ever-cache/src/main.js";
+    import { toast } from "/gh/ofajs/Punch-UI/packages/util.js";
+
     export default async ({ load, query }) => {
+      const aiKeys = (await storage.getItem("ai-keys")) || [];
+
       return {
-        data: {},
+        data: {
+          aiKeys: [], // 所有的 API Key
+          _wid: null, // 监听器ID
+          newKey: "",
+          selectedProvider: "deepseek",
+          concurrency: 1,
+        },
+        proto: {
+          get placeholder() {
+            return `请输入 ${this.selectedProvider} 的 API Key`;
+          },
+          async saveKey() {
+            const existingKey = this.aiKeys.find(
+              (item) =>
+                item.provider === this.selectedProvider &&
+                item.key === this.newKey,
+            );
+
+            if (existingKey) {
+              toast({
+                color: "error",
+                message: "该 API Key 已存在",
+              });
+              return;
+            }
+
+            this.aiKeys.push({
+              provider: this.selectedProvider,
+              key: this.newKey,
+              concurrency: parseInt(this.concurrency) || 1,
+            });
+
+            this.newKey = "";
+            this.concurrency = 1;
+
+            toast({
+              color: "success",
+              message: "API Key 保存成功",
+            });
+          },
+          async deleteKey(keyItem, index) {
+            this.aiKeys.splice(index, 1);
+
+            toast({
+              color: "success",
+              message: "API Key 删除成功",
+            });
+          },
+        },
         async attached() {
           this.emit("set-active-id", {
             composed: true,
@@ -30,6 +189,16 @@
               query: { ...query },
             },
           });
+
+          this.aiKeys = aiKeys;
+
+          this._wid = this.aiKeys.watchTick(() => {
+            const aiKeys = this.aiKeys.toJSON();
+            storage.setItem("ai-keys", aiKeys);
+          });
+        },
+        detached() {
+          this.aiKeys.unwatch(this._wid);
         },
       };
     };
