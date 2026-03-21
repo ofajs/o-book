@@ -121,7 +121,7 @@ const processDirectory = async (handle, rootPath) => {
       console.error(`Error processing item ${item.name}:`, error);
     }
   }
-  return children;
+  return children.sort((a, b) => a.name.localeCompare(b.name));
 };
 
 export const getArticleData = async (handle, options = {}) => {
