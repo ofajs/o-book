@@ -71,11 +71,21 @@ const processHtmlFile = async (handle, relativePath, content) => {
     }
 
     const temp = $(`<template>${content}</template>`);
-    const articles = temp.all("article");
+    const article = temp.$("article");
+
+    // 是否在一级子元素
+    let isSub = false;
+
+    for (let ele of temp.ele.content.children) {
+      if (ele === article.ele) {
+        isSub = true;
+        break;
+      }
+    }
 
     let result;
-    if (articles.length === 1) {
-      result = await processSingleArticle(articles[0], content);
+    if (isSub) {
+      result = await processSingleArticle(article, content);
     } else {
       const children = temp.ele.content.children;
       result = await processMultipleArticles(children);

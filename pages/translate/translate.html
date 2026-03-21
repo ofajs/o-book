@@ -15,6 +15,7 @@
       <o-fill :value="articleData">
         <p-list-item
           button
+          on:click="$host.clickItem($data)"
           attr:active-item="$host.activeArticlePath === $data.path"
         >
           {{$data.name}}
@@ -44,6 +45,9 @@
           _originArticleData: null,
         },
         proto: {
+          clickItem(item) {
+            this.activeArticlePath = item.path;
+          },
           async loadArticle() {
             try {
               const handle = await get(query.path);
