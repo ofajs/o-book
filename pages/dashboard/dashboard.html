@@ -150,12 +150,14 @@
     </template>
   </div>
   <script>
-    export const parent = "./layout.html";
+    export const parent = "../layout.html";
+
+    import { buildPreviewUrl, buildIndexPreviewUrl } from "./dashboard-data.js";
 
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
-      const { getData } = await load("../util/yaml-handle.js");
-      const { initGenerator, getBasePath } = await load("../util/generate.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+      const { initGenerator, getBasePath } = await load("../../util/generate.js");
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
 
       return {
@@ -173,24 +175,13 @@
             if (!url) {
               return;
             }
-            // 统一去掉前缀 ./ 和后缀 _config.yaml，得到目录名
-            const dirName = this.activeHeader
-              .replace(/^\.\//, "")
-              .replace(/\/_config\.yaml$/, "");
-
-            // 去掉前缀 ./ 和后缀 .md，得到文件名
-            const suffixName = url
-              .replace(/^\.\//, "")
-              .replace(/\.md$/, ".html");
-
-            // 拼接并打开预览地址
             window.open(
-              `/${query.path}/website/cn/${dirName}/${suffixName}`,
+              buildPreviewUrl(this.activeHeader, url, query.path),
               "_blank",
             );
           },
           clickPreview() {
-            window.open(`/${query.path}/website/cn/index.html`, "_blank");
+            window.open(buildIndexPreviewUrl(query.path), "_blank");
           },
           async refreshPreview() {
             await this.init({ watchArticle: false });

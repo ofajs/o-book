@@ -144,7 +144,7 @@
         },
         proto: {
           handleClick(item) {
-            this.goto(`./dashboard.html?path=${item._handle.path}`);
+            this.goto(`./dashboard/dashboard.html?path=${item._handle.path}`);
           },
           async selectDirectory() {
             const handle = await mount();
@@ -160,7 +160,7 @@
 
             // TODO: 检查文件夹内容是否符合 OBook 约定
 
-            this.goto(`./dashboard.html?path=${handle.path}`);
+            this.goto(`./dashboard/dashboard.html?path=${handle.path}`);
           },
           async loadHistory() {
             const history = (await storage.getItem("history")) || [];

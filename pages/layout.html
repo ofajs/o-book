@@ -21,7 +21,7 @@
         <o-if :value="activeId !== 'start'">
           <p-nav-item
             attr:active-item="activeId === 'dashboard'"
-            on:click="goto('./dashboard.html?path='+query.path)"
+            on:click="goto('./dashboard/dashboard.html?path='+query.path)"
           >
             总揽
             <n-icon
