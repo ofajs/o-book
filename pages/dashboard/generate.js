@@ -1,8 +1,8 @@
-import { getData } from "./yaml-handle.js";
+import { getData } from "../../util/yaml-handle.js";
 import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
 import hljs from "/npm/highlight.js@11.9.0/+esm";
 import jsBeautify from "/npm/js-beautify@1.15.1/+esm";
-// import { genRag } from "./gen-rag.js";
+// import { genRag } from "../../util/gen-rag.js";
 
 marked.use({
   renderer: {

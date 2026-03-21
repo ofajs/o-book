@@ -157,7 +157,7 @@
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../../util/yaml-handle.js");
-      const { initGenerator, getBasePath } = await load("../../util/generate.js");
+      const { initGenerator, getBasePath } = await load("./generate.js");
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
 
       return {
