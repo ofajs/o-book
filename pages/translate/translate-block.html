@@ -46,8 +46,19 @@
   <div class="container">
     <div class="left">{{item.raw}}</div>
     <div class="right">
-      <textarea> aa </textarea>
+      <textarea sync:value="translateText" attr:disabled="translating">
+      </textarea>
     </div>
+  </div>
+  <div style="display: flex; justify-content: flex-end; margin-top: 4px">
+    <p-button
+      size="small"
+      variant="outlined"
+      on:click="translate"
+      attr:disabled="translating"
+    >
+      翻译
+    </p-button>
   </div>
 
   <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
@@ -60,7 +71,10 @@
       return {
         tag: "translate-block",
         data: {
+          translateText: "aa", // 翻译后的文本
+          translating: false, // 是否正在翻译
           item: null,
+          targetLang: "", // 翻译到目标语言
           projectPath: "",
         },
         watch: {
@@ -73,13 +87,19 @@
           },
         },
         proto: {
+          // 翻译原文
+          async translate() {
+            debugger;
+          },
           async init() {
             if (this.item.type === "space") {
               this.style.display = "none";
               return;
             }
 
-            const storage = getStorage(this.projectPath);
+            const storage = getStorage(this.targetLang + this.projectPath);
+
+            // 获取翻译后的历史数据
           },
         },
       };
@@ -88,7 +108,7 @@
     const storages = {};
     // 获取翻译的存储空间
     const getStorage = (projectPath) => {
-      const key = "obook-translates-" + projectPath;
+      const key = "translates-" + projectPath;
       if (storages[key]) {
         return storages[key];
       }

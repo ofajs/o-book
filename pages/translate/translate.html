@@ -1,5 +1,6 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="./translate-block.html"></l-m>
   <style>
     :host {
@@ -14,6 +15,7 @@
       align-items: center;
       padding: 0 16px;
       height: 50px;
+      font-size: 14px;
     }
     .layout {
       display: flex;
@@ -40,7 +42,18 @@
     }
   </style>
   <div class="container">
-    <div class="top">写作语言: <span>{{config.writingLang}}</span></div>
+    <div class="top">
+      <div>
+        写作语言:
+        <span style="color: var(--md-sys-color-primary)">
+          {{config.writingLang}}
+        </span>
+      </div>
+      <div style="margin-left: 16px">
+        翻译到:
+        <span style="color: var(--md-sys-color-primary)">{{targetLang}} </span>
+      </div>
+    </div>
     <div class="layout">
       <div class="left">
         <h3 style="margin: 0 0 16px 0; font-size: 14px">需要翻译的文件</h3>
@@ -58,7 +71,10 @@
       </div>
       <div class="article-content">
         <o-fill :value="currentBlocks">
-          <translate-block :item="$data"></translate-block>
+          <translate-block
+            :item="$data"
+            :target-lang="$host.targetLang"
+          ></translate-block>
         </o-fill>
       </div>
     </div>
@@ -81,6 +97,7 @@
             writingLang: "cn",
             languages: ["cn", "en"],
           },
+          targetLang: "en", // 翻译到目标语言
           articleList: [], // 所有的文章数据
           activeArticlePath: "", // 当前选中文章路径
           currentBlocks: [], // 当前选中文章数据
