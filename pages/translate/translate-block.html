@@ -49,17 +49,26 @@
       <textarea> aa </textarea>
     </div>
   </div>
+
+  <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
   <script>
+    import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
+
     export default async function ({ load }) {
       const { get } = await load("/nos/fs/main.js");
 
       return {
         tag: "translate-block",
         data: {
-          item: {},
+          item: null,
+          projectPath: "",
         },
         watch: {
           item() {
+            if (!this.item) {
+              return;
+            }
+
             this.init();
           },
         },
@@ -69,9 +78,22 @@
               this.style.display = "none";
               return;
             }
+
+            const storage = getStorage(this.projectPath);
           },
         },
       };
     }
+
+    const storages = {};
+    // 获取翻译的存储空间
+    const getStorage = (projectPath) => {
+      const key = "obook-translates-" + projectPath;
+      if (storages[key]) {
+        return storages[key];
+      }
+      const storage = (storages[key] = new EverCache(key));
+      return storage;
+    };
   </script>
 </template>
