@@ -1,5 +1,6 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
+  <l-m src="./translate-block.html"></l-m>
   <style>
     :host {
       display: block;
@@ -38,11 +39,11 @@
   </style>
   <div class="container">
     <div class="top">写作语言: <span>{{config.writingLang}}</span></div>
-    <!-- <p>{{config}}</p> -->
     <div class="layout">
       <div class="left">
+        <h3 style="margin: 0 0 16px 0; font-size: 14px">需要翻译的文件</h3>
         <p-list>
-          <o-fill :value="articleData">
+          <o-fill :value="articleList">
             <p-list-item
               button
               on:click="$host.clickItem($data)"
@@ -53,7 +54,11 @@
           </o-fill>
         </p-list>
       </div>
-      <div class="article-content">asd</div>
+      <div class="article-content">
+        <o-fill :value="currentBlocks">
+          <translate-block :item="$data"></translate-block>
+        </o-fill>
+      </div>
     </div>
   </div>
   <script>
@@ -74,36 +79,45 @@
             writingLang: "cn",
             languages: ["cn", "en"],
           },
-          articleData: [],
-          activeArticlePath: "",
-          _originArticleData: null,
+          articleList: [], // 所有的文章数据
+          activeArticlePath: "", // 当前选中文章路径
+          currentBlocks: [], // 当前选中文章数据
+          _originArticleData: null, // 原始文章数据
         },
         proto: {
           clickItem(item) {
             this.activeArticlePath = item.path;
+
+            // 从_originArticleData中获取当前选中的文章数据
+            const article = this._originArticleData.find(
+              (a) => a.path === item.path,
+            );
+            if (article) {
+              this.currentBlocks = article.blocks;
+            }
           },
           async loadArticle() {
             try {
               const handle = await get(query.path);
               this.config = await getData(handle);
-              const articleData = await getArticleData(
+              const articleList = await getArticleData(
                 await handle.get(this.config.writingLang),
                 { isRoot: true },
               );
 
-              if (!articleData || articleData.length === 0) {
+              if (!articleList || articleList.length === 0) {
                 console.warn("No articles found");
-                this.articleData = [];
+                this.articleList = [];
                 this._originArticleData = null;
                 return;
               }
 
-              this._originArticleData = articleData;
-              this.activeArticlePath = articleData[0].path;
-              this.articleData = articleData.map(transformArticle);
+              this._originArticleData = articleList;
+              this.articleList = articleList.map(transformArticle);
+              this.clickItem(articleList[0]);
             } catch (error) {
               console.error("Failed to load article:", error);
-              this.articleData = [];
+              this.articleList = [];
               this._originArticleData = null;
             }
           },

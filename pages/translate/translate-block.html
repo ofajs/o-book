@@ -1,0 +1,31 @@
+<template component>
+  <style>
+    :host {
+      display: block;
+      margin: 16px 0;
+    }
+    .container {
+      display: flex;
+      gap: 16px;
+    }
+    .left,
+    .right {
+      flex: 1;
+      flex-shrink: 0;
+    }
+  </style>
+  <div class="container">
+    <div class="left">{{item.raw}}</div>
+    <div class="right">aa</div>
+  </div>
+  <script>
+    export default async function ({ load }) {
+      return {
+        tag: "translate-block",
+        data: {
+          item: {},
+        },
+      };
+    }
+  </script>
+</template>
