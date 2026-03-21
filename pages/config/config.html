@@ -156,8 +156,6 @@
     import { toast } from "/gh/ofajs/Punch-UI/packages/util.js";
 
     export default async ({ load, query }) => {
-      const aiKeys = (await storage.getItem("ai-keys")) || [];
-
       return {
         data: {
           aiKeys: [], // 所有的 API Key
@@ -236,6 +234,7 @@
             },
           });
 
+          const aiKeys = (await storage.getItem("ai-keys")) || [];
           this.aiKeys = aiKeys;
 
           this._wid = this.aiKeys.watchTick(() => {
