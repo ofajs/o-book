@@ -27,7 +27,8 @@
     export const parent = "../layout.html";
 
     import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
-    import { getArticleData } from "./util.js";
+    import { getArticleData } from "./article-data.js";
+    import { transformArticle } from "./transform.js";
 
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/main.js");
@@ -56,44 +57,21 @@
                 await handle.get(this.config.writingLang),
                 { isRoot: true },
               );
+
+              if (!articleData || articleData.length === 0) {
+                console.warn("No articles found");
+                this.articleData = [];
+                this._originArticleData = null;
+                return;
+              }
+
               this._originArticleData = articleData;
-
               this.activeArticlePath = articleData[0].path;
-
-              // 获取并修正关键内容
-              this.articleData = articleData.map((e) => {
-                if (e.isTemp) {
-                  return {
-                    name: e.name,
-                    path: e.path,
-                    realPath: e.realPath,
-                    isTemp: true,
-                    contentHash: e.contentHash,
-                  };
-                }
-
-                return {
-                  name: e.name,
-                  path: e.path,
-                  realPath: e.realPath,
-                  blocks: e.blocks.map((e2) => {
-                    if (!e2.type) {
-                      return {
-                        tag: e2.tag,
-                        rawHash: e2.rawHash,
-                      };
-                    }
-
-                    return {
-                      type: e2.type,
-                      rawHash: e2.rawHash,
-                    };
-                  }),
-                };
-              });
-              console.log(articleData);
+              this.articleData = articleData.map(transformArticle);
             } catch (error) {
               console.error("Failed to load article:", error);
+              this.articleData = [];
+              this._originArticleData = null;
             }
           },
         },
