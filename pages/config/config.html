@@ -5,6 +5,7 @@
   <l-m src="/gh/ofajs/Punch-UI/packages/icon/icon.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/radio/group.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/radio/radio.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <style>
     :host {
       display: block;
@@ -81,15 +82,6 @@
       <label class="form-label">API Key</label>
       <p-input sync:value="newKey" attr:placeholder="placeholder"></p-input>
     </div>
-    <div class="form-item">
-      <label class="form-label">并发次数</label>
-      <p-input
-        sync:value="concurrency"
-        type="number"
-        min="1"
-        placeholder="请输入并发次数（默认为1）"
-      ></p-input>
-    </div>
     <div class="toolbar">
       <p-button on:click="saveKey" attr:disabled="!newKey.trim()"
         >保存</p-button
@@ -107,20 +99,55 @@
           <div>{{$data.key}}</div>
           <div secondary>并发: {{$data.concurrency || 1}}</div>
 
-          <p-button
-            variant="outlined"
-            on:click="$host.deleteKey($data,$index)"
-            slot="suffix"
-            size="small"
-          >
-            删除
-          </p-button>
+          <div slot="suffix" style="display: flex; gap: 8px">
+            <p-button
+              variant="text"
+              on:click="$host.openEditDialog($data,$index)"
+              size="small"
+            >
+              编辑
+            </p-button>
+            <p-button
+              variant="outlined"
+              on:click="$host.deleteKey($data,$index)"
+              size="small"
+            >
+              删除
+            </p-button>
+          </div>
         </p-list-item>
       </template>
       <x-if :value="aiKeys.length === 0">
         <p-list-item>暂无保存的 API Keys</p-list-item>
       </x-if>
     </div>
+
+    <p-dialog sync:open="editDialogOpen">
+      <h2 slot="title">编辑 API Key</h2>
+      <div>
+        <div class="form-item">
+          <label class="form-label">服务提供商</label>
+          <p-input :value="editItem.provider" disabled></p-input>
+        </div>
+        <div class="form-item">
+          <label class="form-label">API Key</label>
+          <p-input :value="editItem.key" disabled></p-input>
+        </div>
+        <div class="form-item">
+          <label class="form-label">并发次数</label>
+          <p-input
+            sync:value="editConcurrency"
+            type="number"
+            min="1"
+            placeholder="请输入并发次数"
+          ></p-input>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end">
+        <p-button variant="outlined" on:click="closeEditDialog">取消</p-button>
+        <p-button on:click="saveEdit">保存</p-button>
+      </div>
+    </p-dialog>
   </div>
   <script>
     export const parent = "../layout.html";
@@ -137,7 +164,10 @@
           _wid: null, // 监听器ID
           newKey: "",
           selectedProvider: "deepseek",
-          concurrency: 1,
+          editDialogOpen: false,
+          editItem: {},
+          editConcurrency: 1,
+          editIndex: -1,
         },
         proto: {
           get placeholder() {
@@ -161,24 +191,40 @@
             this.aiKeys.push({
               provider: this.selectedProvider,
               key: this.newKey,
-              concurrency: parseInt(this.concurrency) || 1,
+              concurrency: 1,
             });
 
             this.newKey = "";
-            this.concurrency = 1;
+          },
+          openEditDialog(item, index) {
+            this.editItem = { ...item };
+            this.editConcurrency = item.concurrency || 1;
+            this.editIndex = index;
+            this.editDialogOpen = true;
+          },
+          closeEditDialog() {
+            this.editDialogOpen = false;
+            this.editItem = {};
+            this.editConcurrency = 1;
+            this.editIndex = -1;
+          },
+          saveEdit() {
+            if (!this.editConcurrency || this.editConcurrency < 1) {
+              toast({
+                color: "error",
+                message: "并发次数必须大于 0",
+              });
+              return;
+            }
 
-            toast({
-              color: "success",
-              message: "API Key 保存成功",
-            });
+            this.aiKeys[this.editIndex].concurrency = parseInt(
+              this.editConcurrency,
+            );
+
+            this.closeEditDialog();
           },
           async deleteKey(keyItem, index) {
             this.aiKeys.splice(index, 1);
-
-            toast({
-              color: "success",
-              message: "API Key 删除成功",
-            });
           },
         },
         async attached() {
@@ -195,6 +241,11 @@
           this._wid = this.aiKeys.watchTick(() => {
             const aiKeys = this.aiKeys.toJSON();
             storage.setItem("ai-keys", aiKeys);
+
+            toast({
+              color: "success",
+              message: "API Key 更新成功",
+            });
           });
         },
         detached() {
