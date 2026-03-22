@@ -130,13 +130,32 @@
           <p-input :value="editItem.provider" disabled></p-input>
         </div>
         <div class="form-item">
+          <label class="form-label">模型</label>
+          <select
+            sync:value="editItem.model"
+            style="
+              width: 100%;
+              padding: 12px;
+              border: 1px solid var(--md-sys-color-outline);
+              border-radius: 4px;
+              background: var(--md-sys-color-surface);
+              color: var(--md-sys-color-on-surface);
+              font-size: 14px;
+            "
+          >
+            <x-fill :value="editAvailableModels">
+              <option>{{$data}}</option>
+            </x-fill>
+          </select>
+        </div>
+        <div class="form-item">
           <label class="form-label">API Key</label>
           <p-input :value="editItem.key" disabled></p-input>
         </div>
         <div class="form-item">
           <label class="form-label">并发次数</label>
           <p-input
-            sync:value="editConcurrency"
+            sync:value="editItem.concurrency"
             type="number"
             min="1"
             placeholder="请输入并发次数"
@@ -158,18 +177,26 @@
     export default async ({ load, query }) => {
       return {
         data: {
-          aiKeys: [], // 所有的 API Key
-          _wid: null, // 监听器ID
+          aiKeys: [],
+          _wid: null,
           newKey: "",
           selectedProvider: "deepseek",
           editDialogOpen: false,
           editItem: {},
-          editConcurrency: 1,
           editIndex: -1,
         },
         proto: {
           get placeholder() {
             return `请输入 ${this.selectedProvider} 的 API Key`;
+          },
+          get editAvailableModels() {
+            const models = {
+              deepseek: ["deepseek-chat", "deepseek-coder"],
+              kimi: ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"],
+              glm: ["glm-4", "glm-3-turbo", "glm-4v"],
+              minimax: ["abab5.5-chat", "abab5.5s-chat"],
+            };
+            return models[this.editItem.provider] || [];
           },
           async saveKey() {
             const existingKey = this.aiKeys.find(
@@ -196,18 +223,20 @@
           },
           openEditDialog(item, index) {
             this.editItem = { ...item };
-            this.editConcurrency = item.concurrency || 1;
+            if (!item.model) {
+              this.editItem.model = this.editAvailableModels[0] || "";
+            }
+            this.editItem.concurrency = item.concurrency || 1;
             this.editIndex = index;
             this.editDialogOpen = true;
           },
           closeEditDialog() {
             this.editDialogOpen = false;
             this.editItem = {};
-            this.editConcurrency = 1;
             this.editIndex = -1;
           },
           saveEdit() {
-            if (!this.editConcurrency || this.editConcurrency < 1) {
+            if (!this.editItem.concurrency || this.editItem.concurrency < 1) {
               toast({
                 color: "error",
                 message: "并发次数必须大于 0",
@@ -215,8 +244,9 @@
               return;
             }
 
+            this.aiKeys[this.editIndex].model = this.editItem.model;
             this.aiKeys[this.editIndex].concurrency = parseInt(
-              this.editConcurrency,
+              this.editItem.concurrency,
             );
 
             this.closeEditDialog();
