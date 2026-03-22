@@ -178,17 +178,34 @@
           editIndex: -1,
         },
         proto: {
+          get providerModels() {
+            return {
+              deepseek: ["deepseek-chat", "deepseek-coder", "deepseek-r1"],
+              kimi: [
+                "kimi-k2.5",
+                "kimi-k2.5-8k",
+                "kimi-k2.5-32k",
+                "kimi-k2.5-128k",
+              ],
+              glm: [
+                "glm-5-turbo",
+                "glm-4.7",
+                "glm-4.6",
+                "glm-4.5",
+                "glm-4.5-air",
+                "glm-4v",
+              ],
+              minimax: ["minimax-m1", "abab6.5-chat", "abab6.5s-chat"],
+            };
+          },
           get placeholder() {
             return `请输入 ${this.selectedProvider} 的 API Key`;
           },
           get editAvailableModels() {
-            const models = {
-              deepseek: ["deepseek-chat", "deepseek-coder"],
-              kimi: ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"],
-              glm: ["glm-4", "glm-3-turbo", "glm-4v"],
-              minimax: ["abab5.5-chat", "abab5.5s-chat"],
-            };
-            return models[this.editItem.provider] || [];
+            return this.providerModels[this.editItem.provider] || [];
+          },
+          get availableModels() {
+            return this.providerModels[this.selectedProvider] || [];
           },
           async saveKey() {
             const existingKey = this.aiKeys.find(
@@ -207,6 +224,7 @@
 
             this.aiKeys.push({
               provider: this.selectedProvider,
+              model: this.availableModels[0] || "",
               key: this.newKey,
               concurrency: 1,
             });
