@@ -153,7 +153,7 @@
     export const parent = "../layout.html";
 
     import { storage } from "/gh/kirakiray/ever-cache/src/main.js";
-    import { toast } from "/gh/ofajs/Punch-UI/packages/util.js";
+    import { toast, confirm } from "/gh/ofajs/Punch-UI/packages/util.js";
 
     export default async ({ load, query }) => {
       return {
@@ -222,7 +222,14 @@
             this.closeEditDialog();
           },
           async deleteKey(keyItem, index) {
-            this.aiKeys.splice(index, 1);
+            const result = await confirm({
+              title: "确认删除",
+              message: `确定要删除这个 ${keyItem.provider} 的 API Key 吗？`,
+            });
+
+            if (result) {
+              this.aiKeys.splice(index, 1);
+            }
           },
         },
         async attached() {
