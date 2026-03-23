@@ -147,13 +147,13 @@
               await translate(
                 this.item.raw,
                 this.targetLang,
-                ({ content, fullContent, done, provider }) => {
-                  this.translateText = fullContent;
+                ({ provider, chunk, content, done }) => {
+                  this.translateText = content;
                   this.provider = provider;
 
                   if (done) {
                     storage.setItem(this.cacheKey, {
-                      text: fullContent,
+                      text: content,
                       provider: provider,
                     });
                   }

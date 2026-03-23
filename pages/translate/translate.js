@@ -13,9 +13,9 @@ export const translate = async (text, targetLang, callback) => {
   ];
 
   return await chat(messages, {
-    callback: ({ provider, content, fullContent, done }) => {
+    callback: ({ provider, chunk, content, done }) => {
       if (callback) {
-        callback({ provider, content, fullContent, done });
+        callback({ provider, chunk, content, done });
       }
     },
   });
