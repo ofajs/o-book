@@ -64,6 +64,24 @@
       text-transform: uppercase;
       align-self: center;
     }
+    .model-tag {
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      background-color: var(--md-sys-color-secondary);
+      color: var(--md-sys-color-on-secondary);
+      font-weight: 500;
+      align-self: center;
+    }
+    .id-tag {
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      background-color: var(--md-sys-color-tertiary);
+      color: var(--md-sys-color-on-tertiary);
+      font-weight: 500;
+      align-self: center;
+    }
   </style>
   <div class="container">
     <div class="left">{{item.raw}}</div>
@@ -86,6 +104,8 @@
       align-items: center;
     "
   >
+    <div class="id-tag" :text="id" style="display: none"></div>
+    <div class="model-tag" :text="model" style="display: none"></div>
     <div class="provider-tag" :text="provider" style="display: none"></div>
     <p-button
       size="small"
@@ -114,6 +134,8 @@
           targetLang: "", // 翻译到目标语言
           projectPath: "",
           provider: "", // 翻译提供商
+          model: "", // 翻译模型
+          id: "", // API Key ID
         },
         watch: {
           item() {
@@ -129,6 +151,18 @@
               providerTags.style.display = this.provider ? "block" : "none";
             }
           },
+          model() {
+            const modelTags = this.shadow.$(".model-tag");
+            if (modelTags) {
+              modelTags.style.display = this.model ? "block" : "none";
+            }
+          },
+          id() {
+            const idTags = this.shadow.$(".id-tag");
+            if (idTags) {
+              idTags.style.display = this.id ? "block" : "none";
+            }
+          },
         },
         proto: {
           // 翻译原文
@@ -140,6 +174,8 @@
             this.translating = true;
             this.translateText = "";
             this.provider = "";
+            this.model = "";
+            this.id = "";
 
             try {
               const storage = getStorage(this.targetLang + this.projectPath);
@@ -147,14 +183,18 @@
               await translate(
                 this.item.raw,
                 this.targetLang,
-                ({ provider, chunk, content, done }) => {
+                ({ provider, id, model, chunk, content, done }) => {
                   this.translateText = content;
                   this.provider = provider;
+                  this.model = model;
+                  this.id = id;
 
                   if (done) {
                     storage.setItem(this.cacheKey, {
                       text: content,
                       provider: provider,
+                      model: model,
+                      id: id,
                     });
                   }
                 },
@@ -163,6 +203,8 @@
               console.error("Translation failed:", error);
               this.translateText = "翻译失败: " + error.message;
               this.provider = "";
+              this.model = "";
+              this.id = "";
             } finally {
               this.translating = false;
             }
@@ -186,9 +228,13 @@
               if (typeof cachedData === "string") {
                 this.translateText = cachedData;
                 this.provider = "";
+                this.model = "";
+                this.id = "";
               } else {
                 this.translateText = cachedData.text || "";
                 this.provider = cachedData.provider || "";
+                this.model = cachedData.model || "";
+                this.id = cachedData.id || "";
               }
             }
           },
