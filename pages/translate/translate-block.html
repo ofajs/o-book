@@ -54,6 +54,18 @@
       color: var(--md-sys-color-on-surface);
       opacity: 0.5;
     }
+    .provider-tag {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      font-weight: 500;
+      text-transform: uppercase;
+    }
   </style>
   <div class="container">
     <div class="left">{{item.raw}}</div>
@@ -65,6 +77,7 @@
         data-placeholder="未翻译"
         on:input="handleInput"
       ></div>
+      <div class="provider-tag" :text="provider" style="display: none"></div>
     </div>
   </div>
   <div style="display: flex; justify-content: flex-end; margin-top: 4px">
@@ -92,6 +105,7 @@
           item: null,
           targetLang: "", // 翻译到目标语言
           projectPath: "",
+          provider: "", // 翻译提供商
         },
         watch: {
           item() {
@@ -100,6 +114,12 @@
             }
 
             this.init();
+          },
+          provider() {
+            const providerTag = this.shadow.$(".provider-tag");
+            if (providerTag) {
+              providerTag.style.display = this.provider ? "block" : "none";
+            }
           },
         },
         proto: {
@@ -111,6 +131,7 @@
 
             this.translating = true;
             this.translateText = "";
+            this.provider = "";
 
             try {
               const storage = getStorage(this.targetLang + this.projectPath);
@@ -118,17 +139,22 @@
               await translate(
                 this.item.raw,
                 this.targetLang,
-                ({ content, fullContent, done }) => {
+                ({ content, fullContent, done, provider }) => {
                   this.translateText = fullContent;
+                  this.provider = provider;
 
                   if (done) {
-                    storage.setItem(this.cacheKey, fullContent);
+                    storage.setItem(this.cacheKey, {
+                      text: fullContent,
+                      provider: provider,
+                    });
                   }
                 },
               );
             } catch (error) {
               console.error("Translation failed:", error);
               this.translateText = "翻译失败: " + error.message;
+              this.provider = "";
             } finally {
               this.translating = false;
             }
@@ -147,9 +173,15 @@
 
             const storage = getStorage(this.targetLang + this.projectPath);
 
-            const cachedTranslation = await storage.getItem(this.cacheKey);
-            if (cachedTranslation) {
-              this.translateText = cachedTranslation;
+            const cachedData = await storage.getItem(this.cacheKey);
+            if (cachedData) {
+              if (typeof cachedData === "string") {
+                this.translateText = cachedData;
+                this.provider = "";
+              } else {
+                this.translateText = cachedData.text || "";
+                this.provider = cachedData.provider || "";
+              }
             }
           },
         },
