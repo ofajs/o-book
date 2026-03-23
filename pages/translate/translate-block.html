@@ -54,6 +54,10 @@
       color: var(--md-sys-color-on-surface);
       opacity: 0.5;
     }
+    .right .editable.thinking {
+      opacity: 0.7;
+      font-style: italic;
+    }
     .provider-tag {
       padding: 2px 8px;
       font-size: 11px;
@@ -92,6 +96,7 @@
         :text="translateText"
         data-placeholder="未翻译"
         on:input="handleInput"
+        class:thinking="thinking"
       ></div>
     </div>
   </div>
@@ -113,7 +118,8 @@
       on:click="translate"
       attr:disabled="translating"
     >
-      <o-if :value="translating"> 翻译中... </o-if>
+      <o-if :value="thinking"> 思考中... </o-if>
+      <o-else-if :value="translating"> 翻译中... </o-else-if>
       <o-else-if :value="translateText">重新翻译</o-else-if>
       <o-else> 翻译 </o-else>
     </p-button>
@@ -130,6 +136,7 @@
         data: {
           translateText: "", // 翻译后的文本
           translating: false, // 是否正在翻译
+          thinking: false, // 是否正在思考
           item: null,
           targetLang: "", // 翻译到目标语言
           projectPath: "",
@@ -163,6 +170,16 @@
               idTags.style.display = this.id ? "block" : "none";
             }
           },
+          thinking() {
+            const editable = this.shadow.$(".editable");
+            if (editable) {
+              if (this.thinking) {
+                editable.classList.add("thinking");
+              } else {
+                editable.classList.remove("thinking");
+              }
+            }
+          },
         },
         proto: {
           // 翻译原文
@@ -176,6 +193,7 @@
             this.provider = "";
             this.model = "";
             this.id = "";
+            this.thinking = false;
 
             try {
               const storage = getStorage(this.targetLang + this.projectPath);
@@ -183,11 +201,12 @@
               await translate(
                 this.item.raw,
                 this.targetLang,
-                ({ provider, id, model, chunk, content, done }) => {
+                ({ provider, id, model, chunk, content, done, isThinking }) => {
                   this.translateText = content;
                   this.provider = provider;
                   this.model = model;
                   this.id = id;
+                  this.thinking = isThinking;
 
                   if (done) {
                     storage.setItem(this.cacheKey, {
@@ -205,8 +224,10 @@
               this.provider = "";
               this.model = "";
               this.id = "";
+              this.thinking = false;
             } finally {
               this.translating = false;
+              this.thinking = false;
             }
           },
           get cacheKey() {

@@ -1,5 +1,16 @@
 import { chat } from "/nos/ai/chat.js";
 
+const extractTranslation = (content) => {
+  const thinkRegex = /<think>([\s\S]*?)<\/think>/gi;
+  const thinkMatch = content.match(thinkRegex);
+  
+  if (thinkMatch) {
+    return content.replace(thinkRegex, "").trim();
+  }
+  
+  return content;
+};
+
 export const translate = async (text, targetLang, callback) => {
   const messages = [
     {
@@ -15,7 +26,10 @@ export const translate = async (text, targetLang, callback) => {
   return await chat(messages, {
     callback: ({ provider, id, model, chunk, content, done }) => {
       if (callback) {
-        callback({ provider, id, model, chunk, content, done });
+        const translatedContent = extractTranslation(content);
+        const isThinking = content.includes("<think>") && !content.includes("</think>");
+        
+        callback({ provider, id, model, chunk, content: translatedContent, done, isThinking });
       }
     },
   });
