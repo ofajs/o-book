@@ -46,7 +46,11 @@
   <div class="container">
     <div class="left">{{item.raw}}</div>
     <div class="right">
-      <textarea sync:value="translateText" attr:disabled="translating">
+      <textarea
+        sync:value="translateText"
+        placeholder="未翻译"
+        attr:disabled="translating"
+      >
       </textarea>
     </div>
   </div>
