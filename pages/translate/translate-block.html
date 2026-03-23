@@ -64,12 +64,13 @@
   <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
   <script>
     import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
+    import { translate } from "./translate.js";
 
     export default async function ({ load }) {
       return {
         tag: "translate-block",
         data: {
-          translateText: "aa", // 翻译后的文本
+          translateText: "", // 翻译后的文本
           translating: false, // 是否正在翻译
           item: null,
           targetLang: "", // 翻译到目标语言
@@ -87,7 +88,36 @@
         proto: {
           // 翻译原文
           async translate() {
-            debugger;
+            if (!this.item || !this.item.raw) {
+              return;
+            }
+
+            this.translating = true;
+            this.translateText = "";
+
+            try {
+              const storage = getStorage(this.targetLang + this.projectPath);
+
+              await translate(
+                this.item.raw,
+                this.targetLang,
+                ({ content, fullContent, done }) => {
+                  this.translateText = fullContent;
+
+                  if (done) {
+                    storage.setItem(this.cacheKey, fullContent);
+                  }
+                },
+              );
+            } catch (error) {
+              console.error("Translation failed:", error);
+              this.translateText = "翻译失败: " + error.message;
+            } finally {
+              this.translating = false;
+            }
+          },
+          get cacheKey() {
+            return this.item.rawHash;
           },
           async init() {
             if (this.item.type === "space") {
@@ -97,7 +127,10 @@
 
             const storage = getStorage(this.targetLang + this.projectPath);
 
-            // 获取翻译后的历史数据
+            const cachedTranslation = await storage.getItem(this.cacheKey);
+            if (cachedTranslation) {
+              this.translateText = cachedTranslation;
+            }
           },
         },
       };
