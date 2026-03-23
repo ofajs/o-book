@@ -87,7 +87,9 @@
       on:click="translate"
       attr:disabled="translating"
     >
-      翻译
+      <o-if :value="translating"> 翻译中... </o-if>
+      <o-else-if :value="translateText">重新翻译</o-else-if>
+      <o-else> 翻译 </o-else>
     </p-button>
   </div>
 
