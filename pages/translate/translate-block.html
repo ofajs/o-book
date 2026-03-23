@@ -109,9 +109,21 @@
       align-items: center;
     "
   >
-    <div class="id-tag" :text="id" style="display: none"></div>
-    <div class="model-tag" :text="model" style="display: none"></div>
-    <div class="provider-tag" :text="provider" style="display: none"></div>
+    <div
+      class="id-tag"
+      :style.display="!!id ? 'block' : 'none'"
+      :text="id"
+    ></div>
+    <div
+      class="model-tag"
+      :style.display="!!model ? 'block' : 'none'"
+      :text="model"
+    ></div>
+    <div
+      class="provider-tag"
+      :style.display="!!provider ? 'block' : 'none'"
+      :text="provider"
+    ></div>
     <p-button
       size="small"
       variant="outlined"
@@ -151,24 +163,6 @@
             }
 
             this.init();
-          },
-          provider() {
-            const providerTags = this.shadow.$(".provider-tag");
-            if (providerTags) {
-              providerTags.style.display = this.provider ? "block" : "none";
-            }
-          },
-          model() {
-            const modelTags = this.shadow.$(".model-tag");
-            if (modelTags) {
-              modelTags.style.display = this.model ? "block" : "none";
-            }
-          },
-          id() {
-            const idTags = this.shadow.$(".id-tag");
-            if (idTags) {
-              idTags.style.display = this.id ? "block" : "none";
-            }
           },
           thinking() {
             const editable = this.shadow.$(".editable");
