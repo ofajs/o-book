@@ -55,9 +55,6 @@
       opacity: 0.5;
     }
     .provider-tag {
-      position: absolute;
-      top: 4px;
-      right: 4px;
       padding: 2px 8px;
       font-size: 11px;
       border-radius: 4px;
@@ -65,6 +62,7 @@
       color: var(--md-sys-color-on-primary);
       font-weight: 500;
       text-transform: uppercase;
+      align-self: center;
     }
   </style>
   <div class="container">
@@ -77,10 +75,10 @@
         data-placeholder="未翻译"
         on:input="handleInput"
       ></div>
-      <div class="provider-tag" :text="provider" style="display: none"></div>
     </div>
   </div>
-  <div style="display: flex; justify-content: flex-end; margin-top: 4px">
+  <div style="display: flex; justify-content: flex-end; margin-top: 4px; gap: 8px; align-items: center">
+    <div class="provider-tag" :text="provider" style="display: none"></div>
     <p-button
       size="small"
       variant="outlined"
@@ -118,9 +116,9 @@
             this.init();
           },
           provider() {
-            const providerTag = this.shadow.$(".provider-tag");
-            if (providerTag) {
-              providerTag.style.display = this.provider ? "block" : "none";
+            const providerTags = this.shadow.$(".provider-tag");
+            if (providerTags) {
+              providerTags.style.display = this.provider ? "block" : "none";
             }
           },
         },
