@@ -46,13 +46,13 @@
       </div>
       <p-button-group size="small" style="margin-left: 16px">
         <p-button
-          on:click="activeId = 'translate-all'"
+          on:click="changeActiveId('translate-all')"
           attr:variant="activeId === 'translate-all' ? 'contained' : 'outlined'"
         >
           翻译全部
         </p-button>
         <p-button
-          on:click="activeId = 'edit'"
+          on:click="changeActiveId('edit')"
           attr:variant="activeId === 'edit' ? 'contained' : 'outlined'"
         >
           编辑部份
@@ -80,7 +80,7 @@
 
       return {
         data: {
-          activeId: "edit",
+          activeId: sessionStorage.getItem("translateActiveId") || "edit",
           targetLang: "en", // 翻译到目标语言
           config: {
             writingLang: "cn",
@@ -88,7 +88,12 @@
           },
           projectPath: query.path || "",
         },
-        proto: {},
+        proto: {
+          changeActiveId(id) {
+            this.activeId = id;
+            sessionStorage.setItem("translateActiveId", id);
+          },
+        },
         attached() {
           this.emit("set-active-id", {
             composed: true,
