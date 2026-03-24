@@ -45,7 +45,10 @@
             on:click="goto('./config/config.html?path='+query.path)"
           >
             配置
-            <n-icon icon="material-symbols:settings-outline-rounded" slot="icon"></n-icon>
+            <n-icon
+              icon="material-symbols:settings-outline-rounded"
+              slot="icon"
+            ></n-icon>
           </p-nav-item>
         </o-if>
       </p-nav-bar>
@@ -67,7 +70,7 @@
           this.on("set-active-id", (e) => {
             const { name, query } = e.data;
             this.activeId = name;
-            if (query.path) {
+            if (query && query.path) {
               this.query = query;
             }
           });

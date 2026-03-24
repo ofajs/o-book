@@ -17,29 +17,6 @@
       height: 50px;
       font-size: 14px;
     }
-    .layout {
-      display: flex;
-      gap: 16px;
-      height: calc(100% - 60px);
-    }
-    .left {
-      margin-left: 16px;
-      width: 300px;
-      height: 100%;
-      flex-shrink: 0;
-      overflow: auto;
-    }
-    .article-content {
-      flex: 1;
-      padding-right: 16px;
-      overflow: auto;
-    }
-    p-list-item {
-      border-radius: 30px;
-    }
-    p-list-item[active-item] {
-      background-color: var(--md-sys-color-primary-container);
-    }
   </style>
   <div class="container">
     <div class="top">
@@ -54,37 +31,10 @@
         <span style="color: var(--md-sys-color-primary)">{{targetLang}} </span>
       </div>
     </div>
-    <div class="layout">
-      <div class="left">
-        <h3 style="margin: 0 0 16px 0; font-size: 14px">需要翻译的文件</h3>
-        <p-list>
-          <o-fill :value="articleList">
-            <p-list-item
-              button
-              on:click="$host.clickItem($data)"
-              attr:active-item="$host.activeArticlePath === $data.path"
-            >
-              {{$data.name}}
-            </p-list-item>
-          </o-fill>
-        </p-list>
-      </div>
-      <div class="article-content">
-        <o-fill :value="currentBlocks">
-          <translate-block
-            :item="$data"
-            :target-lang="$host.targetLang"
-          ></translate-block>
-        </o-fill>
-      </div>
-    </div>
+    <o-page :project-path="projectPath" src="./translate-edit.html"></o-page>
   </div>
   <script>
     export const parent = "../layout.html";
-
-    import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
-    import { getArticleData } from "./util/article-data.js";
-    import { transformArticle } from "./util/transform.js";
 
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/main.js");
@@ -92,57 +42,16 @@
 
       return {
         data: {
+          targetLang: "en", // 翻译到目标语言
           activeId: "AI",
           config: {
             writingLang: "cn",
             languages: ["cn", "en"],
           },
-          targetLang: "en", // 翻译到目标语言
-          articleList: [], // 所有的文章数据
-          activeArticlePath: "", // 当前选中文章路径
-          currentBlocks: [], // 当前选中文章数据
-          _originArticleData: null, // 原始文章数据
+          projectPath: query.path || "",
         },
-        proto: {
-          clickItem(item) {
-            this.activeArticlePath = item.path;
-
-            // 从_originArticleData中获取当前选中的文章数据
-            const article = this._originArticleData.find(
-              (a) => a.path === item.path,
-            );
-            if (article) {
-              this.currentBlocks = article.blocks;
-            }
-          },
-          async loadArticle() {
-            try {
-              const handle = await get(query.path);
-              this.config = await getData(handle);
-              const articleList = await getArticleData(
-                await handle.get(this.config.writingLang),
-                { isRoot: true },
-              );
-
-              if (!articleList || articleList.length === 0) {
-                console.warn("No articles found");
-                this.articleList = [];
-                this._originArticleData = null;
-                return;
-              }
-
-              this._originArticleData = articleList;
-              this.articleList = articleList.map(transformArticle);
-              this.clickItem(articleList[0]);
-            } catch (error) {
-              console.error("Failed to load article:", error);
-              this.articleList = [];
-              this._originArticleData = null;
-            }
-          },
-        },
+        proto: {},
         attached() {
-          this.loadArticle();
           this.emit("set-active-id", {
             composed: true,
             data: {
