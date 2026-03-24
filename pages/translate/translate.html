@@ -8,6 +8,8 @@
       height: 100%;
     }
     .container {
+      display: flex;
+      flex-direction: column;
       height: 100%;
     }
     .top {
@@ -16,6 +18,17 @@
       padding: 0 16px;
       height: 50px;
       font-size: 14px;
+    }
+    .article-content {
+      position: relative;
+      flex: 1;
+    }
+    .article-content > o-page {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
     }
   </style>
   <div class="container">
@@ -31,7 +44,9 @@
         <span style="color: var(--md-sys-color-primary)">{{targetLang}} </span>
       </div>
     </div>
-    <o-page :project-path="projectPath" src="./translate-edit.html"></o-page>
+    <div class="article-content">
+      <o-page :project-path="projectPath" src="./translate-edit.html"></o-page>
+    </div>
   </div>
   <script>
     export const parent = "../layout.html";
