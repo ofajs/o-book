@@ -86,18 +86,36 @@
       font-weight: 500;
       align-self: center;
     }
+    .edited-tag {
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      background-color: var(--md-sys-color-warning);
+      color: var(--md-sys-color-on-warning);
+      font-weight: 500;
+      align-self: center;
+    }
+    .hide {
+      display: none !important;
+    }
   </style>
   <div class="container">
     <div class="left">{{item.raw}}</div>
     <div class="right">
       <div
-        class="editable"
-        attr:contenteditable="!translating"
-        :text="translateText"
+        class="editable input-editor"
+        contenteditable
+        class:hide="translating"
         data-placeholder="未翻译"
         on:input="handleInput"
-        class:thinking="thinking"
       ></div>
+      <div
+        class="editable translated-editor"
+        class:hide="!translating"
+        class:thinking="thinking"
+      >
+        {{translateText}}
+      </div>
     </div>
   </div>
   <div
@@ -109,21 +127,18 @@
       align-items: center;
     "
   >
-    <div
-      class="id-tag"
-      :style.display="!!id ? 'block' : 'none'"
-      :text="id"
-    ></div>
-    <div
-      class="model-tag"
-      :style.display="!!model ? 'block' : 'none'"
-      :text="model"
-    ></div>
+    <div class="id-tag" :style.display="!!id ? 'block' : 'none'">{{id}}</div>
+    <div class="model-tag" :style.display="!!model ? 'block' : 'none'">
+      {{model}}
+    </div>
     <div
       class="provider-tag"
       :style.display="!!provider ? 'block' : 'none'"
       :text="provider"
     ></div>
+    <div class="edited-tag" :style.display="isEdit ? 'block' : 'none'">
+      已编辑
+    </div>
     <p-button
       size="small"
       variant="outlined"
@@ -155,6 +170,7 @@
           provider: "", // 翻译提供商
           model: "", // 翻译模型
           id: "", // API Key ID
+          editedText: "", // 用户编辑后的文本
         },
         watch: {
           item() {
@@ -165,7 +181,7 @@
             this.init();
           },
           thinking() {
-            const editable = this.shadow.$(".editable");
+            const editable = this.shadow.$(".translated-editor");
             if (editable) {
               if (this.thinking) {
                 editable.classList.add("thinking");
@@ -176,6 +192,17 @@
           },
         },
         proto: {
+          get isEdit() {
+            if (!this.editedText) {
+              return false;
+            }
+
+            if (this.translateText !== this.editedText) {
+              return true;
+            }
+
+            return false;
+          },
           // 翻译原文
           async translate() {
             if (!this.item || !this.item.raw) {
@@ -188,6 +215,7 @@
             this.model = "";
             this.id = "";
             this.thinking = false;
+            this.editedText = "";
 
             try {
               const storage = getStorage(this.targetLang + this.projectPath);
@@ -208,10 +236,13 @@
                       provider: provider,
                       model: model,
                       id: id,
+                      editedText: "",
                     });
                   }
                 },
               );
+
+              this.init();
             } catch (error) {
               console.error("Translation failed:", error);
               this.translateText = "翻译失败: " + error.message;
@@ -219,6 +250,7 @@
               this.model = "";
               this.id = "";
               this.thinking = false;
+              this.editedText = "";
             } finally {
               this.translating = false;
               this.thinking = false;
@@ -228,7 +260,26 @@
             return this.item.rawHash;
           },
           handleInput(e) {
-            this.translateText = e.target.innerText.trim();
+            const newText = e.target.innerText.trim();
+            if (newText !== this.translateText) {
+              this.editedText = newText;
+            } else {
+              this.editedText = "";
+            }
+            this.saveEditedTranslation();
+          },
+          async saveEditedTranslation() {
+            const storage = getStorage(this.targetLang + this.projectPath);
+            const cachedData = await storage.getItem(this.cacheKey);
+
+            if (cachedData) {
+              const dataToSave =
+                typeof cachedData === "string"
+                  ? { text: cachedData, editedText: this.editedText }
+                  : { ...cachedData, editedText: this.editedText };
+
+              storage.setItem(this.cacheKey, dataToSave);
+            }
           },
           async init() {
             if (this.item.type === "space") {
@@ -245,8 +296,12 @@
                 this.provider = "";
                 this.model = "";
                 this.id = "";
+                this.editedText = "";
               } else {
+                this.editedText = cachedData.editedText || "";
                 this.translateText = cachedData.text || "";
+                this.shadow.$(".input-editor").text =
+                  this.editedText || this.translateText;
                 this.provider = cachedData.provider || "";
                 this.model = cachedData.model || "";
                 this.id = cachedData.id || "";
