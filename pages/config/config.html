@@ -1,7 +1,17 @@
 <template page>
   <style>
     :host {
+      position: relative;
       display: block;
+      height: 100%;
+    }
+    o-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
     }
   </style>
   <o-page src="/nos-tool/ai/pages/key-manager.html"></o-page>
