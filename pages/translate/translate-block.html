@@ -154,7 +154,7 @@
   <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
   <script>
     import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
-    import { translate } from "./translate.js";
+    import { translate } from "./util/translate.js";
 
     export default async function ({ load }) {
       return {
@@ -174,6 +174,10 @@
         watch: {
           item() {
             if (!this.item) {
+              return;
+            }
+
+            if (!this.cacheKey) {
               return;
             }
 

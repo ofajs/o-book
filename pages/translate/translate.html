@@ -83,8 +83,8 @@
     export const parent = "../layout.html";
 
     import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
-    import { getArticleData } from "./article-data.js";
-    import { transformArticle } from "./transform.js";
+    import { getArticleData } from "./util/article-data.js";
+    import { transformArticle } from "./util/transform.js";
 
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/main.js");
