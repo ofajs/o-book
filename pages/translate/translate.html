@@ -1,6 +1,7 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/group.html"></l-m>
   <l-m src="./translate-block.html"></l-m>
   <style>
     :host {
@@ -23,7 +24,7 @@
       position: relative;
       flex: 1;
     }
-    .article-content > o-page {
+    .article-content o-page {
       position: absolute;
       left: 0;
       top: 0;
@@ -43,9 +44,31 @@
         翻译到:
         <span style="color: var(--md-sys-color-primary)">{{targetLang}} </span>
       </div>
+      <p-button-group size="small" style="margin-left: 16px">
+        <p-button
+          on:click="activeId = 'translate-all'"
+          attr:variant="activeId === 'translate-all' ? 'contained' : 'outlined'"
+        >
+          翻译全部
+        </p-button>
+        <p-button
+          on:click="activeId = 'edit'"
+          attr:variant="activeId === 'edit' ? 'contained' : 'outlined'"
+        >
+          编辑部份
+        </p-button>
+      </p-button-group>
     </div>
     <div class="article-content">
-      <o-page :project-path="projectPath" src="./translate-edit.html"></o-page>
+      <o-if :value="activeId === 'translate-all'">
+        <o-page :project-path="projectPath" src="./translate-all.html"></o-page>
+      </o-if>
+      <o-if :value="activeId === 'edit'">
+        <o-page
+          :project-path="projectPath"
+          src="./translate-edit.html"
+        ></o-page>
+      </o-if>
     </div>
   </div>
   <script>
@@ -57,8 +80,8 @@
 
       return {
         data: {
+          activeId: "edit",
           targetLang: "en", // 翻译到目标语言
-          activeId: "AI",
           config: {
             writingLang: "cn",
             languages: ["cn", "en"],
