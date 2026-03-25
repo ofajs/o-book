@@ -308,7 +308,11 @@
             let translated = 0;
 
             for (const article of this.allArticles) {
-              if (article.isTemp && article.blocks && article.blocks.length > 0) {
+              if (
+                article.isTemp &&
+                article.blocks &&
+                article.blocks.length > 0
+              ) {
                 total++;
                 const cachedData = await this._storage.getItem(
                   article.blocks[0].rawHash,
@@ -344,7 +348,11 @@
             const untranslatedBlocks = [];
 
             for (const article of this.allArticles) {
-              if (article.isTemp && article.blocks && article.blocks.length > 0) {
+              if (
+                article.isTemp &&
+                article.blocks &&
+                article.blocks.length > 0
+              ) {
                 const cachedData = await this._storage.getItem(
                   article.blocks[0].rawHash,
                 );
@@ -583,6 +591,11 @@
               ? preview + "..."
               : preview;
           },
+        },
+        detached() {
+          if (this.isTranslating) {
+            this.stopTranslation();
+          }
         },
       };
     };
