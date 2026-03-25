@@ -40,13 +40,19 @@ const processElementsToBlocks = async (elements) => {
 const processHtmlFile = async (handle, relativePath, content) => {
   try {
     if (content.startsWith("<template ")) {
+      const blocks = [
+        {
+          raw: content,
+          rawHash: await getHash(content),
+          content,
+        },
+      ];
       return {
         name: handle.name,
         path: relativePath,
         realPath: handle.path,
         isTemp: true,
-        content,
-        contentHash: await getHash(content),
+        blocks,
       };
     }
 
