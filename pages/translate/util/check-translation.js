@@ -137,6 +137,22 @@ const RULES = [
       return { hasIssue: false };
     },
   },
+  {
+    id: "heading-hash-mismatch",
+    name: "标题井号数量异常",
+    description: "标题的井号数量不匹配",
+    check: (original, translated) => {
+      const originalHashes = (original.match(/^#+\s/gm) || []).length;
+      const translatedHashes = (translated.match(/^#+\s/gm) || []).length;
+      if (originalHashes !== translatedHashes) {
+        return {
+          hasIssue: true,
+          message: `标题井号数量不匹配，原文 ${originalHashes} 个，译文 ${translatedHashes} 个`,
+        };
+      }
+      return { hasIssue: false };
+    },
+  },
 ];
 
 export const checkTranslation = (original, translated) => {
