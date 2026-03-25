@@ -5,151 +5,9 @@
       height: 100%;
       padding: 16px;
     }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .status-card {
-      padding: 24px;
-      border-radius: 12px;
-      background-color: var(--md-sys-color-surface);
-      margin-bottom: 16px;
-    }
-
-    .status-title {
-      font-size: 18px;
-      font-weight: 500;
-      margin-bottom: 12px;
-      color: var(--md-sys-color-on-surface);
-    }
-
-    .status-content {
-      font-size: 14px;
-      color: var(--md-sys-color-on-surface-variant);
-      margin-bottom: 16px;
-    }
-
-    .stats {
-      display: flex;
-      gap: 24px;
-      margin-bottom: 16px;
-    }
-
-    .stat-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .stat-number {
-      font-size: 32px;
-      font-weight: 600;
-      color: var(--md-sys-color-primary);
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--md-sys-color-on-surface-variant);
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      background-color: var(--md-sys-color-surface-variant);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background-color: var(--md-sys-color-primary);
-      transition: width 0.3s ease;
-    }
-
-    .button-container {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-
-    .translation-item {
-      padding: 16px;
-      border-radius: 8px;
-      background-color: var(--md-sys-color-surface);
-      margin-bottom: 12px;
-      border-left: 4px solid var(--md-sys-color-primary);
-    }
-
-    .translation-item.completed {
-      border-left-color: var(--md-sys-color-success);
-    }
-
-    .translation-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .article-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface);
-    }
-
-    .block-info {
-      font-size: 12px;
-      color: var(--md-sys-color-on-surface-variant);
-    }
-
-    .translation-content {
-      font-size: 13px;
-      color: var(--md-sys-color-on-surface-variant);
-      margin-top: 8px;
-      padding: 8px;
-      background-color: var(--md-sys-color-surface-container);
-      border-radius: 4px;
-      max-height: 100px;
-      overflow: auto;
-    }
-
-    .status-badge {
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .status-badge.translating {
-      background-color: var(--md-sys-color-primary);
-      color: var(--md-sys-color-on-primary);
-    }
-
-    .status-badge.completed {
-      background-color: var(--md-sys-color-success);
-      color: var(--md-sys-color-on-success);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--md-sys-color-on-surface-variant);
-    }
-
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--md-sys-color-on-surface-variant);
-    }
   </style>
+  <link rel="stylesheet" href="./translate-all.css" />
+
   <div class="container">
     <o-if :value="loading">
       <div class="loading">
@@ -163,8 +21,11 @@
       </div>
     </o-else-if>
     <o-else>
-      <div class="status-card">
-        <div class="status-title">翻译状态</div>
+      <div class="status-card" class:compact="isTranslating">
+        <div class="status-title">
+          <o-if :value="isTranslating">翻译进度</o-if>
+          <o-else>翻译状态</o-else>
+        </div>
         <o-if :value="isCompleted">
           <div
             class="status-content"
@@ -173,14 +34,14 @@
             ✅ 全部翻译完成！
           </div>
         </o-if>
-        <o-else>
+        <o-else-if :value="!isTranslating">
           <div class="status-content">
             <o-if :value="untranslatedCount > 0">
               还有 <strong>{{untranslatedCount}}</strong> 个内容块待翻译
             </o-if>
             <o-else> 正在检查翻译状态... </o-else>
           </div>
-        </o-else>
+        </o-else-if>
 
         <div class="stats">
           <div class="stat-item">
@@ -199,6 +60,14 @@
             </div>
             <div class="stat-label">待翻译</div>
           </div>
+          <o-if :value="failedItems.length > 0">
+            <div class="stat-item">
+              <div class="stat-number" style="color: var(--md-sys-color-error)">
+                {{failedItems.length}}
+              </div>
+              <div class="stat-label">失败</div>
+            </div>
+          </o-if>
         </div>
 
         <o-if :value="isTranslating">
@@ -234,20 +103,53 @@
 
       <o-if :value="translatingItems.length > 0 || completedItems.length > 0">
         <div class="status-card">
-          <div class="status-title">翻译详情</div>
+          <div class="status-title">
+            翻译详情
+            <o-if :value="completedItems.length > 0">
+              <span
+                style="
+                  font-size: 12px;
+                  color: var(--md-sys-color-on-surface-variant);
+                  margin-left: 8px;
+                "
+              >
+                (已完成 {{completedItems.length}} 项)
+              </span>
+            </o-if>
+          </div>
           <o-fill :value="translatingItems">
-            <div class="translation-item">
+            <div class="translation-item translating">
               <div class="translation-item-header">
                 <div>
                   <div class="article-name">{{$data.articleName}}</div>
                   <div class="block-info">块 #{{$data.blockIndex + 1}}</div>
                 </div>
-                <div class="status-badge translating">翻译中</div>
+                <div class="status-badge translating">
+                  <o-if :value="$data.isThinking">思考中</o-if>
+                  <o-else>翻译中</o-else>
+                </div>
               </div>
               <div class="translation-content">{{$data.preview}}</div>
+              <o-if :value="$data.streamContent">
+                <div class="stream-content" class:thinking="$data.isThinking">
+                  {{$data.streamContent}}
+                </div>
+              </o-if>
             </div>
           </o-fill>
-          <o-fill :value="completedItems">
+          <o-fill :value="displayedCompletedItems">
+            <o-if :value="$host.hasMoreCompletedItems && $index === 0">
+              <div
+                style="
+                  text-align: center;
+                  padding: 8px;
+                  color: var(--md-sys-color-on-surface-variant);
+                  font-size: 12px;
+                "
+              >
+                ... 已隐藏 {{$host.hiddenCompletedCount}} 个已完成的翻译 ...
+              </div>
+            </o-if>
             <div class="translation-item completed">
               <div class="translation-item-header">
                 <div>
@@ -261,6 +163,60 @@
           </o-fill>
         </div>
       </o-if>
+
+      <o-if :value="failedItems.length > 0">
+        <div class="status-card">
+          <div class="status-title" style="color: var(--md-sys-color-error)">
+            翻译失败 ({{failedItems.length}})
+          </div>
+          <o-fill :value="failedItems">
+            <div
+              class="translation-item"
+              style="border-left-color: var(--md-sys-color-error)"
+            >
+              <div class="translation-item-header">
+                <div>
+                  <div class="article-name">{{$data.articleName}}</div>
+                  <div class="block-info">块 #{{$data.blockIndex + 1}}</div>
+                </div>
+                <div
+                  class="status-badge"
+                  style="
+                    background-color: var(--md-sys-color-error);
+                    color: var(--md-sys-color-on-error);
+                  "
+                >
+                  失败
+                </div>
+              </div>
+              <div class="translation-content">{{$data.preview}}</div>
+              <div
+                style="
+                  margin-top: 8px;
+                  font-size: 12px;
+                  color: var(--md-sys-color-error);
+                "
+              >
+                错误: {{$data.error}}
+              </div>
+              <div style="margin-top: 8px; display: flex; gap: 8px">
+                <p-button
+                  size="small"
+                  variant="outlined"
+                  on:click="$host.retryFailedItem($data)"
+                >
+                  重试
+                </p-button>
+              </div>
+            </div>
+          </o-fill>
+          <div style="margin-top: 12px; text-align: center">
+            <p-button variant="outlined" on:click="retryAllFailed">
+              重试全部失败项
+            </p-button>
+          </div>
+        </div>
+      </o-if>
     </o-else>
   </div>
 
@@ -269,7 +225,8 @@
     import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
     import { getArticleData } from "./util/article-data.js";
     import { translate } from "./util/translate.js";
-    import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
+    import { EverCache, storage } from "/gh/kirakiray/ever-cache/src/main.js";
+    import { getStatus } from "/nos/ai/chat.js";
 
     export default async ({ load }) => {
       const { get } = await load("/nos/fs/main.js");
@@ -289,6 +246,7 @@
           shouldStop: false, // 是否应该停止翻译（用于中断翻译过程）
           translatingItems: [], // 当前正在翻译的块列表
           completedItems: [], // 本次翻译会话中已完成的块列表
+          failedItems: [], // 翻译失败的块列表
           translatedInSession: 0, // 本次翻译会话中已完成的数量
           totalToTranslate: 0, // 本次翻译会话需要翻译的总数量
           _storage: null, // 翻译缓存存储对象（EverCache 实例）
@@ -307,6 +265,18 @@
             return Math.round(
               (this.translatedInSession / this.totalToTranslate) * 100,
             );
+          },
+          get displayedCompletedItems() {
+            if (this.completedItems.length > 20) {
+              return this.completedItems.slice(-10);
+            }
+            return this.completedItems;
+          },
+          get hasMoreCompletedItems() {
+            return this.completedItems.length > 20;
+          },
+          get hiddenCompletedCount() {
+            return this.completedItems.length - 10;
           },
           async loadArticles() {
             try {
@@ -368,6 +338,7 @@
             this.shouldStop = false;
             this.translatingItems = [];
             this.completedItems = [];
+            this.failedItems = [];
             this.translatedInSession = 0;
 
             const untranslatedBlocks = [];
@@ -405,24 +376,55 @@
 
             this.totalToTranslate = untranslatedBlocks.length;
 
-            for (const item of untranslatedBlocks) {
+            const keys = (await storage.getItem("ai-keys")) || [];
+            let concurrencyLimit = 3;
+            if (keys.length > 0) {
+              const totalConcurrency = keys.reduce((sum, key) => {
+                return sum + (key.concurrency || 1);
+              }, 0);
+              concurrencyLimit = Math.max(3, totalConcurrency);
+            }
+
+            const executingTasks = new Set();
+
+            const translateBlock = async (item, retryCount = 0) => {
               if (this.shouldStop) {
-                break;
+                return { stopped: true };
               }
 
               const translatingItem = {
                 articleName: item.article.name,
                 blockIndex: item.blockIndex,
                 preview: this.getPreview(item.block.raw),
+                retryCount: retryCount,
+                streamContent: "",
+                isThinking: false,
               };
 
-              this.translatingItems = [translatingItem];
+              this.translatingItems = [
+                ...this.translatingItems,
+                translatingItem,
+              ];
 
               try {
                 await translate(
                   item.block.raw,
                   this.targetLang,
-                  ({ provider, id, model, content, done }) => {
+                  ({ provider, id, model, content, done, isThinking }) => {
+                    if (this.shouldStop) {
+                      return;
+                    }
+
+                    const index = this.translatingItems.findIndex(
+                      (t) =>
+                        t.articleName === translatingItem.articleName &&
+                        t.blockIndex === translatingItem.blockIndex,
+                    );
+                    if (index !== -1) {
+                      this.translatingItems[index].streamContent = content;
+                      this.translatingItems[index].isThinking = isThinking;
+                    }
+
                     if (done) {
                       this._storage.setItem(item.block.rawHash, {
                         text: content,
@@ -435,25 +437,144 @@
                   },
                 );
 
+                if (this.shouldStop) {
+                  this.translatingItems = this.translatingItems.filter(
+                    (t) =>
+                      t.articleName !== translatingItem.articleName ||
+                      t.blockIndex !== translatingItem.blockIndex,
+                  );
+                  return { stopped: true };
+                }
+
                 this.translatedInSession++;
                 this.translatedCount++;
                 this.untranslatedCount--;
 
-                this.translatingItems = [];
+                this.translatingItems = this.translatingItems.filter(
+                  (t) =>
+                    t.articleName !== translatingItem.articleName ||
+                    t.blockIndex !== translatingItem.blockIndex,
+                );
                 this.completedItems = [...this.completedItems, translatingItem];
+                return { stopped: false };
               } catch (error) {
                 console.error("Translation failed:", error);
-                this.translatingItems = [];
+                this.translatingItems = this.translatingItems.filter(
+                  (t) =>
+                    t.articleName !== translatingItem.articleName ||
+                    t.blockIndex !== translatingItem.blockIndex,
+                );
+
+                const failedItem = {
+                  ...translatingItem,
+                  error: error.message || "翻译失败",
+                  item: item,
+                };
+                this.failedItems = [...this.failedItems, failedItem];
+                return { stopped: false };
+              }
+            };
+
+            for (const item of untranslatedBlocks) {
+              if (this.shouldStop) {
+                break;
               }
 
-              await new Promise((resolve) => setTimeout(resolve, 500));
+              const task = translateBlock(item)
+                .then((result) => {
+                  if (result?.stopped) {
+                    executingTasks.delete(task);
+                  }
+                  return result;
+                })
+                .finally(() => {
+                  executingTasks.delete(task);
+                });
+
+              executingTasks.add(task);
+
+              if (executingTasks.size >= concurrencyLimit) {
+                await Promise.race(executingTasks);
+              }
+            }
+
+            if (executingTasks.size > 0 && !this.shouldStop) {
+              await Promise.all(executingTasks);
             }
 
             this.isTranslating = false;
-            this.isCompleted = this.untranslatedCount === 0;
+            this.isCompleted = this.untranslatedCount === 0 && !this.shouldStop;
           },
           stopTranslation() {
             this.shouldStop = true;
+            this.translatingItems = [];
+            this.isTranslating = false;
+          },
+          async retryFailedItem(failedItem) {
+            this.failedItems = this.failedItems.filter(
+              (item) =>
+                item.articleName !== failedItem.articleName ||
+                item.blockIndex !== failedItem.blockIndex,
+            );
+
+            const translatingItem = {
+              articleName: failedItem.articleName,
+              blockIndex: failedItem.blockIndex,
+              preview: failedItem.preview,
+              retryCount: (failedItem.retryCount || 0) + 1,
+            };
+
+            this.translatingItems = [...this.translatingItems, translatingItem];
+
+            try {
+              await translate(
+                failedItem.item.block.raw,
+                this.targetLang,
+                ({ provider, id, model, content, done }) => {
+                  if (done) {
+                    this._storage.setItem(failedItem.item.block.rawHash, {
+                      text: content,
+                      provider: provider,
+                      model: model,
+                      id: id,
+                      editedText: "",
+                    });
+                  }
+                },
+              );
+
+              this.translatedInSession++;
+              this.translatedCount++;
+              this.untranslatedCount--;
+
+              this.translatingItems = this.translatingItems.filter(
+                (t) =>
+                  t.articleName !== translatingItem.articleName ||
+                  t.blockIndex !== translatingItem.blockIndex,
+              );
+              this.completedItems = [...this.completedItems, translatingItem];
+              this.isCompleted = this.untranslatedCount === 0;
+            } catch (error) {
+              console.error("Retry failed:", error);
+              this.translatingItems = this.translatingItems.filter(
+                (t) =>
+                  t.articleName !== translatingItem.articleName ||
+                  t.blockIndex !== translatingItem.blockIndex,
+              );
+
+              const newFailedItem = {
+                ...failedItem,
+                error: error.message || "重试失败",
+                retryCount: translatingItem.retryCount,
+              };
+              this.failedItems = [...this.failedItems, newFailedItem];
+            }
+          },
+          async retryAllFailed() {
+            const itemsToRetry = [...this.failedItems];
+            for (const failedItem of itemsToRetry) {
+              await this.retryFailedItem(failedItem);
+            }
           },
           refreshStatus() {
             this.loadArticles();
