@@ -402,6 +402,15 @@
             }
           },
           async generateSingleFile(fileItem, targetLangHandle) {
+            const joinTranslatedBlocks = (blocks) => {
+              return blocks.map(e=>{
+                if(e.startsWith("#")) {
+                    return e + "\n\n";
+                }
+                return e;
+              }).join("");
+            };
+
             const translatedBlocks = [];
 
             for (const block of fileItem.blocks) {
@@ -425,9 +434,9 @@
             if (fileItem.isTemp && fileItem.blocks.length > 0) {
               content = translatedBlocks[0] || "";
             } else if (fileItem.replaceContent) {
-              content = fileItem.replaceContent.replace("${temp}", translatedBlocks.join("\n\n"));
+              content = fileItem.replaceContent.replace("${temp}", joinTranslatedBlocks(translatedBlocks));
             } else {
-              content = translatedBlocks.join("\n\n");
+              content = joinTranslatedBlocks(translatedBlocks);
             }
 
             const pathParts = fileItem.path.split("/");
