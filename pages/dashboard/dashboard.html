@@ -88,6 +88,14 @@
         ></n-icon>
         重新生成
       </p-button>
+      <p-button
+        class="toolbar-btn"
+        on:click="openConfigDialog"
+        variant="outlined"
+      >
+        <n-icon icon="material-symbols:settings" slot="prefix"></n-icon>
+        项目配置
+      </p-button>
       <span class="toolbar-label">写作语言</span>: {{writingLang}}
     </div>
     <div class="list-content">
@@ -149,6 +157,13 @@
       </p-list-item>
     </template>
   </div>
+
+  <o-page
+    src="./project-config-dialog.html"
+    sync:open="showConfigDialog"
+    on:config-saved="onConfigSaved"
+  ></o-page>
+
   <script>
     export const parent = "../layout.html";
 
@@ -169,6 +184,8 @@
           _documentHandle: null,
           writingLang: "",
           refreshing: false,
+          _projectConfig: null,
+          showConfigDialog: false,
         },
         proto: {
           clickDocumentItem(url) {
@@ -208,6 +225,8 @@
             this.refreshing = true;
 
             const config = await getData(this._topHandle);
+            this._projectConfig = config;
+
             const writingLang = config.writingLang || "en";
 
             this.writingLang = writingLang;
@@ -238,6 +257,13 @@
             });
 
             this.refreshing = false;
+          },
+          openConfigDialog() {
+            this.showConfigDialog = true;
+          },
+          onConfigSaved() {
+            console.log("config-saved");
+            // this.init({ watchArticle: false });
           },
         },
         async attached() {
