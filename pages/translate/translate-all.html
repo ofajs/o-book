@@ -308,10 +308,10 @@
             let translated = 0;
 
             for (const article of this.allArticles) {
-              if (article.isTemp) {
+              if (article.isTemp && article.blocks && article.blocks.length > 0) {
                 total++;
                 const cachedData = await this._storage.getItem(
-                  article.contentHash,
+                  article.blocks[0].rawHash,
                 );
                 if (cachedData) {
                   translated++;
@@ -344,17 +344,14 @@
             const untranslatedBlocks = [];
 
             for (const article of this.allArticles) {
-              if (article.isTemp) {
+              if (article.isTemp && article.blocks && article.blocks.length > 0) {
                 const cachedData = await this._storage.getItem(
-                  article.contentHash,
+                  article.blocks[0].rawHash,
                 );
                 if (!cachedData) {
                   untranslatedBlocks.push({
                     article,
-                    block: {
-                      raw: article.content,
-                      rawHash: article.contentHash,
-                    },
+                    block: article.blocks[0],
                     blockIndex: 0,
                   });
                 }
