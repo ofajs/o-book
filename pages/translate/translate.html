@@ -52,16 +52,22 @@
           翻译全部
         </p-button>
         <p-button
-          on:click="changeActiveId('edit')"
-          attr:variant="activeId === 'edit' ? 'contained' : 'outlined'"
-        >
-          编辑部份
-        </p-button>
-        <p-button
           on:click="changeActiveId('checker')"
           attr:variant="activeId === 'checker' ? 'contained' : 'outlined'"
         >
           检查翻译
+        </p-button>
+        <p-button
+          on:click="changeActiveId('build-file')"
+          attr:variant="activeId === 'build-file' ? 'contained' : 'outlined'"
+        >
+          生成翻译文档
+        </p-button>
+        <p-button
+          on:click="changeActiveId('edit')"
+          attr:variant="activeId === 'edit' ? 'contained' : 'outlined'"
+        >
+          编辑部份
         </p-button>
       </p-button-group>
     </div>
