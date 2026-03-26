@@ -1,25 +1,11 @@
 <template page>
-  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
     :host {
       display: block;
     }
 
-    .rotate-anime {
-      animation: rotate 1s linear infinite;
-    }
-
-    @keyframes rotate {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
     .toolbar {
-      width: 100%;
+      padding: 12px 24px;
       display: flex;
       align-items: center;
     }
@@ -27,29 +13,9 @@
     .toolbar-btn {
       margin-left: 8px;
     }
-
-    .toolbar-label {
-      color: var(--md-sys-color-normal);
-      font-size: 13px;
-      margin-left: 8px;
-    }
   </style>
   <div class="toolbar">
-    <p-button on:click="clickPreview"> 预览网页 </p-button>
-    <p-button
-      class="toolbar-btn"
-      on:click="refreshPreview"
-      variant="outlined"
-      attr:disabled="refreshing"
-    >
-      <n-icon
-        class="rotate-anime"
-        class:rotate-anime="refreshing"
-        icon="material-symbols:refresh"
-        slot="prefix"
-      ></n-icon>
-      重新生成
-    </p-button>
+    <p-button on:click="clickPreview"> 预览主页 </p-button>
     <p-button
       class="toolbar-btn"
       on:click="openConfigDialog"
@@ -78,11 +44,9 @@
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../../util/yaml-handle.js");
       const { initGenerator } = await load("./generate.js");
-      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
 
       return {
         data: {
-          refreshing: false,
           _projectConfig: null,
           showConfigDialog: false,
           projectPath: query.path,
@@ -91,17 +55,7 @@
           clickPreview() {
             window.open(buildIndexPreviewUrl(query.path), "_blank");
           },
-          async refreshPreview() {
-            await this.init({ watchArticle: false });
-
-            toast({
-              color: "success",
-              message: "重新生成完毕",
-            });
-          },
           async init({ watchArticle = true }) {
-            this.refreshing = true;
-
             const config = await getData(this._topHandle);
             this._projectConfig = config;
 
@@ -115,8 +69,6 @@
               watchArticle,
               lang: writingLang,
             });
-
-            this.refreshing = false;
           },
           openConfigDialog() {
             this.showConfigDialog = true;
