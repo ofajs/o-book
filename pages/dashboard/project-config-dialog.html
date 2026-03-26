@@ -105,11 +105,7 @@
       <div class="config-form">
         <div class="form-item">
           <label>写作语言 (writingLang)</label>
-          <p-input
-            sync:value="editConfig.writingLang"
-            readonly
-            placeholder="写作时使用的语言"
-          ></p-input>
+          <div>{{languageMap[editConfig.writingLang]}}</div>
         </div>
         <div class="form-item">
           <label>网站初始语言 (primaryLang)</label>
