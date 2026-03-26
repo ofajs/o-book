@@ -50,8 +50,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 12px;
-      padding-top: 12px;
+      padding-top: 8px;
       border-top: 1px solid var(--md-ref-palette-outline-variant);
     }
   </style>
@@ -96,10 +95,17 @@
               </p-chip>
             </o-fill>
           </div>
+          <h5 style="margin: 16px 0 0; color: var(--md-ref-palette-normal40)">
+            可添加的语言
+          </h5>
           <div class="available-languages">
             <o-fill :value="availableLanguagesToAdd">
               <p-chip button tonal on:click="$host.toggleLanguage($data)">
                 {{$host.languageMap[$data]}}
+                <n-icon
+                  icon="material-symbols:add-rounded"
+                  slot="suffix"
+                ></n-icon>
               </p-chip>
             </o-fill>
           </div>

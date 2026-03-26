@@ -15,7 +15,6 @@
     }
   </style>
   <div class="toolbar">
-    <p-button on:click="clickPreview"> 预览主页 </p-button>
     <p-button
       class="toolbar-btn"
       on:click="openConfigDialog"
@@ -38,8 +37,6 @@
   <script>
     export const parent = "../layout.html";
 
-    import { buildIndexPreviewUrl } from "./dashboard-data.js";
-
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../../util/yaml-handle.js");
@@ -52,9 +49,6 @@
           projectPath: query.path,
         },
         proto: {
-          clickPreview() {
-            window.open(buildIndexPreviewUrl(query.path), "_blank");
-          },
           async init({ watchArticle = true }) {
             const config = await getData(this._topHandle);
             this._projectConfig = config;

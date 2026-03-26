@@ -94,6 +94,14 @@
           </p-button>
         </h2>
         <p-list style="--ladder-left: 8px">
+          <p-list-item button on:click="clickPreview()"
+            >首页
+            <n-icon
+              icon="majesticons:open-line"
+              slot="suffix"
+              style="color: var(--md-sys-color-primary); font-size: 16px"
+            ></n-icon>
+          </p-list-item>
           <o-fill :value="header" name="header-list-item"> </o-fill>
         </p-list>
         <template name="header-list-item">
@@ -103,6 +111,17 @@
             attr:active-item="$host.activeHeader === $data.url"
           >
             {{$data.name}}
+            <x-if :value="$data.content.length">
+              <i
+                toggle-collapse
+                triangle
+                slot="suffix"
+                style="transform: rotate(-90deg)"
+              ></i>
+            </x-if>
+            <x-else>
+              <n-icon icon="entypo:list" slot="suffix"></n-icon>
+            </x-else>
             <p-list slot="childs">
               <o-fill :value="$data.content" name="header-list-item"></o-fill>
             </p-list>
@@ -153,7 +172,7 @@
   </div>
 
   <script>
-    import { buildPreviewUrl } from "./dashboard-data.js";
+    import { buildPreviewUrl, buildIndexPreviewUrl } from "./dashboard-data.js";
 
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
@@ -173,6 +192,9 @@
           _cancels: null,
         },
         proto: {
+          clickPreview() {
+            window.open(buildIndexPreviewUrl(this.projectPath), "_blank");
+          },
           clickDocumentItem(url) {
             if (!url) {
               return;
