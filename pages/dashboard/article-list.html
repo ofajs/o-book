@@ -205,14 +205,14 @@
         },
         proto: {
           clickPreview() {
-            window.open(buildIndexPreviewUrl(this.projectPath), "_blank");
+            window.open(buildIndexPreviewUrl(this.projectPath, this.lang), "_blank");
           },
           clickDocumentItem(url) {
             if (!url) {
               return;
             }
             window.open(
-              buildPreviewUrl(this.activeHeader, url, this.projectPath),
+              buildPreviewUrl(this.activeHeader, url, this.projectPath, this.lang),
               "_blank",
             );
           },

@@ -1,4 +1,4 @@
-export const buildPreviewUrl = (activeHeader, url, path) => {
+export const buildPreviewUrl = (activeHeader, url, path, lang) => {
   const dirName = activeHeader
     .replace(/^\.\//, "")
     .replace(/\/_config\.yaml$/, "");
@@ -7,9 +7,9 @@ export const buildPreviewUrl = (activeHeader, url, path) => {
     .replace(/^\.\//, "")
     .replace(/\.md$/, ".html");
 
-  return `/${path}/website/cn/${dirName}/${suffixName}`;
+  return `/${path}/website/${lang}/${dirName}/${suffixName}`;
 };
 
-export const buildIndexPreviewUrl = (path) => {
-  return `/${path}/website/cn/index.html`;
+export const buildIndexPreviewUrl = (path, lang) => {
+  return `/${path}/website/${lang}/index.html`;
 };
