@@ -1,4 +1,6 @@
 <template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
     :host {
       display: block;
@@ -15,6 +17,12 @@
     }
   </style>
   <div class="toolbar">
+    <p-select sync:value="lang" style="width: 200px; margin-right: 16px">
+      <label> 切换语言 </label>
+      <p-option value="cn"> Chinese </p-option>
+      <p-option value="en"> English </p-option>
+      <p-option value="ja"> Japanese </p-option>
+    </p-select>
     <p-button
       class="toolbar-btn"
       on:click="openConfigDialog"
@@ -45,6 +53,7 @@
         data: {
           showConfigDialog: false, // 是否显示项目配置弹窗
           projectPath: query.path, // 项目路径
+          lang: "cn", // 查看对应网站的语言
         },
         proto: {
           openConfigDialog() {

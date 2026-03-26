@@ -82,10 +82,7 @@
         ></o-page>
       </o-else-if>
       <o-else-if :value="activeId === 'build-file'">
-        <o-page
-          :project-path="projectPath"
-          src="./build-file.html"
-        ></o-page>
+        <o-page :project-path="projectPath" src="./build-file.html"></o-page>
       </o-else-if>
       <o-else-if :value="activeId === 'checker'">
         <o-page

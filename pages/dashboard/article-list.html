@@ -182,13 +182,14 @@
 
       return {
         data: {
-          projectPath: query.path || "",
+          projectPath: query.path || "", // 项目路径
+          lang: "cn", // 查看网站的语言
           header: [],
           documentList: [],
           activeHeader: "",
+          refreshing: false,
           _topHandle: null,
           _documentHandle: null,
-          refreshing: false,
           _cancels: [],
         },
         proto: {
@@ -230,16 +231,15 @@
             this._topHandle = await get(this.projectPath);
 
             const config = await getData(this._topHandle);
-            const writingLang = config.writingLang || "en";
 
-            const writingLangConfig = await getData(
+            const langConfig = await getData(
               this._topHandle,
-              `${writingLang}/_config.yaml`,
+              `${this.lang}/_config.yaml`,
             );
 
-            this._documentHandle = await this._topHandle.get(writingLang);
+            this._documentHandle = await this._topHandle.get(this.lang);
 
-            this.header = writingLangConfig.header || [];
+            this.header = langConfig.header || [];
 
             if (this.header[0]?.url) {
               this.clickHeaderItem(this.header[0]);
@@ -254,7 +254,7 @@
                 websiteHandle: await this._topHandle.get("website", {
                   create: "dir",
                 }),
-                lang: writingLang,
+                lang: this.lang,
               });
             }
 
@@ -264,7 +264,7 @@
               websiteHandle: await this._topHandle.get("website", {
                 create: "dir",
               }),
-              lang: writingLang,
+              lang: this.lang,
             });
 
             this.refreshing = false;
