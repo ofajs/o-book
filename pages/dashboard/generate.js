@@ -2,7 +2,8 @@ import { getData } from "../../util/yaml-handle.js";
 import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
 import hljs from "/npm/highlight.js@11.9.0/+esm";
 import jsBeautify from "/npm/js-beautify@1.15.1/+esm";
-// import { genRag } from "../../util/gen-rag.js";
+import { startArticleWatch } from "./watch-article.js";
+import { saveArticleConfig } from "./article-config.js";
 
 marked.use({
   renderer: {
@@ -89,8 +90,7 @@ export const initGenerator = async ({
   watchArticle = false,
   websiteHandle,
 }) => {
-  // 生成 rag 索引文件内容
-  // genRag({ topHandle, lang, websiteHandle });
+  let cancels = [];
 
   const projectConfig = await getData(topHandle);
 
@@ -168,10 +168,6 @@ export const initGenerator = async ({
     await writeFileIfChanged(headerFileHandle, headerContent);
   }
 
-  // 存储取消监听函数，用于组件卸载时停止监听
-  let cancels = [];
-
-  // 获取对应语言的文章目录
   const websiteLangHandle = await websiteHandle.get(lang, {
     create: "dir",
   });
@@ -180,36 +176,15 @@ export const initGenerator = async ({
 
   // 如果需要监听文章变化
   if (watchArticle) {
-    // 监听文章变化，及时生成对应的 html 文件
-    cancels.push(
-      await articleHandle.observe(async (event) => {
-        const relativePath = event.path.replace(articleHandle.path + "/", "");
-
-        // 如果是 _config.yaml 文件，则更新文章配置
-        if (relativePath.endsWith("_config.yaml")) {
-          await saveArticleConfig(articleHandle, websiteLangHandle);
-          return;
-        }
-
-        // 只处理 .md 和 .html 文件
-        if (!relativePath.endsWith(".md") && !relativePath.endsWith(".html")) {
-          return;
-        }
-
-        const sourceFileHandle = await articleHandle.get(relativePath);
-        const targetFileHandle = await websiteLangHandle.get(
-          relativePath.replace(/\.(html|md)$/, ".html"),
-          { create: "file" },
-        );
-
-        await formatPage({
-          inputFileHandle: sourceFileHandle,
-          outputFileHandle: targetFileHandle,
-          langRootDirHandle: websiteLangHandle,
+    cancels = await startArticleWatch({
+      articleHandle,
+      websiteLangHandle,
+      formatPage: (params) =>
+        formatPage({
+          ...params,
           logoImageFileName: projectConfig.logoImg.split("/").pop(),
-        });
-      }),
-    );
+        }),
+    });
   }
 
   // 保存文章配置信息
@@ -525,61 +500,4 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
   indexHTML = await fetch(`${templateBasePath}/index.html`).then((response) =>
     response.text(),
   );
-};
-
-/**
- * 保存文章配置信息
- * 读取每个导航分类的配置，生成导航数据
- */
-const saveArticleConfig = async (articleHandle, websiteLangHandle) => {
-  const siteConfig = await getData(articleHandle);
-
-  const processHeaderItem = async (headerItem) => {
-    if (headerItem.content && !headerItem.url) {
-      for (const childItem of headerItem.content) {
-        await processHeaderItem(childItem);
-      }
-      return;
-    }
-
-    if (!headerItem.url) {
-      return;
-    }
-
-    const headerItemData = await getData(articleHandle, headerItem.url);
-    headerItem.data = headerItemData;
-
-    const prefix = headerItem.url
-      .replace(/^\.\//, "")
-      .replace("_config.yaml", "");
-
-    const fixContentUrl = (data) => {
-      if (data.url) {
-        data.url = fixUrlPath(data.url);
-      }
-      if (data.content) {
-        data.content.forEach(fixContentUrl);
-      }
-    };
-
-    fixContentUrl({ content: headerItemData });
-
-    const flattenedItems = headerItemData.flatMap(
-      (item) => item.content || [item],
-    );
-    const firstNavItem = flattenedItems[0];
-
-    headerItem.firstUrl = prefix + firstNavItem?.url;
-    headerItem.prefix = prefix;
-  };
-
-  for (const headerItem of siteConfig.header) {
-    await processHeaderItem(headerItem);
-  }
-
-  const configFileHandle = await websiteLangHandle.get("article-config.json", {
-    create: "file",
-  });
-
-  await writeFileIfChanged(configFileHandle, JSON.stringify(siteConfig));
 };

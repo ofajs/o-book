@@ -40,7 +40,6 @@
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../../util/yaml-handle.js");
-      const { initGenerator } = await load("./generate.js");
 
       return {
         data: {
@@ -49,27 +48,11 @@
           projectPath: query.path,
         },
         proto: {
-          async init({ watchArticle = true }) {
-            const config = await getData(this._topHandle);
-            this._projectConfig = config;
-
-            const writingLang = config.writingLang || "en";
-
-            this._cancels = await initGenerator({
-              topHandle: this._topHandle,
-              websiteHandle: await this._topHandle.get("website", {
-                create: "dir",
-              }),
-              watchArticle,
-              lang: writingLang,
-            });
-          },
           openConfigDialog() {
             this.showConfigDialog = true;
           },
           onConfigSaved() {
             console.log("config-saved");
-            this.init({ watchArticle: false });
           },
         },
         async attached() {
@@ -82,12 +65,8 @@
               query: { ...query },
             },
           });
-
-          this.init({ watchArticle: true });
         },
-        detached() {
-          this._cancels?.forEach((cancel) => cancel());
-        },
+        detached() {},
       };
     };
   </script>
