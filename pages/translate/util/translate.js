@@ -21,6 +21,27 @@ const extractTranslation = (content) => {
 
 export const translate = async (text, targetLang, callback) => {
   const targetLanguage = languageMap[targetLang] || targetLang;
+
+  const isEnglishMarkdown = /^#.*\n[\s\S]/m.test(text);
+  const isEnglishContent = /^[a-zA-Z\s.,!?;:'"()\[\]{}\-_+=\n\r]*$/.test(
+    text.replace(/#.*\n/g, ""),
+  );
+
+  if (isEnglishMarkdown && isEnglishContent && targetLang !== "en") {
+    if (callback) {
+      callback({
+        provider: "none",
+        id: "skip",
+        model: "none",
+        chunk: text,
+        content: text,
+        done: true,
+        isThinking: false,
+      });
+    }
+    return;
+  }
+
   const messages = [
     {
       role: "system",
