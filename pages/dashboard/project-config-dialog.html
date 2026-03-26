@@ -39,7 +39,15 @@
       <h3 style="margin: 0 0 8px; font-size: 16px">项目配置</h3>
       <div class="config-form">
         <div class="form-item">
-          <label>默认语言 (primaryLang)</label>
+          <label>写作语言 (writingLang)</label>
+          <p-input
+            sync:value="editConfig.writingLang"
+            readonly
+            placeholder="写作时使用的语言"
+          ></p-input>
+        </div>
+        <div class="form-item">
+          <label>网站初始语言 (primaryLang)</label>
           <p-input
             sync:value="editConfig.primaryLang"
             placeholder="如: cn, en"
@@ -62,13 +70,15 @@
 
   <script>
     export default async ({ load }) => {
-      const { saveData } = await load("../../util/yaml-handle.js");
+      const { saveData, getData } = await load("../../util/yaml-handle.js");
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+      const { get } = await load("/nos/fs/handle/mount/mount.js");
 
       return {
         data: {
           open: false,
           editConfig: {
+            writingLang: "",
             primaryLang: "",
             languagesText: "",
           },
@@ -77,14 +87,18 @@
           projectPath: "",
         },
         watch: {
-          open(val) {
-            if (val && this.projectConfig) {
+          async open(val) {
+            if (val && this.projectPath) {
+              this._topHandle = await get(this.projectPath);
+              this._projectConfig = await getData(this._topHandle);
+              this.editConfig.writingLang =
+                this._projectConfig.writingLang || "";
               this.editConfig.primaryLang =
-                this.projectConfig.primaryLang || "";
+                this._projectConfig.primaryLang || "";
               this.editConfig.languagesText = Array.isArray(
-                this.projectConfig.languages,
+                this._projectConfig.languages,
               )
-                ? this.projectConfig.languages.join(", ")
+                ? this._projectConfig.languages.join(", ")
                 : "";
             }
           },
@@ -100,8 +114,8 @@
                 .map((lang) => lang.trim())
                 .filter((lang) => lang);
 
-              this.projectConfig.primaryLang = this.editConfig.primaryLang;
-              this.projectConfig.languages = languages;
+              this._projectConfig.primaryLang = this.editConfig.primaryLang;
+              this._projectConfig.languages = languages;
 
               await saveData(
                 this._topHandle,
