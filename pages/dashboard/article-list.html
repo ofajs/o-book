@@ -218,16 +218,24 @@
             this.documentList = Array.isArray(documentList) ? documentList : [];
           },
           async refreshPreview() {
-            await this.init({ watchArticle: false });
+            this.refreshing = true;
+
+            await buildWebsite({
+              topHandle: this._topHandle,
+              websiteHandle: await this._topHandle.get("website", {
+                create: "dir",
+              }),
+              lang: this.lang,
+            });
+
+            this.refreshing = false;
 
             toast({
               color: "success",
               message: "重新生成完毕",
             });
           },
-          async init({ watchArticle = true }) {
-            this.refreshing = true;
-
+          async setupProject() {
             this._topHandle = await get(this.projectPath);
 
             const config = await getData(this._topHandle);
@@ -245,33 +253,31 @@
               this.clickHeaderItem(this.header[0]);
             }
 
-            if (watchArticle) {
-              this._cancels.forEach((cancel) => cancel());
+            this._cancels.forEach((cancel) => cancel());
 
-              // 监听文章变化实时更新
-              this._cancels = await watchWebsite({
-                topHandle: this._topHandle,
-                websiteHandle: await this._topHandle.get("website", {
-                  create: "dir",
-                }),
-                lang: this.lang,
-              });
-            }
-
-            // 初始化网站生成器
-            await buildWebsite({
+            this._cancels = await watchWebsite({
               topHandle: this._topHandle,
               websiteHandle: await this._topHandle.get("website", {
                 create: "dir",
               }),
               lang: this.lang,
             });
-
-            this.refreshing = false;
           },
         },
         async attached() {
-          this.init({ watchArticle: true });
+          await this.setupProject();
+
+          this.refreshing = true;
+
+          await buildWebsite({
+            topHandle: this._topHandle,
+            websiteHandle: await this._topHandle.get("website", {
+              create: "dir",
+            }),
+            lang: this.lang,
+          });
+
+          this.refreshing = false;
         },
         detached() {
           this._cancels?.forEach((cancel) => cancel());
