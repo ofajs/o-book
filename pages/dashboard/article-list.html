@@ -177,7 +177,7 @@
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../../util/yaml-handle.js");
-      const { initGenerator, watchGenerator } = await load("./generate.js");
+      const { buildWebsite, watchWebsite } = await load("./generate.js");
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
 
       return {
@@ -249,7 +249,7 @@
               this._cancels.forEach((cancel) => cancel());
 
               // 监听文章变化实时更新
-              this._cancels = await watchGenerator({
+              this._cancels = await watchWebsite({
                 topHandle: this._topHandle,
                 websiteHandle: await this._topHandle.get("website", {
                   create: "dir",
@@ -259,7 +259,7 @@
             }
 
             // 初始化网站生成器
-            await initGenerator({
+            await buildWebsite({
               topHandle: this._topHandle,
               websiteHandle: await this._topHandle.get("website", {
                 create: "dir",

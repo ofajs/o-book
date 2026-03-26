@@ -2,7 +2,6 @@ import { getData } from "../../util/yaml-handle.js";
 import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
 import hljs from "/npm/highlight.js@11.9.0/+esm";
 import jsBeautify from "/npm/js-beautify@1.15.1/+esm";
-import { startArticleWatch } from "./watch-article.js";
 import { saveArticleConfig } from "./article-config.js";
 
 marked.use({
@@ -31,10 +30,6 @@ marked.use({
   },
 });
 
-/**
- * 如果文件内容发生变化，则写入文件
- * 用于避免不必要的磁盘写入操作
- */
 const writeFileIfChanged = async (fileHandle, newContent) => {
   const currentContent = await fileHandle.text();
   if (currentContent !== newContent) {
@@ -42,32 +37,16 @@ const writeFileIfChanged = async (fileHandle, newContent) => {
   }
 };
 
-/**
- * 修正 URL 路径：将 ./ 前缀去掉，并将 .md 转换为 .html
- * 例如: ./guide/getting-started.md -> guide/getting-started.html
- */
 const fixUrlPath = (url) => url?.replace(/^\.\//, "").replace(/\.md$/, ".html");
 
-/**
- * 计算文件相对于根目录的深度
- * 用于生成相对路径前缀
- */
 const getDirectoryDepth = (filePath, rootPath) =>
   filePath.replace(rootPath, "").split("/").length - 1;
 
-/**
- * 根据文件深度生成相对路径前缀
- * 例如: 深度为0返回""，深度为1返回"../"，深度为2返回"../../"
- */
 const getPathPrefix = (filePath, rootPath) => {
   const depth = getDirectoryDepth(filePath, rootPath);
   return "../".repeat(depth).replace(/\/$/, "");
 };
 
-/**
- * 获取项目的基础路径
- * 支持挂载模式下的路径解析
- */
 export const getBasePath = () => {
   if (location.href.includes("$mount-")) {
     const dirId = location.href.replace(/.+\$mount-(.+)o\-book.+/, "$1");
@@ -76,18 +55,9 @@ export const getBasePath = () => {
   return "/";
 };
 
-/**
- * 初始化网站生成器
- * @param {Object} options 配置选项
- * @param {Object} options.topHandle - 项目根目录的 handle
- * @param {string} options.lang - 文档的写作语言
- * @param {boolean} options.watchArticle - 是否监听文章变化实时更新
- * @param {Object} options.websiteHandle - 输出网站的目录 handle
- */
-export const initGenerator = async ({ topHandle, lang, websiteHandle }) => {
+export const buildWebsite = async ({ topHandle, lang, websiteHandle }) => {
   const projectConfig = await getData(topHandle);
 
-  // 初始化静态资源文件（CSS、模板文件等）
   await initStaticFile({
     websiteHandle,
     logoImgName: projectConfig.logoImg
@@ -99,7 +69,6 @@ export const initGenerator = async ({ topHandle, lang, websiteHandle }) => {
   });
 
   {
-    // 拷贝publics目录到网站目录的根目录（只复制有改动的文件）
     const publicsHandle = await topHandle.get("publics");
 
     if (publicsHandle && publicsHandle.kind === "dir") {
@@ -138,7 +107,6 @@ export const initGenerator = async ({ topHandle, lang, websiteHandle }) => {
     }
   }
 
-  // 修正 header 的 logo 路径和文字
   if (projectConfig.logoImg || projectConfig.logoName) {
     const headerFileHandle = await websiteHandle.get("header.html");
     let headerContent = await headerFileHandle.text();
@@ -169,7 +137,6 @@ export const initGenerator = async ({ topHandle, lang, websiteHandle }) => {
 
   await saveArticleConfig(articleHandle, websiteLangHandle);
 
-  // 遍历所有文章文件并生成 HTML
   const { dataList: allArticleData, markdownContents } = await traverseFiles({
     sourceDirHandle: articleHandle,
     targetDirHandle: websiteLangHandle,
@@ -177,14 +144,12 @@ export const initGenerator = async ({ topHandle, lang, websiteHandle }) => {
     logoImageFileName: projectConfig.logoImg.split("/").pop(),
   });
 
-  // 生成数据库文件，用于搜索等功能
   const dbFileHandle = await websiteLangHandle.get("db.json", {
     create: "file",
   });
 
   await writeFileIfChanged(dbFileHandle, JSON.stringify(allArticleData));
 
-  // 生成 llms-full.txt 文件（所有 markdown 合并文件）
   const llmsFullHandle = await websiteLangHandle.get("llms-full.txt", {
     create: "file",
   });
@@ -196,7 +161,7 @@ export const initGenerator = async ({ topHandle, lang, websiteHandle }) => {
   await writeFileIfChanged(llmsFullHandle, llmsFullContent);
 };
 
-export const watchGenerator = async ({ topHandle, lang, websiteHandle }) => {
+export const watchWebsite = async ({ topHandle, lang, websiteHandle }) => {
   const projectConfig = await getData(topHandle);
 
   const websiteLangHandle = await websiteHandle.get(lang, {
@@ -205,7 +170,7 @@ export const watchGenerator = async ({ topHandle, lang, websiteHandle }) => {
 
   const articleHandle = await topHandle.get(lang);
 
-  const cancels = await startArticleWatch({
+  const cancels = await watchArticles({
     articleHandle,
     websiteLangHandle,
     formatPage: (params) =>
@@ -218,10 +183,43 @@ export const watchGenerator = async ({ topHandle, lang, websiteHandle }) => {
   return cancels;
 };
 
-/**
- * 递归遍历源目录，处理所有文章文件
- * 同级文件并行处理，子目录递归处理
- */
+const watchArticles = async ({
+  articleHandle,
+  websiteLangHandle,
+  formatPage,
+}) => {
+  const cancels = [];
+
+  cancels.push(
+    await articleHandle.observe(async (event) => {
+      const relativePath = event.path.replace(articleHandle.path + "/", "");
+
+      if (relativePath.endsWith("_config.yaml")) {
+        await saveArticleConfig(articleHandle, websiteLangHandle);
+        return;
+      }
+
+      if (!relativePath.endsWith(".md") && !relativePath.endsWith(".html")) {
+        return;
+      }
+
+      const sourceFileHandle = await articleHandle.get(relativePath);
+      const targetFileHandle = await websiteLangHandle.get(
+        relativePath.replace(/\.(html|md)$/, ".html"),
+        { create: "file" },
+      );
+
+      await formatPage({
+        inputFileHandle: sourceFileHandle,
+        outputFileHandle: targetFileHandle,
+        langRootDirHandle: websiteLangHandle,
+      });
+    }),
+  );
+
+  return cancels;
+};
+
 const traverseFiles = async ({
   sourceDirHandle,
   targetDirHandle,
@@ -232,19 +230,16 @@ const traverseFiles = async ({
   const markdownContents = [];
   const entries = [];
 
-  // 收集所有文件和目录
   for await (const handle of sourceDirHandle.values()) {
     entries.push(handle);
   }
 
-  // 分离文件和目录
   const fileEntries = entries.filter(
     (h) =>
       h.kind === "file" && (h.name.endsWith(".html") || h.name.endsWith(".md")),
   );
   const dirEntries = entries.filter((h) => h.kind === "dir");
 
-  // 并行处理所有文件
   const fileResults = await Promise.all(
     fileEntries.map(async (handle) => {
       const outputName = handle.name.replace(/\.(html|md)$/, ".html");
@@ -285,7 +280,6 @@ const traverseFiles = async ({
 
   dataList.push(...fileResults.filter(Boolean));
 
-  // 串行处理子目录（保证目录结构的依赖顺序）
   for (const handle of dirEntries) {
     const subTargetHandle = await targetDirHandle.get(handle.name, {
       create: "dir",
@@ -305,10 +299,6 @@ const traverseFiles = async ({
   return { dataList, markdownContents };
 };
 
-/**
- * 格式化单个页面
- * 将 Markdown 转换为 HTML，处理链接、图片等
- */
 const formatPage = async ({
   inputFileHandle,
   outputFileHandle,
@@ -317,13 +307,11 @@ const formatPage = async ({
 }) => {
   let content = await inputFileHandle.text();
 
-  // 如果是 ofa.js 组件模板（<template 开头），直接输出不做转换
   if (content.trim().startsWith("<template ")) {
     await writeFileIfChanged(outputFileHandle, content);
     return;
   }
 
-  // Markdown 文件转换为 HTML
   if (inputFileHandle.name.endsWith("md")) {
     content = `<article class="markdown-body">${marked.parse(content)}</article>`;
   }
@@ -332,7 +320,6 @@ const formatPage = async ({
   const paragraphContent = [];
 
   {
-    // 解析 HTML 内容，提取标题和链接
     let tempEl = $(`<template>${content}</template>`);
     const titleEl = tempEl.$("title,h1,h2,h3,h4");
 
@@ -340,53 +327,44 @@ const formatPage = async ({
       titleText = titleEl.text.trim();
     }
 
-    // 如果有 title 标签，从正文中移除
     if (titleEl && titleEl.is("title")) {
       titleEl.remove();
       content = tempEl.html;
       tempEl = $(`<template>${content}</template>`);
     }
 
-    // 处理所有链接
     const aEls = tempEl.all("a");
 
     if (aEls.length > 0) {
       aEls.forEach((aEl) => {
         const href = aEl.attr("href");
 
-        // 外部链接打开新窗口
         if (/^http/.test(href)) {
           aEl.attr("target", "_blank");
           return;
         }
 
-        // 内部链接 .md 转换为 .html
         aEl.attr("href", href.replace(/\.md(\?.*)?$/, ".html$1"));
-        // 标记为站内链接
         aEl.attr("olink", "");
       });
 
       content = tempEl.html;
     }
 
-    // 提取文章段落用于搜索索引
     tempEl.$("article")?.forEach((p) => {
       paragraphContent.push({ t: p.tag, c: p.text.trim() });
     });
   }
 
-  // 计算相对路径前缀
   const pathPrefix = getPathPrefix(
     outputFileHandle.path,
     langRootDirHandle.path,
   );
 
-  // 生成最终 HTML
   let finalHtml = indexHTML
     .replace("<!-- main content -->", content)
     .replace(/\{pathPrefix\}/g, pathPrefix);
 
-  // 设置页面标题
   if (titleText) {
     finalHtml = finalHtml.replace(
       "<title>Document</title>",
@@ -394,7 +372,6 @@ const formatPage = async ({
     );
   }
 
-  // 设置网站图标
   if (logoImageFileName) {
     finalHtml = finalHtml.replace(
       '<link rel="icon" href="https://ofajs.com/publics/logo.svg" />',
@@ -402,7 +379,6 @@ const formatPage = async ({
     );
   }
 
-  // 格式化 HTML（缩进等）
   finalHtml = jsBeautify.html(finalHtml, {
     indent_size: 2,
     indent_char: " ",
@@ -421,10 +397,6 @@ const formatPage = async ({
 
 let indexHTML = "";
 
-/**
- * 初始化静态资源文件
- * 从模板目录复制 CSS、JS、HTML 模板等到输出目录
- */
 const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
   const templateBasePath = `${getBasePath()}template/default`;
   const cssBasePath = `${getBasePath()}css`;
@@ -452,7 +424,6 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
     },
   ];
 
-  // 如果有 logo 图片，添加到复制列表
   if (logoImgName) {
     staticFileList.push({
       name: logoImgName,
@@ -461,12 +432,10 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
     });
   }
 
-  // 获取模板文件列表
   const templateFileList = await fetch(`${templateBasePath}/_files.json`).then(
     (response) => response.json(),
   );
 
-  // 添加模板文件到复制列表
   templateFileList.forEach((filePath) => {
     if (filePath.startsWith("/gh/") || filePath.startsWith("/nos/")) {
       staticFileList.push({
@@ -484,7 +453,6 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
     });
   });
 
-  // 并行复制所有静态文件
   await Promise.all(
     staticFileList.map(async ({ name, path: filePath, outputPath }) => {
       const fileContent = await fetch(filePath).then((r) => r.text());
@@ -495,7 +463,6 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
     }),
   );
 
-  // 获取首页模板
   indexHTML = await fetch(`${templateBasePath}/index.html`).then((response) =>
     response.text(),
   );
