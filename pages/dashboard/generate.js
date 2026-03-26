@@ -87,11 +87,8 @@ export const getBasePath = () => {
 export const initGenerator = async ({
   topHandle,
   lang,
-  watchArticle = false,
   websiteHandle,
 }) => {
-  let cancels = [];
-
   const projectConfig = await getData(topHandle);
 
   // 初始化静态资源文件（CSS、模板文件等）
@@ -174,20 +171,6 @@ export const initGenerator = async ({
 
   const articleHandle = await topHandle.get(lang);
 
-  // 如果需要监听文章变化
-  if (watchArticle) {
-    cancels = await startArticleWatch({
-      articleHandle,
-      websiteLangHandle,
-      formatPage: (params) =>
-        formatPage({
-          ...params,
-          logoImageFileName: projectConfig.logoImg.split("/").pop(),
-        }),
-    });
-  }
-
-  // 保存文章配置信息
   await saveArticleConfig(articleHandle, websiteLangHandle);
 
   // 遍历所有文章文件并生成 HTML
@@ -215,6 +198,26 @@ export const initGenerator = async ({
     .join("\n\n---\n\n");
 
   await writeFileIfChanged(llmsFullHandle, llmsFullContent);
+};
+
+export const watchGenerator = async ({ topHandle, lang, websiteHandle }) => {
+  const projectConfig = await getData(topHandle);
+
+  const websiteLangHandle = await websiteHandle.get(lang, {
+    create: "dir",
+  });
+
+  const articleHandle = await topHandle.get(lang);
+
+  const cancels = await startArticleWatch({
+    articleHandle,
+    websiteLangHandle,
+    formatPage: (params) =>
+      formatPage({
+        ...params,
+        logoImageFileName: projectConfig.logoImg.split("/").pop(),
+      }),
+  });
 
   return cancels;
 };
