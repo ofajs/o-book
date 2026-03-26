@@ -74,17 +74,22 @@
           },
           _topHandle: null,
           _projectConfig: null,
+          projectPath: "",
+        },
+        watch: {
+          open(val) {
+            if (val && this.projectConfig) {
+              this.editConfig.primaryLang =
+                this.projectConfig.primaryLang || "";
+              this.editConfig.languagesText = Array.isArray(
+                this.projectConfig.languages,
+              )
+                ? this.projectConfig.languages.join(", ")
+                : "";
+            }
+          },
         },
         proto: {
-          async openDialog(topHandle, config) {
-            this._topHandle = topHandle;
-            this._projectConfig = config;
-            this.editConfig.primaryLang = config.primaryLang || "";
-            this.editConfig.languagesText = Array.isArray(config.languages)
-              ? config.languages.join(", ")
-              : "";
-            this.open = true;
-          },
           handleClose() {
             this.open = false;
           },
@@ -95,8 +100,8 @@
                 .map((lang) => lang.trim())
                 .filter((lang) => lang);
 
-              this._projectConfig.primaryLang = this.editConfig.primaryLang;
-              this._projectConfig.languages = languages;
+              this.projectConfig.primaryLang = this.editConfig.primaryLang;
+              this.projectConfig.languages = languages;
 
               await saveData(
                 this._topHandle,
@@ -109,6 +114,11 @@
               toast({
                 color: "success",
                 message: "配置保存成功",
+              });
+
+              this.emit("config-saved", {
+                bubbles: true,
+                composed: true,
               });
             } catch (error) {
               toast({
