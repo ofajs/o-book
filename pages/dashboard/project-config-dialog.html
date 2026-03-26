@@ -67,14 +67,35 @@
       color: var(--md-ref-palette-error);
     }
 
-    .add-language {
+    .available-languages {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
-      margin-top: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--md-ref-palette-outline-variant);
     }
 
-    .add-language p-input {
-      flex: 1;
+    .available-language {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      color: var(--md-ref-palette-normal40);
+      background-color: var(--md-ref-palette-surface-container-highest);
+      border-radius: 16px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .available-language:hover {
+      background-color: var(--md-ref-palette-primary-container);
+      color: var(--md-ref-palette-on-primary-container);
+    }
+
+    .available-language.selected {
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
     }
   </style>
 
@@ -102,20 +123,23 @@
           <div class="language-tags">
             <o-fill :value="editConfig.languages">
               <div class="language-tag">
-                {{$data}}
+                {{$host.languageMap[$data]}}
                 <div class="delete-btn" on:click="$host.removeLanguage($data)">
                   ×
                 </div>
               </div>
             </o-fill>
           </div>
-          <div class="add-language">
-            <p-input
-              sync:value="newLanguage"
-              placeholder="输入语言代码，如: en"
-              on:keydown="handleLanguageKeydown"
-            ></p-input>
-            <p-button on:click="addLanguage">添加</p-button>
+          <div class="available-languages">
+            <o-fill :value="availableLanguages">
+              <div
+                class="available-language"
+                class:selected="$host.editConfig.languages.includes($data)"
+                on:click="$host.toggleLanguage($data)"
+              >
+                {{$host.languageMap[$data]}}
+              </div>
+            </o-fill>
           </div>
         </div>
       </div>
@@ -142,7 +166,14 @@
             primaryLang: "",
             languages: [],
           },
-          newLanguage: "",
+          availableLanguages: ["cn", "en", "ja", "es", "ko"],
+          languageMap: {
+            cn: "Chinese",
+            en: "English",
+            ja: "Japanese",
+            es: "Spanish",
+            ko: "Korean",
+          },
           _topHandle: null,
           _projectConfig: null,
           projectPath: "",
@@ -168,22 +199,18 @@
           handleClose() {
             this.open = false;
           },
-          addLanguage() {
-            const lang = this.newLanguage.trim();
-            if (lang && !this.editConfig.languages.includes(lang)) {
+          toggleLanguage(lang) {
+            const index = this.editConfig.languages.indexOf(lang);
+            if (index > -1) {
+              this.editConfig.languages.splice(index, 1);
+            } else {
               this.editConfig.languages.push(lang);
-              this.newLanguage = "";
             }
           },
           removeLanguage(lang) {
             const index = this.editConfig.languages.indexOf(lang);
             if (index > -1) {
               this.editConfig.languages.splice(index, 1);
-            }
-          },
-          handleLanguageKeydown(event) {
-            if (event.key === "Enter") {
-              this.addLanguage();
             }
           },
           async handleSave() {
