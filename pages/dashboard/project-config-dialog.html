@@ -32,6 +32,50 @@
       gap: 8px;
       padding-top: 16px;
     }
+
+    .language-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .language-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      color: var(--md-sys-color-on-primary-container);
+      background-color: var(--md-sys-color-primary-container);
+      border-radius: 16px;
+      font-size: 13px;
+      gap: 6px;
+    }
+
+    .language-tag .delete-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .language-tag .delete-btn:hover {
+      background-color: var(--md-ref-palette-error-container);
+      color: var(--md-ref-palette-error);
+    }
+
+    .add-language {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .add-language p-input {
+      flex: 1;
+    }
   </style>
 
   <p-dialog :open="open" on:click-mask="handleClose">
@@ -55,10 +99,24 @@
         </div>
         <div class="form-item">
           <label>支持的语言 (languages)</label>
-          <p-input
-            sync:value="editConfig.languagesText"
-            placeholder="多个语言用逗号分隔，如: cn, en, jp"
-          ></p-input>
+          <div class="language-tags">
+            <o-fill :value="editConfig.languages">
+              <div class="language-tag">
+                {{$data}}
+                <div class="delete-btn" on:click="$host.removeLanguage($data)">
+                  ×
+                </div>
+              </div>
+            </o-fill>
+          </div>
+          <div class="add-language">
+            <p-input
+              sync:value="newLanguage"
+              placeholder="输入语言代码，如: en"
+              on:keydown="handleLanguageKeydown"
+            ></p-input>
+            <p-button on:click="addLanguage">添加</p-button>
+          </div>
         </div>
       </div>
       <div class="dialog-actions">
@@ -82,8 +140,9 @@
           editConfig: {
             writingLang: "",
             primaryLang: "",
-            languagesText: "",
+            languages: [],
           },
+          newLanguage: "",
           _topHandle: null,
           _projectConfig: null,
           projectPath: "",
@@ -97,11 +156,11 @@
                 this._projectConfig.writingLang || "";
               this.editConfig.primaryLang =
                 this._projectConfig.primaryLang || "";
-              this.editConfig.languagesText = Array.isArray(
+              this.editConfig.languages = Array.isArray(
                 this._projectConfig.languages,
               )
-                ? this._projectConfig.languages.join(", ")
-                : "";
+                ? [...this._projectConfig.languages]
+                : [];
             }
           },
         },
@@ -109,15 +168,28 @@
           handleClose() {
             this.open = false;
           },
+          addLanguage() {
+            const lang = this.newLanguage.trim();
+            if (lang && !this.editConfig.languages.includes(lang)) {
+              this.editConfig.languages.push(lang);
+              this.newLanguage = "";
+            }
+          },
+          removeLanguage(lang) {
+            const index = this.editConfig.languages.indexOf(lang);
+            if (index > -1) {
+              this.editConfig.languages.splice(index, 1);
+            }
+          },
+          handleLanguageKeydown(event) {
+            if (event.key === "Enter") {
+              this.addLanguage();
+            }
+          },
           async handleSave() {
             try {
-              const languages = this.editConfig.languagesText
-                .split(",")
-                .map((lang) => lang.trim())
-                .filter((lang) => lang);
-
               this._projectConfig.primaryLang = this.editConfig.primaryLang;
-              this._projectConfig.languages = languages;
+              this._projectConfig.languages = this.editConfig.languages;
 
               const configHandle = await this._topHandle.get("_config.yaml");
               const configText = yaml.dump(this._projectConfig);
