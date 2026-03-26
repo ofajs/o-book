@@ -1,9 +1,12 @@
 import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
 import { getHash } from "/nos/util/hash/get-hash.js";
+import yaml from "/npm/js-yaml@4.1.1/dist/js-yaml.min.mjs";
 
 const FILE_EXTENSIONS = {
   MARKDOWN: ".md",
   HTML: ".html",
+  YAML: ".yaml",
+  YML: ".yml",
 };
 
 const processMarkdownFile = async (handle, relativePath, content) => {
@@ -97,6 +100,30 @@ const processHtmlFile = async (handle, relativePath, content) => {
   }
 };
 
+const processYamlFile = async (handle, relativePath, content) => {
+  try {
+    const data = yaml.load(content);
+    const blocks = [
+      {
+        raw: content,
+        rawHash: await getHash(content),
+        content: JSON.stringify(data),
+      },
+    ];
+    return {
+      name: handle.name,
+      path: relativePath,
+      realPath: handle.path,
+      isYaml: true,
+      data,
+      blocks,
+    };
+  } catch (error) {
+    console.error(`Error processing YAML file ${handle.name}:`, error);
+    return null;
+  }
+};
+
 const processFile = async (handle, rootPath) => {
   const content = await handle.text();
   const relativePath = handle.path.replace(rootPath + "/", "");
@@ -107,6 +134,13 @@ const processFile = async (handle, rootPath) => {
 
   if (handle.name.endsWith(FILE_EXTENSIONS.HTML)) {
     return await processHtmlFile(handle, relativePath, content);
+  }
+
+  if (
+    handle.name.endsWith(FILE_EXTENSIONS.YAML) ||
+    handle.name.endsWith(FILE_EXTENSIONS.YML)
+  ) {
+    return await processYamlFile(handle, relativePath, content);
   }
 
   return null;
