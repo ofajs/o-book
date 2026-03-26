@@ -69,8 +69,10 @@
   </p-dialog>
 
   <script>
+    import yaml from "/npm/js-yaml@4.1.1/dist/js-yaml.min.mjs";
+
     export default async ({ load }) => {
-      const { saveData, getData } = await load("../../util/yaml-handle.js");
+      const { getData } = await load("../../util/yaml-handle.js");
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
       const { get } = await load("/nos/fs/handle/mount/mount.js");
 
@@ -117,11 +119,9 @@
               this._projectConfig.primaryLang = this.editConfig.primaryLang;
               this._projectConfig.languages = languages;
 
-              await saveData(
-                this._topHandle,
-                "_config.yaml",
-                this._projectConfig,
-              );
+              const configHandle = await this._topHandle.get("_config.yaml");
+              const configText = yaml.dump(this._projectConfig);
+              await configHandle.write(configText);
 
               this.open = false;
 
