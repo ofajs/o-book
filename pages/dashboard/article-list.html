@@ -79,7 +79,7 @@
           顶部导航
 
           <p-button
-            on:click="refreshPreview"
+            on:click="refreshPreview(true)"
             size="mini"
             variant="outlined"
             attr:disabled="refreshing"
@@ -111,7 +111,7 @@
             attr:active-item="$host.activeHeader === $data.url"
           >
             {{$data.name}}
-            <x-if :value="$data.content.length">
+            <x-if :value="$data.content && $data.content.length">
               <i
                 toggle-collapse
                 triangle
@@ -217,7 +217,7 @@
             const documentList = await getData(this._documentHandle, `${url}`);
             this.documentList = Array.isArray(documentList) ? documentList : [];
           },
-          async refreshPreview() {
+          async refreshPreview(bool) {
             this.refreshing = true;
 
             await buildWebsite({
@@ -230,10 +230,12 @@
 
             this.refreshing = false;
 
-            toast({
-              color: "success",
-              message: "重新生成完毕",
-            });
+            if (bool) {
+              toast({
+                color: "success",
+                message: "重新生成完毕",
+              });
+            }
           },
           async setupProject() {
             this._topHandle = await get(this.projectPath);
@@ -267,17 +269,7 @@
         async attached() {
           await this.setupProject();
 
-          this.refreshing = true;
-
-          await buildWebsite({
-            topHandle: this._topHandle,
-            websiteHandle: await this._topHandle.get("website", {
-              create: "dir",
-            }),
-            lang: this.lang,
-          });
-
-          this.refreshing = false;
+          await this.refreshPreview(false);
         },
         detached() {
           this._cancels?.forEach((cancel) => cancel());
