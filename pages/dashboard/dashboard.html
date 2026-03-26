@@ -33,7 +33,11 @@
     </p-button>
   </div>
 
-  <o-page :project-path="projectPath" src="./article-list.html"></o-page>
+  <o-page
+    :project-path="projectPath"
+    :lang="finalLang"
+    src="./article-list.html"
+  ></o-page>
 
   <o-page
     src="./project-config-dialog.html"
@@ -48,12 +52,91 @@
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../../util/yaml-handle.js");
+      const { getArticleData } = await load(
+        "../translate/util/article-data.js",
+      );
+      const { EverCache } = await load("/gh/kirakiray/ever-cache/src/main.js");
+      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+
+      const storages = {};
+      const getStorage = (lang, projectPath) => {
+        const key = "translates-" + lang + projectPath;
+        if (storages[key]) {
+          return storages[key];
+        }
+        const storage = (storages[key] = new EverCache(key));
+        return storage;
+      };
 
       return {
         data: {
-          showConfigDialog: false, // 是否显示项目配置弹窗
-          projectPath: query.path, // 项目路径
-          lang: "cn", // 查看对应网站的语言
+          showConfigDialog: false,
+          projectPath: query.path,
+          lang: "cn",
+          finalLang: "cn",
+          _storage: null,
+          _checkingLang: false,
+        },
+        watch: {
+          async lang(newLang) {
+            if (this._checkingLang) return;
+            if (newLang === this.finalLang) return;
+
+            this._checkingLang = true;
+
+            const oldLang = this.finalLang;
+            const storage = getStorage(newLang, this.projectPath);
+            const handle = await get(this.projectPath);
+            const config = await getData(handle);
+
+            const articleList = await getArticleData(
+              await handle.get(config.writingLang),
+              { isRoot: true },
+            );
+
+            let total = 0;
+            let translated = 0;
+
+            for (const article of articleList || []) {
+              if (
+                article.isTemp &&
+                article.blocks &&
+                article.blocks.length > 0
+              ) {
+                total++;
+                const cachedData = await storage.getItem(
+                  article.blocks[0].rawHash,
+                );
+                if (cachedData) {
+                  translated++;
+                }
+              } else if (article.blocks && article.blocks.length > 0) {
+                for (const block of article.blocks) {
+                  if (block.type === "space") continue;
+                  total++;
+                  const cachedData = await storage.getItem(block.rawHash);
+                  if (cachedData) {
+                    translated++;
+                  }
+                }
+              }
+            }
+
+            const untranslatedCount = total - translated;
+            const isCompleted = untranslatedCount === 0 && total > 0;
+
+            if (isCompleted) {
+              this.finalLang = newLang;
+            } else {
+              this.lang = oldLang;
+              toast({
+                color: "error",
+                message: `翻译未完成，还有 ${untranslatedCount} 个内容块待翻译，无法切换语言`,
+              });
+            }
+
+            this._checkingLang = false;
+          },
         },
         proto: {
           openConfigDialog() {

@@ -94,8 +94,8 @@
           </p-button>
         </h2>
         <p-list style="--ladder-left: 8px">
-          <p-list-item button on:click="clickPreview()"
-            >首页
+          <p-list-item button on:click="clickPreview()">
+            Home
             <n-icon
               icon="majesticons:open-line"
               slot="suffix"
@@ -183,7 +183,7 @@
       return {
         data: {
           projectPath: query.path || "", // 项目路径
-          lang: "cn", // 查看网站的语言
+          lang: "", // 查看网站的语言
           header: [],
           documentList: [],
           activeHeader: "",
@@ -191,6 +191,17 @@
           _topHandle: null,
           _documentHandle: null,
           _cancels: [],
+        },
+        watch: {
+          async lang(lang) {
+            if (!lang) {
+              return;
+            }
+
+            await this.setupProject();
+
+            await this.refreshPreview(false);
+          },
         },
         proto: {
           clickPreview() {
@@ -266,11 +277,8 @@
             });
           },
         },
-        async attached() {
-          await this.setupProject();
-
-          await this.refreshPreview(false);
-        },
+        // async attached() {
+        // },
         detached() {
           this._cancels?.forEach((cancel) => cancel());
         },
