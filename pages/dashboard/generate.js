@@ -84,11 +84,7 @@ export const getBasePath = () => {
  * @param {boolean} options.watchArticle - 是否监听文章变化实时更新
  * @param {Object} options.websiteHandle - 输出网站的目录 handle
  */
-export const initGenerator = async ({
-  topHandle,
-  lang,
-  websiteHandle,
-}) => {
+export const initGenerator = async ({ topHandle, lang, websiteHandle }) => {
   const projectConfig = await getData(topHandle);
 
   // 初始化静态资源文件（CSS、模板文件等）
