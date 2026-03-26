@@ -2,6 +2,7 @@
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/chip/chip.html"></l-m>
   <style>
     .config-dialog {
       width: 400px;
@@ -45,33 +46,6 @@
       margin-top: 8px;
     }
 
-    .language-tag {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 12px;
-      color: var(--md-sys-color-on-primary-container);
-      background-color: var(--md-sys-color-primary-container);
-      border-radius: 16px;
-      font-size: 13px;
-      gap: 6px;
-    }
-
-    .language-tag .delete-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 12px;
-    }
-
-    .language-tag .delete-btn:hover {
-      background-color: var(--md-ref-palette-error-container);
-      color: var(--md-ref-palette-error);
-    }
-
     .available-languages {
       display: flex;
       flex-wrap: wrap;
@@ -79,28 +53,6 @@
       margin-top: 12px;
       padding-top: 12px;
       border-top: 1px solid var(--md-ref-palette-outline-variant);
-    }
-
-    .available-language {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 12px;
-      color: var(--md-ref-palette-normal40);
-      background-color: var(--md-ref-palette-surface-container-highest);
-      border-radius: 16px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .available-language:hover {
-      background-color: var(--md-ref-palette-primary-container);
-      color: var(--md-ref-palette-on-primary-container);
-    }
-
-    .available-language.selected {
-      background-color: var(--md-sys-color-primary-container);
-      color: var(--md-sys-color-on-primary-container);
     }
   </style>
 
@@ -129,23 +81,26 @@
           <label>支持的语言 (languages)</label>
           <div class="language-tags">
             <o-fill :value="editConfig.languages">
-              <div class="language-tag">
+              <p-chip tonal>
                 {{$host.languageMap[$data]}}
-                <div class="delete-btn" on:click="$host.removeLanguage($data)">
-                  ×
-                </div>
-              </div>
+                <x-if
+                  :value="$data !== $host.editConfig.writingLang && $data !== 'en'"
+                >
+                  <n-icon
+                    slot="suffix"
+                    icon="material-symbols:close"
+                    button
+                    on:click="$host.removeLanguage($data)"
+                  ></n-icon>
+                </x-if>
+              </p-chip>
             </o-fill>
           </div>
           <div class="available-languages">
-            <o-fill :value="availableLanguages">
-              <div
-                class="available-language"
-                class:selected="$host.editConfig.languages.includes($data)"
-                on:click="$host.toggleLanguage($data)"
-              >
+            <o-fill :value="availableLanguagesToAdd">
+              <p-chip button tonal on:click="$host.toggleLanguage($data)">
                 {{$host.languageMap[$data]}}
-              </div>
+              </p-chip>
             </o-fill>
           </div>
         </div>
@@ -222,6 +177,11 @@
             }
             return options;
           },
+          get availableLanguagesToAdd() {
+            return this.availableLanguages.filter(
+              (lang) => !this.editConfig.languages.includes(lang),
+            );
+          },
           handleClose() {
             this.open = false;
           },
@@ -234,6 +194,9 @@
             }
           },
           removeLanguage(lang) {
+            if (lang === this.editConfig.writingLang || lang === "en") {
+              return;
+            }
             const index = this.editConfig.languages.indexOf(lang);
             if (index > -1) {
               this.editConfig.languages.splice(index, 1);
