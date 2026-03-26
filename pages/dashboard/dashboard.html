@@ -1,36 +1,8 @@
 <template page>
-  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
     :host {
       display: block;
-    }
-
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      padding: 16px;
-    }
-
-    .list-content {
-      min-width: 240px;
-      padding: 4px;
-    }
-
-    p-list-item {
-      border-radius: 8px;
-      margin: 2px 0;
-    }
-
-    h2 {
-      font-size: 14px;
-      padding: 8px 0;
-      margin: 0;
-      color: var(--md-ref-palette-normal40);
-    }
-
-    .hide {
-      display: none !important;
     }
 
     .rotate-anime {
@@ -44,15 +16,6 @@
       100% {
         transform: rotate(360deg);
       }
-    }
-
-    .article-item {
-      color: var(--md-sys-color-primary);
-    }
-
-    n-icon[slot="prefix"] {
-      margin-right: 4px;
-      font-size: 16px;
     }
 
     .toolbar {
@@ -71,91 +34,33 @@
       margin-left: 8px;
     }
   </style>
-  <div class="container">
-    <div class="toolbar">
-      <p-button on:click="clickPreview"> 预览网页 </p-button>
-      <p-button
-        class="toolbar-btn"
-        on:click="refreshPreview"
-        variant="outlined"
-        attr:disabled="refreshing"
-      >
-        <n-icon
-          class="rotate-anime"
-          class:rotate-anime="refreshing"
-          icon="material-symbols:refresh"
-          slot="prefix"
-        ></n-icon>
-        重新生成
-      </p-button>
-      <p-button
-        class="toolbar-btn"
-        on:click="openConfigDialog"
-        variant="outlined"
-      >
-        <n-icon icon="material-symbols:settings" slot="prefix"></n-icon>
-        项目配置
-      </p-button>
-    </div>
-    <div class="list-content">
-      <h2>顶部导航</h2>
-      <p-list style="--ladder-left: 8px">
-        <o-fill :value="header" name="header-list-item"> </o-fill>
-      </p-list>
-      <template name="header-list-item">
-        <p-list-item
-          attr:button="!!$data.url"
-          on:click="$host.clickHeaderItem($data)"
-          attr:active-item="$host.activeHeader === $data.url"
-        >
-          {{$data.name}}
-          <p-list slot="childs">
-            <o-fill :value="$data.content" name="header-list-item"></o-fill>
-          </p-list>
-        </p-list-item>
-      </template>
-    </div>
-    <div class="list-content">
-      <style>
-        .navi-list {
-          display: flex;
-          flex-direction: column;
-          flex-wrap: wrap;
-          max-height: calc(100vh - 100px);
-        }
-
-        .navi-list p-list-item {
-          min-width: 200px;
-        }
-      </style>
-      <h2>导航对应列表</h2>
-      <p-list class="navi-list">
-        <o-fill :value="documentList" name="document-item"> </o-fill>
-      </p-list>
-    </div>
-
-    <template name="document-item">
-      <p-list-item
-        collapse-childs="open"
-        attr:button="$data.url"
-        on:click="$host.clickDocumentItem($data.url)"
-      >
-        <n-icon
-          class="article-item"
-          class:hide="!$data.url"
-          icon="material-symbols:article-outline"
-          slot="prefix"
-        ></n-icon>
-        <x-if :value="$data.content && $data.content.length > 0">
-          <i toggle-collapse triangle slot="suffix" style="z-index: 3"></i>
-        </x-if>
-        {{$data.name}}
-        <p-list slot="childs">
-          <o-fill :value="$data.content" name="document-item"></o-fill>
-        </p-list>
-      </p-list-item>
-    </template>
+  <div class="toolbar">
+    <p-button on:click="clickPreview"> 预览网页 </p-button>
+    <p-button
+      class="toolbar-btn"
+      on:click="refreshPreview"
+      variant="outlined"
+      attr:disabled="refreshing"
+    >
+      <n-icon
+        class="rotate-anime"
+        class:rotate-anime="refreshing"
+        icon="material-symbols:refresh"
+        slot="prefix"
+      ></n-icon>
+      重新生成
+    </p-button>
+    <p-button
+      class="toolbar-btn"
+      on:click="openConfigDialog"
+      variant="outlined"
+    >
+      <n-icon icon="material-symbols:settings" slot="prefix"></n-icon>
+      项目配置
+    </p-button>
   </div>
+
+  <o-page :project-path="projectPath" src="./article-list.html"></o-page>
 
   <o-page
     src="./project-config-dialog.html"
@@ -167,37 +72,22 @@
   <script>
     export const parent = "../layout.html";
 
-    import { buildPreviewUrl, buildIndexPreviewUrl } from "./dashboard-data.js";
+    import { buildIndexPreviewUrl } from "./dashboard-data.js";
 
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../../util/yaml-handle.js");
-      const { initGenerator, getBasePath } = await load("./generate.js");
+      const { initGenerator } = await load("./generate.js");
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
 
       return {
         data: {
-          header: [],
-          documentList: [],
-          activeHeader: "",
-          _topHandle: null,
-          _documentHandle: null,
-          writingLang: "",
           refreshing: false,
           _projectConfig: null,
           showConfigDialog: false,
           projectPath: query.path,
         },
         proto: {
-          clickDocumentItem(url) {
-            if (!url) {
-              return;
-            }
-            window.open(
-              buildPreviewUrl(this.activeHeader, url, query.path),
-              "_blank",
-            );
-          },
           clickPreview() {
             window.open(buildIndexPreviewUrl(query.path), "_blank");
           },
@@ -209,19 +99,6 @@
               message: "重新生成完毕",
             });
           },
-          async clickHeaderItem(targetItem) {
-            if (!targetItem.url) {
-              return;
-            }
-            this.activeHeader = targetItem.url;
-
-            const documentList = await getData(
-              this._documentHandle,
-              `${targetItem.url}`,
-            );
-
-            this.documentList = Array.isArray(documentList) ? documentList : [];
-          },
           async init({ watchArticle = true }) {
             this.refreshing = true;
 
@@ -230,31 +107,13 @@
 
             const writingLang = config.writingLang || "en";
 
-            this.writingLang = writingLang;
-
-            const writingLangConfig = await getData(
-              this._topHandle,
-              `${writingLang}/_config.yaml`,
-            );
-
-            this._documentHandle = await this._topHandle.get(writingLang);
-
-            this.header = writingLangConfig.header || [];
-
-            if (this.header[0]?.url) {
-              this.clickHeaderItem(this.header[0]);
-            } else {
-              debugger;
-            }
-
             this._cancels = await initGenerator({
-              // websiteConfig: config,
               topHandle: this._topHandle,
               websiteHandle: await this._topHandle.get("website", {
                 create: "dir",
               }),
               watchArticle,
-              lang: this.writingLang, // 翻译哪个语言的文件夹
+              lang: writingLang,
             });
 
             this.refreshing = false;
@@ -264,7 +123,7 @@
           },
           onConfigSaved() {
             console.log("config-saved");
-            // this.init({ watchArticle: false });
+            this.init({ watchArticle: false });
           },
         },
         async attached() {
