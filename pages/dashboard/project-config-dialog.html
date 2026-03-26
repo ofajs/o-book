@@ -1,6 +1,7 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
   <style>
     .config-dialog {
       width: 400px;
@@ -20,6 +21,10 @@
       font-size: 12px;
       color: var(--md-ref-palette-normal40);
       margin-bottom: 4px;
+    }
+
+    .form-item p-input {
+      width: 100%;
     }
 
     .form-item p-input {
@@ -109,10 +114,16 @@
         </div>
         <div class="form-item">
           <label>网站初始语言 (primaryLang)</label>
-          <p-input
+          <p-select
             sync:value="editConfig.primaryLang"
-            placeholder="如: cn, en"
-          ></p-input>
+            attr:disabled="editConfig.writingLang === 'en'"
+          >
+            <x-fill :value="primaryLangOptions">
+              <p-option attr:value="$data"
+                >{{$host.languageMap[$data]}}</p-option
+              >
+            </x-fill>
+          </p-select>
         </div>
         <div class="form-item">
           <label>支持的语言 (languages)</label>
@@ -190,8 +201,27 @@
                 : [];
             }
           },
+          "editConfig.writingLang"(val) {
+            if (val === "en") {
+              this.editConfig.primaryLang = "en";
+            } else if (
+              !this.primaryLangOptions.includes(this.editConfig.primaryLang)
+            ) {
+              this.editConfig.primaryLang = val;
+            }
+          },
         },
         proto: {
+          get primaryLangOptions() {
+            const options = [];
+            if (this.editConfig.writingLang) {
+              options.push(this.editConfig.writingLang);
+            }
+            if (this.editConfig.writingLang !== "en") {
+              options.push("en");
+            }
+            return options;
+          },
           handleClose() {
             this.open = false;
           },
