@@ -43,9 +43,8 @@
 
       return {
         data: {
-          _projectConfig: null,
-          showConfigDialog: false,
-          projectPath: query.path,
+          showConfigDialog: false, // 是否显示项目配置弹窗
+          projectPath: query.path, // 项目路径
         },
         proto: {
           openConfigDialog() {
@@ -56,8 +55,6 @@
           },
         },
         async attached() {
-          this._topHandle = await get(query.path);
-
           this.emit("set-active-id", {
             composed: true,
             data: {
