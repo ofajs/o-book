@@ -189,7 +189,7 @@
           _topHandle: null,
           _documentHandle: null,
           refreshing: false,
-          _cancels: null,
+          _cancels: [],
         },
         proto: {
           clickPreview() {
@@ -244,6 +244,8 @@
             if (this.header[0]?.url) {
               this.clickHeaderItem(this.header[0]);
             }
+
+            this._cancels.forEach((cancel) => cancel());
 
             this._cancels = await initGenerator({
               topHandle: this._topHandle,
