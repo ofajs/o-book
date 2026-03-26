@@ -1,5 +1,13 @@
 import { chat } from "/nos/ai/chat.js";
 
+const languageMap = {
+  cn: "Chinese",
+  en: "English",
+  ja: "Japanese",
+  es: "Spanish",
+  ko: "Korean",
+};
+
 const extractTranslation = (content) => {
   const thinkRegex = /<think>([\s\S]*?)<\/think>/gi;
   const thinkMatch = content.match(thinkRegex);
@@ -12,10 +20,11 @@ const extractTranslation = (content) => {
 };
 
 export const translate = async (text, targetLang, callback) => {
+  const targetLanguage = languageMap[targetLang] || targetLang;
   const messages = [
     {
       role: "system",
-      content: `你是一个专业的翻译助手。请将用户提供的文本翻译为${targetLang}。
+      content: `你是一个专业的翻译助手。请将用户提供的文本翻译为${targetLanguage}。
 要求：
 1. 严格保持原始文本的格式，包括换行、空格、缩进、标点符号等
 2. 完整保留所有HTML标签、代码块、特殊字符（包括井号#、星号*、反引号等）
