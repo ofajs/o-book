@@ -72,8 +72,9 @@
         data: {
           showConfigDialog: false,
           projectPath: query.path,
-          lang: "cn",
-          finalLang: "cn",
+          lang: sessionStorage.getItem(`dashboard-lang-${query.path}`) || "cn",
+          finalLang:
+            sessionStorage.getItem(`dashboard-lang-${query.path}`) || "cn",
           _storage: null,
           _checkingLang: false,
         },
@@ -85,9 +86,20 @@
             this._checkingLang = true;
 
             const oldLang = this.finalLang;
-            const storage = getStorage(newLang, this.projectPath);
             const handle = await get(this.projectPath);
             const config = await getData(handle);
+
+            if (newLang === config.writingLang) {
+              this.finalLang = newLang;
+              sessionStorage.setItem(
+                `dashboard-lang-${this.projectPath}`,
+                newLang,
+              );
+              this._checkingLang = false;
+              return;
+            }
+
+            const storage = getStorage(newLang, this.projectPath);
 
             const articleList = await getArticleData(
               await handle.get(config.writingLang),
@@ -127,6 +139,10 @@
 
             if (isCompleted) {
               this.finalLang = newLang;
+              sessionStorage.setItem(
+                `dashboard-lang-${this.projectPath}`,
+                newLang,
+              );
             } else {
               this.lang = oldLang;
               toast({
