@@ -7,6 +7,9 @@ const fixUrlPath = (url) => url?.replace(/^\.\//, "").replace(/\.md$/, ".html");
  * 读取每个导航分类的配置，生成导航数据
  */
 export const saveArticleConfig = async (articleHandle, websiteLangHandle) => {
+  const projectConfig = await getData(articleHandle.parent);
+  const { languages } = projectConfig;
+
   const siteConfig = await getData(articleHandle);
 
   const processHeaderItem = async (headerItem) => {
@@ -51,6 +54,8 @@ export const saveArticleConfig = async (articleHandle, websiteLangHandle) => {
   for (const headerItem of siteConfig.header) {
     await processHeaderItem(headerItem);
   }
+
+  siteConfig.languages = languages;
 
   const configFileHandle = await websiteLangHandle.get("article-config.json", {
     create: "file",

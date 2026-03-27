@@ -1,6 +1,7 @@
 <template page>
   <l-m src="./comps/header-menu.html"></l-m>
   <l-m src="./comps/search/article-search.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
   <style>
     :host {
       display: flex;
@@ -75,10 +76,17 @@
         <n-icon icon="line-md:light-dark" style="font-size: 24px"></n-icon>
       </o-else>
     </p-button>
-    <p-button variant="text">
+    <p-select
+      sync:value="lang"
+      on:change="switchLang"
+      size="small"
+      style="margin: 0 8px"
+    >
       <n-icon icon="mdi:language" slot="prefix"> </n-icon>
-      简体中文
-    </p-button>
+      <o-fill :value="languages">
+        <p-option attr:value="$data.value"> {{$data.name}} </p-option>
+      </o-fill>
+    </p-select>
     <p-button variant="text" icon>
       <n-icon icon="mdi:github" style="font-size: 24px"></n-icon>
     </p-button>
@@ -94,10 +102,18 @@
       return {
         data: {
           theme: "",
+          lang: lang,
+          languages: [],
           // header: [],
           indexUrl: `${headerUrl.replace(/\/header\.html$/, "")}/${lang}/index.html`,
         },
         proto: {
+          switchLang(e) {
+            const targetLang = $(e.target).value;
+            const currentUrl = window.location.href;
+            const newUrl = currentUrl.replace(`/${lang}/`, `/${targetLang}/`);
+            window.location.href = newUrl;
+          },
           clickMode() {
             $("html").css.transition = "all 0.3s ease-in-out";
             clearTimeout(this._timer);
@@ -113,9 +129,35 @@
               puiProvider.theme = "auto";
             }
           },
+          async loadHeader() {
+            const data = await load(`./${lang}/article-config.json`);
+            this.languages = data.languages.map((e) => ({
+              name: getLangName(e),
+              value: e,
+            }));
+          },
         },
-        async attached() {},
+        async attached() {
+          this.loadHeader();
+        },
       };
+    };
+
+    const getLangName = (lang) => {
+      switch (lang) {
+        case "cn":
+          return "中文";
+        case "en":
+          return "English";
+        case "ja":
+          return "日語";
+        case "ko":
+          return "한국어";
+        case "es":
+          return "Español";
+        default:
+          return lang;
+      }
     };
   </script>
 </template>
