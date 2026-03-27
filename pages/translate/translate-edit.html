@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
   <style>
     :host {
       display: block;
@@ -17,6 +18,9 @@
       flex-shrink: 0;
       overflow: auto;
     }
+    .search-box {
+      margin-bottom: 12px;
+    }
     .article-content {
       flex: 1;
       padding-right: 16px;
@@ -32,8 +36,17 @@
   <div class="layout">
     <div class="left">
       <h3 style="margin: 0 0 16px 0; font-size: 14px">需要翻译的文件</h3>
+      <div class="search-box">
+        <p-input
+          sync:value="searchKeyword"
+          placeholder="搜索文章内容..."
+          style="width: 100%"
+        >
+          <n-icon slot="prefix" icon="material-symbols:search"></n-icon>
+        </p-input>
+      </div>
       <p-list>
-        <o-fill :value="articleList">
+        <o-fill :value="filteredArticleList">
           <p-list-item
             button
             on:click="$host.clickItem($data)"
@@ -45,7 +58,7 @@
       </p-list>
     </div>
     <div class="article-content">
-      <o-fill :value="currentBlocks">
+      <o-fill :value="filteredCurrentBlocks">
         <translate-block
           :item="$data"
           :target-lang="$host.targetLang"
@@ -67,6 +80,7 @@
           projectPath: "",
           targetLang: "", // 翻译到目标语言
           articleList: [], // 所有的文章数据
+          searchKeyword: "", // 搜索关键词
           activeArticlePath: sessionStorage.getItem("activeArticlePath") || "", // 当前选中文章路径
           currentBlocks: [], // 当前选中文章数据
           _originArticleData: null, // 原始文章数据
@@ -79,6 +93,33 @@
           },
         },
         proto: {
+          get filteredArticleList() {
+            if (!this.searchKeyword || !this.searchKeyword.trim()) {
+              return this.articleList;
+            }
+            const keyword = this.searchKeyword.toLowerCase().trim();
+            return this.articleList.filter((article) => {
+              if (!this._originArticleData) return false;
+              const originArticle = this._originArticleData.find(
+                (a) => a.path === article.path,
+              );
+              if (!originArticle || !originArticle.blocks) return false;
+              return originArticle.blocks.some((block) => {
+                if (!block.raw) return false;
+                return block.raw.toLowerCase().includes(keyword);
+              });
+            });
+          },
+          get filteredCurrentBlocks() {
+            if (!this.searchKeyword || !this.searchKeyword.trim()) {
+              return this.currentBlocks;
+            }
+            const keyword = this.searchKeyword.toLowerCase().trim();
+            return this.currentBlocks.filter((block) => {
+              if (!block.raw) return false;
+              return block.raw.toLowerCase().includes(keyword);
+            });
+          },
           clickItem(item) {
             this.activeArticlePath = item.path;
             sessionStorage.setItem("activeArticlePath", item.path);
