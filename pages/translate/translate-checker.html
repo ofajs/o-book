@@ -203,6 +203,7 @@
             <translate-block
               :item="$data.block"
               :target-lang="$host.targetLang"
+              :writing-lang="$host.config.writingLang"
             ></translate-block>
           </div>
         </o-fill>
@@ -237,6 +238,7 @@
           },
           _originArticleData: null,
           _allIssueData: null,
+          config: null, // 项目配置数据
         },
         watch: {
           targetLang(newLang) {

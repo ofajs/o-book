@@ -250,6 +250,7 @@
           translatedInSession: 0, // 本次翻译会话中已完成的数量
           totalToTranslate: 0, // 本次翻译会话需要翻译的总数量
           _storage: null, // 翻译缓存存储对象（EverCache 实例）
+          config: null, // 项目配置数据
         },
         watch: {
           projectPath() {
@@ -420,6 +421,7 @@
               try {
                 await translate(
                   item.block.raw,
+                  this.config.writingLang,
                   this.targetLang,
                   ({ provider, id, model, content, done, isThinking }) => {
                     if (this.shouldStop) {
@@ -540,6 +542,7 @@
             try {
               await translate(
                 failedItem.item.block.raw,
+                this.config.writingLang,
                 this.targetLang,
                 ({ provider, id, model, content, done }) => {
                   if (done) {

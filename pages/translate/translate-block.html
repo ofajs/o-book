@@ -165,6 +165,7 @@
           thinking: false, // 是否正在思考
           item: null,
           targetLang: "", // 翻译到目标语言
+          writingLang: "", // 源语言
           projectPath: "",
           provider: "", // 翻译提供商
           model: "", // 翻译模型
@@ -225,6 +226,7 @@
 
               await translate(
                 this.item.raw,
+                this.writingLang,
                 this.targetLang,
                 ({ provider, id, model, chunk, content, done, isThinking }) => {
                   this.translateText = content;
