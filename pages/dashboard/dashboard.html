@@ -19,9 +19,9 @@
   <div class="toolbar">
     <p-select sync:value="lang" style="width: 200px; margin-right: 16px">
       <label> 切换语言 </label>
-      <p-option value="cn"> Chinese </p-option>
-      <p-option value="en"> English </p-option>
-      <p-option value="ja"> Japanese </p-option>
+      <x-fill :value="languages">
+        <p-option attr:value="$data">{{$host.languageMap[$data]}}</p-option>
+      </x-fill>
     </p-select>
     <p-button
       class="toolbar-btn"
@@ -77,6 +77,14 @@
             sessionStorage.getItem(`dashboard-lang-${query.path}`) || "cn",
           _storage: null,
           _checkingLang: false,
+          languageMap: {
+            cn: "Chinese",
+            en: "English",
+            ja: "Japanese",
+            es: "Spanish",
+            ko: "Korean",
+          },
+          languages: [],
         },
         watch: {
           async lang(newLang) {
@@ -158,11 +166,18 @@
           openConfigDialog() {
             this.showConfigDialog = true;
           },
+          async reloadLangs() {
+            const handle = await get(this.projectPath);
+            const config = await getData(handle);
+            this.languages = config.languages || [];
+            this.lang = config.writingLang;
+            this.finalLang = config.writingLang;
+          },
           onConfigSaved() {
-            console.log("config-saved");
+            this.reloadLangs();
           },
         },
-        async attached() {
+        attached() {
           this.emit("set-active-id", {
             composed: true,
             data: {
@@ -170,6 +185,8 @@
               query: { ...query },
             },
           });
+
+          this.reloadLangs();
         },
         detached() {},
       };
