@@ -142,6 +142,16 @@
             sessionStorage.setItem("translateActiveId", id);
           },
         },
+        watch: {
+          targetLang(newLang) {
+            if (newLang) {
+              sessionStorage.setItem(
+                `translate-targetLang-${this.projectPath}`,
+                newLang,
+              );
+            }
+          },
+        },
         async attached() {
           this.emit("set-active-id", {
             composed: true,
