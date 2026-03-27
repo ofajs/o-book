@@ -22,12 +22,9 @@ const extractTranslation = (content) => {
 export const translate = async (text, targetLang, callback) => {
   const targetLanguage = languageMap[targetLang] || targetLang;
 
-  const isEnglishMarkdown = /^#.*\n[\s\S]/m.test(text);
-  const isEnglishContent = /^[a-zA-Z\s.,!?;:'"()\[\]{}\-_+=\n\r]*$/.test(
-    text.replace(/#.*\n/g, ""),
-  );
+  const isSingleEnglishWordHeading = /^#+\s*[a-zA-Z]+\s*$/.test(text.trim());
 
-  if (isEnglishMarkdown && isEnglishContent && targetLang !== "en") {
+  if (isSingleEnglishWordHeading && targetLang !== "en") {
     if (callback) {
       callback({
         provider: "none",
