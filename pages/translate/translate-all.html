@@ -98,6 +98,16 @@
               刷新状态
             </p-button>
           </o-if>
+          <o-if :value="!isTranslating && translatedCount > 0">
+            <p-button variant="outlined" on:click="clearCurrentCache">
+              清除当前语言缓存
+            </p-button>
+          </o-if>
+          <o-if :value="!isTranslating">
+            <p-button variant="outlined" on:click="clearAllCache">
+              清除所有缓存
+            </p-button>
+          </o-if>
         </div>
       </div>
 
@@ -222,6 +232,7 @@
 
   <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
   <script>
+    import { toast, confirm } from "/gh/ofajs/Punch-UI/packages/util.js";
     import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
     import { getArticleData } from "./util/article-data.js";
     import { translate } from "./util/translate.js";
@@ -599,6 +610,53 @@
             return preview.length < text.trim().length
               ? preview + "..."
               : preview;
+          },
+          async clearCurrentCache() {
+            const langNames = {
+              cn: "Chinese",
+              en: "English",
+              ja: "Japanese",
+              es: "Spanish",
+              ko: "Korean",
+            };
+            const langName = langNames[this.targetLang] || this.targetLang;
+            const confirmed = await confirm(
+              `确定要清除 ${langName} 的翻译缓存吗？\n\n这将删除 ${this.translatedCount} 个已翻译的内容块缓存。`,
+            );
+            if (!confirmed) return;
+
+            try {
+              await this._storage.clear();
+              this.translatedCount = 0;
+              this.untranslatedCount = this.totalBlocks;
+              this.isCompleted = false;
+              this.completedItems = [];
+              alert(`${langName} 翻译缓存已清除！`);
+            } catch (error) {
+              console.error("Failed to clear cache:", error);
+              alert("清除缓存失败: " + error.message);
+            }
+          },
+          async clearAllCache() {
+            const confirmed = await confirm(
+              `确定要清除所有语言的翻译缓存吗？\n\n这将删除所有语言的翻译缓存数据。`,
+            );
+            if (!confirmed) return;
+
+            try {
+              const keys = Object.keys(storages);
+              for (const key of keys) {
+                await storages[key].clear();
+              }
+              this.translatedCount = 0;
+              this.untranslatedCount = this.totalBlocks;
+              this.isCompleted = false;
+              this.completedItems = [];
+              alert("所有翻译缓存已清除！");
+            } catch (error) {
+              console.error("Failed to clear all cache:", error);
+              alert("清除缓存失败: " + error.message);
+            }
           },
         },
         detached() {

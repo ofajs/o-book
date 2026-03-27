@@ -1,6 +1,6 @@
 import { chat } from "/nos/ai/chat.js";
 
-const languageMap = {
+export const languageMap = {
   cn: "Chinese",
   en: "English",
   ja: "Japanese",
