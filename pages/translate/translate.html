@@ -41,11 +41,13 @@
           {{languageMap[config.writingLang]}}
         </span>
       </div>
-      <div style="margin-left: 16px">
+      <div style="margin-left: 16px; display: flex; align-items: center">
         翻译到:
-        <span style="color: var(--md-sys-color-primary)"
-          >{{languageMap[targetLang]}}
-        </span>
+        <p-select size="small" sync:value="targetLang" style="width: 100px">
+          <x-fill :value="targetLangOptions">
+            <p-option attr:value="$data">{{$host.languageMap[$data]}}</p-option>
+          </x-fill>
+        </p-select>
       </div>
       <p-button-group size="small" style="margin-left: 16px">
         <p-button
@@ -105,10 +107,10 @@
       return {
         data: {
           activeId: sessionStorage.getItem("translateActiveId") || "edit",
-          targetLang: "en", // 翻译到目标语言
+          targetLang: "",
           config: {
-            writingLang: "cn",
-            languages: ["cn", "en"],
+            writingLang: "",
+            languages: [],
           },
           projectPath: query.path || "",
           languageMap: {
@@ -120,12 +122,17 @@
           },
         },
         proto: {
+          get targetLangOptions() {
+            return this.config.languages.filter(
+              (lang) => lang !== this.config.writingLang,
+            );
+          },
           changeActiveId(id) {
             this.activeId = id;
             sessionStorage.setItem("translateActiveId", id);
           },
         },
-        attached() {
+        async attached() {
           this.emit("set-active-id", {
             composed: true,
             data: {
@@ -133,6 +140,23 @@
               query: { ...query },
             },
           });
+
+          const handle = await get(this.projectPath);
+          const config = await getData(handle);
+          this.config.writingLang = config.writingLang || "";
+          this.config.languages = config.languages || [];
+
+          const storedTargetLang = sessionStorage.getItem(
+            `translate-targetLang-${this.projectPath}`,
+          );
+          if (
+            storedTargetLang &&
+            this.config.languages.includes(storedTargetLang)
+          ) {
+            this.targetLang = storedTargetLang;
+          } else {
+            this.targetLang = this.targetLangOptions[0] || "";
+          }
         },
       };
     };
