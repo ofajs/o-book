@@ -37,12 +37,12 @@
       <div>
         写作语言:
         <span style="color: var(--md-sys-color-primary)">
-          {{config.writingLang}}
+          {{languageMap[config.writingLang]}}
         </span>
       </div>
       <div style="margin-left: 16px">
         翻译到:
-        <span style="color: var(--md-sys-color-primary)">{{targetLang}} </span>
+        <span style="color: var(--md-sys-color-primary)">{{languageMap[targetLang]}} </span>
       </div>
       <p-button-group size="small" style="margin-left: 16px">
         <p-button
@@ -108,6 +108,13 @@
             languages: ["cn", "en"],
           },
           projectPath: query.path || "",
+          languageMap: {
+            cn: "Chinese",
+            en: "English",
+            ja: "Japanese",
+            es: "Spanish",
+            ko: "Korean",
+          },
         },
         proto: {
           changeActiveId(id) {
