@@ -2,6 +2,7 @@
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/group.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
   <l-m src="./translate-block.html"></l-m>
   <style>
     :host {
@@ -42,7 +43,9 @@
       </div>
       <div style="margin-left: 16px">
         翻译到:
-        <span style="color: var(--md-sys-color-primary)">{{languageMap[targetLang]}} </span>
+        <span style="color: var(--md-sys-color-primary)"
+          >{{languageMap[targetLang]}}
+        </span>
       </div>
       <p-button-group size="small" style="margin-left: 16px">
         <p-button
