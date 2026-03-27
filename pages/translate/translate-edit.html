@@ -65,11 +65,18 @@
       return {
         data: {
           projectPath: "",
-          targetLang: "en", // 翻译到目标语言
+          targetLang: "", // 翻译到目标语言
           articleList: [], // 所有的文章数据
           activeArticlePath: sessionStorage.getItem("activeArticlePath") || "", // 当前选中文章路径
           currentBlocks: [], // 当前选中文章数据
           _originArticleData: null, // 原始文章数据
+        },
+        watch: {
+          targetLang(newLang) {
+            if (newLang && this.projectPath) {
+              this.loadArticle();
+            }
+          },
         },
         proto: {
           clickItem(item) {

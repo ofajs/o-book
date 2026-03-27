@@ -252,7 +252,7 @@
       return {
         data: {
           projectPath: "",
-          targetLang: "en",
+          targetLang: "",
           loading: true,
           generating: false,
           allArticles: [],
@@ -274,6 +274,12 @@
           projectPath() {
             if (this.projectPath) {
               this._storage = getStorage(this.targetLang + this.projectPath);
+              this.loadArticles();
+            }
+          },
+          targetLang(newLang) {
+            if (newLang && this.projectPath) {
+              this._storage = getStorage(newLang + this.projectPath);
               this.loadArticles();
             }
           },

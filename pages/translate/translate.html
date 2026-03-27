@@ -78,20 +78,30 @@
     </div>
     <div class="article-content">
       <o-if :value="activeId === 'translate-all'">
-        <o-page :project-path="projectPath" src="./translate-all.html"></o-page>
+        <o-page
+          :project-path="projectPath"
+          :target-lang="targetLang"
+          src="./translate-all.html"
+        ></o-page>
       </o-if>
       <o-else-if :value="activeId === 'edit'">
         <o-page
           :project-path="projectPath"
+          :target-lang="targetLang"
           src="./translate-edit.html"
         ></o-page>
       </o-else-if>
       <o-else-if :value="activeId === 'build-file'">
-        <o-page :project-path="projectPath" src="./build-file.html"></o-page>
+        <o-page
+          :project-path="projectPath"
+          :target-lang="targetLang"
+          src="./build-file.html"
+        ></o-page>
       </o-else-if>
       <o-else-if :value="activeId === 'checker'">
         <o-page
           :project-path="projectPath"
+          :target-lang="targetLang"
           src="./translate-checker.html"
         ></o-page>
       </o-else-if>

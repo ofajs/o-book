@@ -223,7 +223,7 @@
       return {
         data: {
           projectPath: "",
-          targetLang: "en",
+          targetLang: "",
           articleList: [],
           activeArticlePath:
             sessionStorage.getItem("checkerActiveArticlePath") || "",
@@ -237,6 +237,13 @@
           },
           _originArticleData: null,
           _allIssueData: null,
+        },
+        watch: {
+          targetLang(newLang) {
+            if (newLang && this.projectPath) {
+              this.loadArticle();
+            }
+          },
         },
         proto: {
           clickItem(item) {

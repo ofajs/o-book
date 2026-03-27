@@ -235,7 +235,7 @@
       return {
         data: {
           projectPath: "", // 项目路径，从 project-data consumer 获取
-          targetLang: "en", // 翻译目标语言，默认为英语
+          targetLang: "", // 翻译目标语言
           loading: true, // 是否正在加载文章数据
           allArticles: [], // 所有文章数据列表
           totalBlocks: 0, // 总内容块数量（包括已翻译和未翻译）
@@ -255,6 +255,12 @@
           projectPath() {
             if (this.projectPath) {
               this._storage = getStorage(this.targetLang + this.projectPath);
+              this.loadArticles();
+            }
+          },
+          targetLang(newLang) {
+            if (newLang && this.projectPath) {
+              this._storage = getStorage(newLang + this.projectPath);
               this.loadArticles();
             }
           },
