@@ -1,6 +1,6 @@
 import { chat } from "/nos/ai/chat.js";
 
-export const languageMap = {
+export const LANGUAGES = {
   cn: "Chinese",
   en: "English",
   ja: "Japanese",
@@ -20,8 +20,8 @@ const extractTranslation = (content) => {
 };
 
 export const translate = async (text, fromLang, targetLang, callback) => {
-  const fromLanguage = languageMap[fromLang] || fromLang;
-  const targetLanguage = languageMap[targetLang] || targetLang;
+  const fromLanguage = LANGUAGES[fromLang] || fromLang;
+  const targetLanguage = LANGUAGES[targetLang] || targetLang;
 
   const isSingleEnglishWordHeading = /^#+\s*[a-zA-Z]+\s*$/.test(text.trim());
 

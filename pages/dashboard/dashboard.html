@@ -57,6 +57,7 @@
       );
       const { EverCache } = await load("/gh/kirakiray/ever-cache/src/main.js");
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+      const { LANGUAGES } = await load("../translate/util/translate.js");
 
       const storages = {};
       const getStorage = (lang, projectPath) => {
@@ -77,13 +78,7 @@
             sessionStorage.getItem(`dashboard-lang-${query.path}`) || "cn",
           _storage: null,
           _checkingLang: false,
-          languageMap: {
-            cn: "Chinese",
-            en: "English",
-            ja: "Japanese",
-            es: "Spanish",
-            ko: "Korean",
-          },
+          languageMap: LANGUAGES,
           languages: [],
         },
         watch: {

@@ -108,6 +108,8 @@
     </div>
   </div>
   <script>
+    import { LANGUAGES } from "./util/translate.js";
+
     export const parent = "../layout.html";
 
     export default async ({ load, query }) => {
@@ -123,13 +125,7 @@
             languages: [],
           },
           projectPath: query.path || "",
-          languageMap: {
-            cn: "Chinese",
-            en: "English",
-            ja: "Japanese",
-            es: "Spanish",
-            ko: "Korean",
-          },
+          languageMap: LANGUAGES,
         },
         proto: {
           get targetLangOptions() {

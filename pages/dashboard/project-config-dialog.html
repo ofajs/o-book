@@ -125,6 +125,7 @@
       const { getData } = await load("../../util/yaml-handle.js");
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
       const { get } = await load("/nos/fs/handle/mount/mount.js");
+      const { LANGUAGES } = await load("../translate/util/translate.js");
 
       return {
         data: {
@@ -135,13 +136,7 @@
             languages: [],
           },
           availableLanguages: ["cn", "en", "ja", "es", "ko"],
-          languageMap: {
-            cn: "Chinese",
-            en: "English",
-            ja: "Japanese",
-            es: "Spanish",
-            ko: "Korean",
-          },
+          languageMap: LANGUAGES,
           _topHandle: null,
           _projectConfig: null,
           projectPath: "",

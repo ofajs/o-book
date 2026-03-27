@@ -235,7 +235,7 @@
     import { toast, confirm } from "/gh/ofajs/Punch-UI/packages/util.js";
     import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
     import { getArticleData } from "./util/article-data.js";
-    import { translate } from "./util/translate.js";
+    import { translate, LANGUAGES } from "./util/translate.js";
     import { EverCache, storage } from "/gh/kirakiray/ever-cache/src/main.js";
     import { getStatus } from "/nos/ai/chat.js";
 
@@ -612,14 +612,7 @@
               : preview;
           },
           async clearCurrentCache() {
-            const langNames = {
-              cn: "Chinese",
-              en: "English",
-              ja: "Japanese",
-              es: "Spanish",
-              ko: "Korean",
-            };
-            const langName = langNames[this.targetLang] || this.targetLang;
+            const langName = LANGUAGES[this.targetLang] || this.targetLang;
             const confirmed = await confirm(
               `确定要清除 ${langName} 的翻译缓存吗？\n\n这将删除 ${this.translatedCount} 个已翻译的内容块缓存。`,
             );
