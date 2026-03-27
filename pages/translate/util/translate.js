@@ -19,7 +19,8 @@ const extractTranslation = (content) => {
   return content;
 };
 
-export const translate = async (text, targetLang, callback) => {
+export const translate = async (text, fromLang, targetLang, callback) => {
+  const fromLanguage = languageMap[fromLang] || fromLang;
   const targetLanguage = languageMap[targetLang] || targetLang;
 
   const isSingleEnglishWordHeading = /^#+\s*[a-zA-Z]+\s*$/.test(text.trim());
@@ -42,13 +43,15 @@ export const translate = async (text, targetLang, callback) => {
   const messages = [
     {
       role: "system",
-      content: `你是一个专业的翻译助手。请将用户提供的文本翻译为${targetLanguage}。
+      content: `你是一个专业的翻译助手。请将用户提供的${fromLanguage}文本翻译为${targetLanguage}。
 要求：
 1. 严格保持原始文本的格式，包括换行、空格、缩进、标点符号等
-2. 完整保留所有HTML标签、代码块、特殊字符（包括井号#、星号*、反引号等）
-3. 不要添加任何markdown代码块标记（如\`\`\`html、\`\`\`等）
-4. 不要添加任何解释、注释或额外内容
-5. 只返回纯文本的翻译结果，不要包含任何格式化标记`,
+2. 完整保留所有HTML标签、代码块标记（\`\`\`）、特殊字符（包括井号#、星号*、反引号等）
+3. 如果原文包含代码块标记（\`\`\`），必须完整保留，不要删除或修改
+4. 如果原文是不包含\`\`\`的纯HTML内容，翻译结果也不要添加\`\`\`标记
+5. 不要在翻译结果外额外包裹代码块标记
+6. 不要添加任何解释、注释或额外内容
+7. 只返回翻译结果，不要包含任何额外说明`,
     },
     {
       role: "user",
