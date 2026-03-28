@@ -6,6 +6,8 @@ export const LANGUAGES = {
   ja: "Japanese",
   es: "Spanish",
   ko: "Korean",
+  fr: "French",
+  id: "Indonesian",
 };
 
 const extractTranslation = (content) => {
