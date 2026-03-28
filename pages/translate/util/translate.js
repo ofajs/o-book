@@ -1,13 +1,20 @@
 import { chat } from "/nos/ai/chat.js";
 
 export const LANGUAGES = {
-  cn: "Chinese",
   en: "English",
+  cn: "Chinese",
   ja: "Japanese",
-  es: "Spanish",
   ko: "Korean",
-  fr: "French",
   id: "Indonesian",
+  vi: "Vietnamese",
+  es: "Spanish",
+  pt: "Portuguese",
+  fr: "French",
+  de: "German",
+  it: "Italian",
+  ru: "Russian",
+  pl: "Polish",
+  uk: "Ukrainian",
 };
 
 const extractTranslation = (content) => {
