@@ -87,8 +87,9 @@
         <p-option attr:value="$data.value"> {{$data.name}} </p-option>
       </o-fill>
     </p-select>
-    <p-button variant="text" icon>
+    <p-button variant="text" icon on:click="clickGithub">
       <n-icon icon="mdi:github" style="font-size: 24px"></n-icon>
+      <a href="" id="github-link" on:click="$event.stopPropagation()"></a>
     </p-button>
   </div>
 
@@ -108,6 +109,10 @@
           indexUrl: `${headerUrl.replace(/\/header\.html$/, "")}/${lang}/index.html`,
         },
         proto: {
+          clickGithub(e) {
+            e.stopPropagation();
+            e.target.querySelector("#github-link").click();
+          },
           switchLang(e) {
             const targetLang = $(e.target).value;
             const currentUrl = window.location.href;

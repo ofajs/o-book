@@ -128,6 +128,13 @@ export const buildWebsite = async ({ topHandle, lang, websiteHandle }) => {
         `<div class="logo-text">${logoText}</div>`,
       );
 
+    if (projectConfig.github) {
+      headerContent = headerContent.replace(
+        `<a href="" id="github-link"`,
+        `<a href="${projectConfig.github}" id="github-link"`,
+      );
+    }
+
     await writeFileIfChanged(headerFileHandle, headerContent);
   }
 
