@@ -492,7 +492,7 @@ const initStaticFile = async ({
 
         fileContent = fileContent.replace(
           "const data = {};",
-          `const data = ${JSON.stringify(projectConfig)};`,
+          `const data = ${JSON.stringify({ ...projectConfig, googleAnalytics: undefined })};`,
         );
 
         fileContent = fileContent.replace(
@@ -508,6 +508,11 @@ const initStaticFile = async ({
       .join("\n    ")}
   </ul>
 </nav>`,
+        );
+
+        fileContent = fileContent.replace(
+          "<!--google analytics-->",
+          projectConfig.googleAnalytics || "",
         );
 
         fileContent = jsBeautify.html(fileContent, {
