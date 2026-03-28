@@ -3,6 +3,7 @@ import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
 import hljs from "/npm/highlight.js@11.9.0/+esm";
 import jsBeautify from "/npm/js-beautify@1.15.1/+esm";
 import { saveArticleConfig } from "./article-config.js";
+import { LANGUAGES } from "../translate/util/translate.js";
 
 marked.use({
   renderer: {
@@ -478,6 +479,28 @@ const initStaticFile = async ({
           "const data = {};",
           `const data = ${JSON.stringify(projectConfig)};`,
         );
+
+        fileContent = fileContent.replace(
+          "<article></article>",
+          `<nav class="language-selector" role="navigation" aria-label="Language selection">
+  <h1>Select Language - Choose your preferred language</h1>
+  <ul class="language-list">
+    ${projectConfig.languages
+      .map(
+        (lang) =>
+          `<li><a href="./${lang}/" hreflang="${lang}" lang="${lang}">${LANGUAGES[lang] || lang} - ${lang.toUpperCase()} Documentation</a></li>`,
+      )
+      .join("\n    ")}
+  </ul>
+</nav>`,
+        );
+
+        fileContent = jsBeautify.html(fileContent, {
+          indent_size: 2,
+          indent_char: " ",
+          eol: "\n",
+          preserve_newlines: false,
+        });
       }
 
       const fileHandle = await websiteHandle.get(outputPath || name, {

@@ -41,10 +41,26 @@
           transform: rotate(360deg);
         }
       }
+      .language-selector {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.5s ease-out forwards;
+        line-height: 0em;
+        animation-delay: 5s;
+      }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+          line-height: 1.6em;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="loader"></div>
+    <article></article>
     <script>
       (async function () {
         try {
