@@ -9,3 +9,9 @@ export const getCurrentLang = () => {
   return location.pathname.split("/")[1];
   // return "en";
 };
+
+const currentLang = getCurrentLang();
+
+if (currentLang) {
+  sessionStorage.setItem("lang", currentLang);
+}
