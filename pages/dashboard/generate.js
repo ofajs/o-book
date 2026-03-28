@@ -424,7 +424,7 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
     },
     {
       name: "index.html",
-      path: `${templateBasePath}/index.html`,
+      path: `${getBasePath()}template/root-index.html`,
       outputPath: "index.html",
     },
   ];
