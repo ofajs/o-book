@@ -38,6 +38,15 @@
       项目配置
     </p-button>
     <p-button
+      class="toolbar-btn"
+      on:click="openAnalyticsDialog"
+      variant="outlined"
+      attr:disabled="generating"
+    >
+      <n-icon icon="material-symbols:analytics" slot="prefix"></n-icon>
+      谷歌统计
+    </p-button>
+    <p-button
       variant="outlined"
       style="margin-left: 8px"
       on:click="generateAll"
@@ -72,6 +81,12 @@
     on:config-saved="onConfigSaved"
   ></o-page>
 
+  <o-page
+    src="./analytics-dialog.html"
+    sync:open="showAnalyticsDialog"
+    :project-path="projectPath"
+  ></o-page>
+
   <script>
     export const parent = "../layout.html";
 
@@ -99,6 +114,7 @@
       return {
         data: {
           showConfigDialog: false,
+          showAnalyticsDialog: false,
           projectPath: query.path,
           lang: sessionStorage.getItem(`dashboard-lang-${query.path}`) || "cn",
           finalLang:
@@ -189,6 +205,9 @@
         proto: {
           openConfigDialog() {
             this.showConfigDialog = true;
+          },
+          openAnalyticsDialog() {
+            this.showAnalyticsDialog = true;
           },
           async reloadLangs() {
             const handle = await get(this.projectPath);

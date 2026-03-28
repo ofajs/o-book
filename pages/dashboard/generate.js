@@ -525,7 +525,17 @@ const initStaticFile = async ({
     }),
   );
 
-  indexHTML = await fetch(`${templateBasePath}/index.html`).then((response) =>
-    response.text(),
-  );
+  indexHTML = await fetch(`${templateBasePath}/index.html`)
+    .then((response) => response.text())
+    .then((html) => {
+      // 替换谷歌统计代码
+      if (projectConfig.googleAnalytics) {
+        html = html.replace(
+          "<!--google analytics-->",
+          projectConfig.googleAnalytics || "",
+        );
+      }
+
+      return html;
+    });
 };
