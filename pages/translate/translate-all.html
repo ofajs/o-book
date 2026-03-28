@@ -148,27 +148,29 @@
             </div>
           </o-fill>
           <o-fill :value="displayedCompletedItems">
-            <o-if :value="$host.hasMoreCompletedItems && $index === 0">
-              <div
-                style="
-                  text-align: center;
-                  padding: 8px;
-                  color: var(--md-sys-color-on-surface-variant);
-                  font-size: 12px;
-                "
-              >
-                ... 已隐藏 {{$host.hiddenCompletedCount}} 个已完成的翻译 ...
-              </div>
-            </o-if>
-            <div class="translation-item completed">
-              <div class="translation-item-header">
-                <div>
-                  <div class="article-name">{{$data.articleName}}</div>
-                  <div class="block-info">块 #{{$data.blockIndex + 1}}</div>
+            <div style="display: contents">
+              <o-if :value="$host.hasMoreCompletedItems && $index === 0">
+                <div
+                  style="
+                    text-align: center;
+                    padding: 8px;
+                    color: var(--md-sys-color-on-surface-variant);
+                    font-size: 12px;
+                  "
+                >
+                  ... 已隐藏 {{$host.hiddenCompletedCount}} 个已完成的翻译 ...
                 </div>
-                <div class="status-badge completed">已完成</div>
+              </o-if>
+              <div class="translation-item completed">
+                <div class="translation-item-header">
+                  <div>
+                    <div class="article-name">{{$data.articleName}}</div>
+                    <div class="block-info">块 #{{$data.blockIndex + 1}}</div>
+                  </div>
+                  <div class="status-badge completed">已完成</div>
+                </div>
+                <div class="translation-content">{{$data.preview}}</div>
               </div>
-              <div class="translation-content">{{$data.preview}}</div>
             </div>
           </o-fill>
         </div>
