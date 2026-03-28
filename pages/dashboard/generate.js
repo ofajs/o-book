@@ -130,8 +130,16 @@ export const buildWebsite = async ({ topHandle, lang, websiteHandle }) => {
 
     if (projectConfig.github) {
       headerContent = headerContent.replace(
-        `<a href="" id="github-link"`,
-        `<a href="${projectConfig.github}" id="github-link"`,
+        `<a href="" id="github-link" on:click="$event.stopPropagation()"></a>`,
+        `<a href="${projectConfig.github}" id="github-link" on:click="$event.stopPropagation()"></a>`,
+      );
+    } else {
+      headerContent = headerContent.replace(
+        `<p-button variant="text" icon on:click="clickGithub">
+      <n-icon icon="mdi:github" style="font-size: 24px"></n-icon>
+      <a href="" id="github-link" on:click="$event.stopPropagation()"></a>
+    </p-button>`,
+        ``,
       );
     }
 
