@@ -1,20 +1,5 @@
 const RULES = [
   {
-    id: "contains-chinese-when-writing-is-chinese",
-    name: "翻译结果包含中文",
-    description: "写作语言是中文时，翻译结果不应该包含中文",
-    check: (original, translated) => {
-      const hasChinese = /[\u4e00-\u9fa5]/.test(translated);
-      if (hasChinese) {
-        return {
-          hasIssue: true,
-          message: "翻译结果包含中文字符，但写作语言是中文，翻译结果应该是目标语言",
-        };
-      }
-      return { hasIssue: false };
-    },
-  },
-  {
     id: "html-wrapped-in-code-block",
     name: "HTML被代码块包裹",
     description: "纯HTML代码被错误地用 ``` 包裹",
@@ -170,12 +155,9 @@ const RULES = [
   },
 ];
 
-export const checkTranslation = (original, translated, writingLang) => {
+export const checkTranslation = (original, translated) => {
   const issues = [];
   for (const rule of RULES) {
-    if (rule.id === "contains-chinese-when-writing-is-chinese" && writingLang !== "zh") {
-      continue;
-    }
     const result = rule.check(original, translated);
     if (result.hasIssue) {
       issues.push({
@@ -189,7 +171,7 @@ export const checkTranslation = (original, translated, writingLang) => {
   return issues;
 };
 
-export const checkBlock = async (block, storage, targetLang, projectPath, writingLang) => {
+export const checkBlock = async (block, storage, targetLang, projectPath) => {
   if (!block || !block.raw) {
     return null;
   }
@@ -208,7 +190,7 @@ export const checkBlock = async (block, storage, targetLang, projectPath, writin
     return null;
   }
 
-  const issues = checkTranslation(block.raw, translatedText, writingLang);
+  const issues = checkTranslation(block.raw, translatedText);
 
   if (issues.length === 0) {
     return null;
