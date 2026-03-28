@@ -422,6 +422,11 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
       path: `${cssBasePath}/hljs.css`,
       outputPath: "css/hljs.css",
     },
+    {
+      name: "index.html",
+      path: `${templateBasePath}/index.html`,
+      outputPath: "index.html",
+    },
   ];
 
   if (logoImgName) {
