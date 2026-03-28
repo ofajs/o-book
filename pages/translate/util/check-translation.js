@@ -153,11 +153,32 @@ const RULES = [
       return { hasIssue: false };
     },
   },
+  {
+    id: "chinese-in-translation",
+    name: "翻译结果包含中文",
+    description: "翻译结果中不应该出现中文字符",
+    check: (original, translated) => {
+      const chineseRegex = /[\u4e00-\u9fa5]/;
+      const hasChinese = chineseRegex.test(translated);
+      if (hasChinese) {
+        const chineseMatches = translated.match(chineseRegex) || [];
+        return {
+          hasIssue: true,
+          message: `翻译结果包含 ${chineseMatches.length} 个中文字符`,
+        };
+      }
+      return { hasIssue: false };
+    },
+  },
 ];
 
-export const checkTranslation = (original, translated) => {
+export const checkTranslation = (original, translated, writingLang) => {
   const issues = [];
   for (const rule of RULES) {
+    const shouldCheck = rule.id !== "chinese-in-translation" || writingLang === "zh";
+    if (!shouldCheck) {
+      continue;
+    }
     const result = rule.check(original, translated);
     if (result.hasIssue) {
       issues.push({
@@ -171,7 +192,7 @@ export const checkTranslation = (original, translated) => {
   return issues;
 };
 
-export const checkBlock = async (block, storage, targetLang, projectPath) => {
+export const checkBlock = async (block, storage, targetLang, projectPath, writingLang) => {
   if (!block || !block.raw) {
     return null;
   }
@@ -190,7 +211,7 @@ export const checkBlock = async (block, storage, targetLang, projectPath) => {
     return null;
   }
 
-  const issues = checkTranslation(block.raw, translatedText);
+  const issues = checkTranslation(block.raw, translatedText, writingLang);
 
   if (issues.length === 0) {
     return null;
