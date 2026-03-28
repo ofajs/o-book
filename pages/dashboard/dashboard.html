@@ -1,6 +1,7 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/progress/progress.html"></l-m>
   <style>
     :host {
       display: block;
@@ -17,7 +18,11 @@
     }
   </style>
   <div class="toolbar">
-    <p-select sync:value="lang" style="width: 200px; margin-right: 16px">
+    <p-select
+      attr:disabled="generating"
+      sync:value="lang"
+      style="width: 200px; margin-right: 16px"
+    >
       <label> 切换语言 </label>
       <o-fill :value="languages">
         <p-option attr:value="$data">{{$host.languageMap[$data]}}</p-option>
@@ -27,11 +32,31 @@
       class="toolbar-btn"
       on:click="openConfigDialog"
       variant="outlined"
+      attr:disabled="generating"
     >
       <n-icon icon="material-symbols:settings" slot="prefix"></n-icon>
       项目配置
     </p-button>
-    <p-button variant="outlined" style="margin-left: 8px"> 生成所有 </p-button>
+    <p-button
+      variant="outlined"
+      style="margin-left: 8px"
+      on:click="generateAll"
+      attr:disabled="generating"
+    >
+      <x-if :value="generating">
+        <p-progress
+          type="circle"
+          slot="prefix"
+          style="--circle-size: 20"
+          attr:value="generatingProgress"
+          variant="determinate"
+        ></p-progress>
+      </x-if>
+      <x-else>
+        <n-icon icon="hugeicons:ai-content-generator-01" slot="prefix"></n-icon>
+      </x-else>
+      重新生成所有
+    </p-button>
   </div>
 
   <o-page
@@ -59,6 +84,7 @@
       const { EverCache } = await load("/gh/kirakiray/ever-cache/src/main.js");
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
       const { LANGUAGES } = await load("../translate/util/translate.js");
+      const { buildWebsite } = await load("./generate.js");
 
       const storages = {};
       const getStorage = (lang, projectPath) => {
@@ -81,6 +107,8 @@
           _checkingLang: false,
           languageMap: LANGUAGES,
           languages: [],
+          generating: false,
+          generatingProgress: 0,
         },
         watch: {
           async lang(newLang) {
@@ -171,6 +199,57 @@
           },
           onConfigSaved() {
             this.reloadLangs();
+          },
+          async generateAll() {
+            if (this.generating) return;
+
+            this.generating = true;
+            this.generatingProgress = 0;
+
+            const handle = await get(this.projectPath);
+            const config = await getData(handle);
+            const languages = config.languages || [];
+
+            if (languages.length === 0) {
+              toast({
+                color: "error",
+                message: "没有配置任何语言",
+              });
+              this.generating = false;
+              return;
+            }
+
+            const websiteHandle = await handle.get("website", {
+              create: "dir",
+            });
+
+            let completed = 0;
+            const total = languages.length;
+
+            for (const lang of languages) {
+              try {
+                await buildWebsite({
+                  topHandle: handle,
+                  lang,
+                  websiteHandle,
+                });
+              } catch (e) {
+                console.error(`生成 ${lang} 失败:`, e);
+                toast({
+                  color: "error",
+                  message: `生成 ${LANGUAGES[lang] || lang} 失败`,
+                });
+              }
+              completed++;
+              this.generatingProgress = Math.round((completed / total) * 100);
+            }
+
+            this.generating = false;
+
+            toast({
+              color: "success",
+              message: "所有语言生成完成",
+            });
           },
         },
         attached() {
