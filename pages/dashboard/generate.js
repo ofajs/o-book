@@ -66,6 +66,7 @@ export const buildWebsite = async ({ topHandle, lang, websiteHandle }) => {
     logoPath: projectConfig.logoImg
       ? `/${topHandle.path}/${projectConfig.logoImg.replace("./", "")}`
       : "",
+    projectName: projectConfig.name || "Book",
   });
 
   {
@@ -397,7 +398,12 @@ const formatPage = async ({
 
 let indexHTML = "";
 
-const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
+const initStaticFile = async ({
+  websiteHandle,
+  logoImgName,
+  logoPath,
+  projectName,
+}) => {
   const templateBasePath = `${getBasePath()}template/default`;
   const cssBasePath = `${getBasePath()}css`;
 
@@ -460,7 +466,15 @@ const initStaticFile = async ({ websiteHandle, logoImgName, logoPath }) => {
 
   await Promise.all(
     staticFileList.map(async ({ name, path: filePath, outputPath }) => {
-      const fileContent = await fetch(filePath).then((r) => r.text());
+      let fileContent = await fetch(filePath).then((r) => r.text());
+
+      if (name === "index.html" && projectName) {
+        fileContent = fileContent.replace(
+          "<title>Loading</title>",
+          `<title>${projectName}</title>`,
+        );
+      }
+
       const fileHandle = await websiteHandle.get(outputPath || name, {
         create: "file",
       });
