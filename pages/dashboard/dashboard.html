@@ -19,9 +19,9 @@
   <div class="toolbar">
     <p-select sync:value="lang" style="width: 200px; margin-right: 16px">
       <label> 切换语言 </label>
-      <x-fill :value="languages">
+      <o-fill :value="languages">
         <p-option attr:value="$data">{{$host.languageMap[$data]}}</p-option>
-      </x-fill>
+      </o-fill>
     </p-select>
     <p-button
       class="toolbar-btn"
@@ -31,6 +31,7 @@
       <n-icon icon="material-symbols:settings" slot="prefix"></n-icon>
       项目配置
     </p-button>
+    <p-button variant="outlined" style="margin-left: 8px"> 生成所有 </p-button>
   </div>
 
   <o-page
