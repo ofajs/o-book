@@ -66,7 +66,7 @@ export const buildWebsite = async ({ topHandle, lang, websiteHandle }) => {
     logoPath: projectConfig.logoImg
       ? `/${topHandle.path}/${projectConfig.logoImg.replace("./", "")}`
       : "",
-    projectName: projectConfig.name || "Book",
+    projectConfig,
   });
 
   {
@@ -402,7 +402,7 @@ const initStaticFile = async ({
   websiteHandle,
   logoImgName,
   logoPath,
-  projectName,
+  projectConfig,
 }) => {
   const templateBasePath = `${getBasePath()}template/default`;
   const cssBasePath = `${getBasePath()}css`;
@@ -468,10 +468,15 @@ const initStaticFile = async ({
     staticFileList.map(async ({ name, path: filePath, outputPath }) => {
       let fileContent = await fetch(filePath).then((r) => r.text());
 
-      if (name === "index.html" && projectName) {
+      if (name === "index.html" && projectConfig) {
         fileContent = fileContent.replace(
           "<title>Loading</title>",
-          `<title>${projectName}</title>`,
+          `<title>${projectConfig.name}</title>`,
+        );
+
+        fileContent = fileContent.replace(
+          "const data = {};",
+          `const data = ${JSON.stringify(projectConfig)};`,
         );
       }
 

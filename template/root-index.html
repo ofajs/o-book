@@ -48,8 +48,8 @@
     <script>
       (async function () {
         try {
-          const response = await fetch("./package.json");
-          const data = await response.json();
+          const data = {};
+
           const languages = data.languages || [];
 
           const userLang = navigator.language || navigator.userLanguage;
