@@ -43,7 +43,7 @@
       </div>
       <div style="margin-left: 16px; display: flex; align-items: center">
         翻译到:
-        <p-select size="small" sync:value="targetLang" style="width: 100px">
+        <p-select size="small" sync:value="targetLang">
           <x-fill :value="targetLangOptions">
             <p-option attr:value="$data">{{$host.languageMap[$data]}}</p-option>
           </x-fill>

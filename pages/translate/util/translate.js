@@ -1,7 +1,4 @@
 import { chat } from "/nos/ai/chat.js";
-// import { simple2traditional } from "/npm/chinese-simple2traditional@2.2.2/dist/index.js";
-// import { setupEnhance } from "/npm/chinese-simple2traditional@2.2.2/dist/enhance.js";
-// setupEnhance(); // 注入短语库
 
 export const LANGUAGES = {
   en: "English",
@@ -32,7 +29,37 @@ const extractTranslation = (content) => {
   return content;
 };
 
+let simple2traditionalLoadPromise = null;
+
 export const translate = async (text, fromLang, targetLang, callback) => {
+  if (fromLang === "cn" && targetLang === "t-cn") {
+    if (!simple2traditionalLoadPromise) {
+      simple2traditionalLoadPromise = (async () => {
+        const module =
+          await import("/npm/chinese-simple2traditional@2.2.2/dist/index.js");
+        const { setupEnhance } =
+          await import("/npm/chinese-simple2traditional@2.2.2/dist/enhance.js");
+        setupEnhance();
+        return module.simpleToTradition;
+      })();
+    }
+
+    const simple2traditional = await simple2traditionalLoadPromise;
+    const result = simple2traditional(text);
+    if (callback) {
+      callback({
+        provider: "chinese-simple2traditional",
+        id: "local",
+        model: "local",
+        chunk: result,
+        content: result,
+        done: true,
+        isThinking: false,
+      });
+    }
+    return;
+  }
+
   const fromLanguage = LANGUAGES[fromLang] || fromLang;
   const targetLanguage = LANGUAGES[targetLang] || targetLang;
 
