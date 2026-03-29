@@ -1,8 +1,12 @@
 import { chat } from "/nos/ai/chat.js";
+// import { simple2traditional } from "/npm/chinese-simple2traditional@2.2.2/dist/index.js";
+// import { setupEnhance } from "/npm/chinese-simple2traditional@2.2.2/dist/enhance.js";
+// setupEnhance(); // 注入短语库
 
 export const LANGUAGES = {
   en: "English",
   cn: "Chinese",
+  "t-cn": "Traditional Chinese",
   ja: "Japanese",
   ko: "Korean",
   id: "Indonesian",
