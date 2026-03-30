@@ -340,8 +340,13 @@
       animation: pulse 1.5s ease-in-out infinite;
     }
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+      0%,
+      100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
     }
     .status-badge {
       padding: 4px 12px;
@@ -371,33 +376,56 @@
   <p-dialog :open="isRetrying" on:click-mask="stopRetry">
     <div class="retry-dialog">
       <div class="retry-title">正在重试翻译异常块</div>
-      
+
       <div class="retry-stats">
         <div class="retry-stat">
           <div class="retry-stat-value">{{retryProgress}}%</div>
           <div class="retry-stat-label">进度</div>
         </div>
         <div class="retry-stat">
-          <div class="retry-stat-value" style="color: var(--md-sys-color-success)">{{retrySuccessCount}}</div>
+          <div
+            class="retry-stat-value"
+            style="color: var(--md-sys-color-success)"
+          >
+            {{retrySuccessCount}}
+          </div>
           <div class="retry-stat-label">成功</div>
         </div>
         <div class="retry-stat">
-          <div class="retry-stat-value" style="color: var(--md-sys-color-error)">{{retryFailedCount}}</div>
+          <div
+            class="retry-stat-value"
+            style="color: var(--md-sys-color-error)"
+          >
+            {{retryFailedCount}}
+          </div>
           <div class="retry-stat-label">失败</div>
         </div>
         <div class="retry-stat">
-          <div class="retry-stat-value" style="color: var(--md-sys-color-warning)">{{retryRemainingCount}}</div>
+          <div
+            class="retry-stat-value"
+            style="color: var(--md-sys-color-warning)"
+          >
+            {{retryRemainingCount}}
+          </div>
           <div class="retry-stat-label">剩余错误</div>
         </div>
         <div class="retry-stat">
-          <div class="retry-stat-value" style="color: var(--md-sys-color-normal)">{{retryAttemptCount}}</div>
+          <div
+            class="retry-stat-value"
+            style="color: var(--md-sys-color-normal)"
+          >
+            {{retryAttemptCount}}
+          </div>
           <div class="retry-stat-label">重试次数</div>
         </div>
       </div>
 
       <div class="retry-progress-section">
         <div class="retry-progress-bar">
-          <div class="retry-progress-fill" :style.width="retryProgress + '%'"></div>
+          <div
+            class="retry-progress-fill"
+            :style.width="retryProgress + '%'"
+          ></div>
         </div>
         <div class="retry-progress-text">
           {{retryStep}} ({{retryCompletedCount}} / {{retryTotalCount}})
@@ -407,10 +435,16 @@
       <o-if :value="retryItems.length > 0">
         <div class="retry-items">
           <o-fill :value="retryItems">
-            <div class="retry-item" class:completed="$data.status === 'completed'" class:failed="$data.status === 'failed'">
+            <div
+              class="retry-item"
+              class:completed="$data.status === 'completed'"
+              class:failed="$data.status === 'failed'"
+            >
               <div class="retry-item-header">
                 <div>
-                  <div class="retry-item-title">{{$data.articleName}} - 块 #{{$data.blockIndex}}</div>
+                  <div class="retry-item-title">
+                    {{$data.articleName}} - 块 #{{$data.blockIndex}}
+                  </div>
                   <div class="retry-item-lang">{{$data.langName}}</div>
                 </div>
                 <div>
@@ -435,9 +469,7 @@
       </o-if>
 
       <div class="retry-actions">
-        <p-button variant="outlined" on:click="stopRetry">
-          停止重试
-        </p-button>
+        <p-button variant="outlined" on:click="stopRetry"> 停止重试 </p-button>
       </div>
     </div>
   </p-dialog>
@@ -446,7 +478,10 @@
     <div class="left">
       <div class="header">
         <h3>翻译检查器</h3>
-        <p>检查所有语言的翻译质量问题</p>
+        <p>
+          由于采用 AI
+          翻译，可能会存在一些细微的翻译问题。本模块用于检查所有语言的翻译质量。
+        </p>
       </div>
 
       <div class="stats-card">
@@ -456,11 +491,15 @@
             <div class="stat-label">已翻译块</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value" style="color: var(--md-sys-color-error)">{{stats.issueBlocks}}</div>
+            <div class="stat-value" style="color: var(--md-sys-color-error)">
+              {{stats.issueBlocks}}
+            </div>
             <div class="stat-label">异常块</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value" style="color: var(--md-sys-color-warning)">{{retryAttemptCount}}</div>
+            <div class="stat-value" style="color: var(--md-sys-color-warning)">
+              {{retryAttemptCount}}
+            </div>
             <div class="stat-label">重试次数</div>
           </div>
         </div>
@@ -639,7 +678,9 @@
         proto: {
           get retryProgress() {
             if (this.retryTotalCount === 0) return 0;
-            return Math.round((this.retryCompletedCount / this.retryTotalCount) * 100);
+            return Math.round(
+              (this.retryCompletedCount / this.retryTotalCount) * 100,
+            );
           },
           get retryRemainingCount() {
             return this.retryTotalCount - this.retryCompletedCount;
@@ -657,7 +698,9 @@
           getPreview(text) {
             if (!text) return "";
             const preview = text.trim().substring(0, 100);
-            return preview.length < text.trim().length ? preview + "..." : preview;
+            return preview.length < text.trim().length
+              ? preview + "..."
+              : preview;
           },
           async loadArticles() {
             this.isChecking = true;
