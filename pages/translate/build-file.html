@@ -459,8 +459,14 @@
               create: "file",
             });
 
-            const blob = new Blob([content], { type: "text/plain" });
-            await outputFileHandle.write(blob);
+            const existingContent = await outputFileHandle.text().catch(() => "");
+
+            if (existingContent === content) {
+              return;
+            }
+
+
+            await outputFileHandle.write(content);
           },
         },
       };
