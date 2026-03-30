@@ -226,7 +226,228 @@
       gap: 8px;
       margin-top: 8px;
     }
+    .retry-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--md-sys-color-surface);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .retry-card {
+      width: 100%;
+      max-width: 600px;
+      padding: 24px;
+      background-color: var(--md-sys-color-surface-container);
+      border-radius: 16px;
+    }
+    .retry-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: var(--md-sys-color-on-surface);
+    }
+    .retry-stats {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+    .retry-stat {
+      display: flex;
+      flex-direction: column;
+    }
+    .retry-stat-value {
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--md-sys-color-primary);
+    }
+    .retry-stat-label {
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .retry-progress-section {
+      margin-bottom: 16px;
+    }
+    .retry-progress-bar {
+      height: 8px;
+      background-color: var(--md-sys-color-surface-variant);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .retry-progress-fill {
+      height: 100%;
+      background-color: var(--md-sys-color-primary);
+      transition: width 0.3s ease;
+    }
+    .retry-progress-text {
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-bottom: 8px;
+    }
+    .retry-items {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .retry-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      background-color: var(--md-sys-color-surface);
+      margin-bottom: 8px;
+      border-left: 4px solid var(--md-sys-color-primary);
+    }
+    .retry-item.completed {
+      border-left-color: var(--md-sys-color-success);
+    }
+    .retry-item.failed {
+      border-left-color: var(--md-sys-color-error);
+    }
+    .retry-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .retry-item-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface);
+    }
+    .retry-item-lang {
+      font-size: 11px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .retry-item-preview {
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-top: 4px;
+      padding: 6px 8px;
+      background-color: var(--md-sys-color-surface-container);
+      border-radius: 4px;
+      max-height: 60px;
+      overflow: auto;
+    }
+    .retry-item-stream {
+      font-size: 12px;
+      color: var(--md-sys-color-primary);
+      margin-top: 6px;
+      padding: 8px;
+      background-color: var(--md-sys-color-primary-container);
+      border-radius: 4px;
+      max-height: 80px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .status-badge.translating {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+    }
+    .status-badge.completed {
+      background-color: var(--md-sys-color-success);
+      color: var(--md-sys-color-on-success);
+    }
+    .status-badge.failed {
+      background-color: var(--md-sys-color-error);
+      color: var(--md-sys-color-on-error);
+    }
+    .retry-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 16px;
+    }
   </style>
+
+  <o-if :value="isRetrying">
+    <div class="retry-overlay">
+      <div class="retry-card">
+        <div class="retry-title">正在重试翻译异常块</div>
+        
+        <div class="retry-stats">
+          <div class="retry-stat">
+            <div class="retry-stat-value">{{retryProgress}}%</div>
+            <div class="retry-stat-label">进度</div>
+          </div>
+          <div class="retry-stat">
+            <div class="retry-stat-value" style="color: var(--md-sys-color-success)">{{retrySuccessCount}}</div>
+            <div class="retry-stat-label">成功</div>
+          </div>
+          <div class="retry-stat">
+            <div class="retry-stat-value" style="color: var(--md-sys-color-error)">{{retryFailedCount}}</div>
+            <div class="retry-stat-label">失败</div>
+          </div>
+          <div class="retry-stat">
+            <div class="retry-stat-value" style="color: var(--md-sys-color-warning)">{{retryAttemptCount}}</div>
+            <div class="retry-stat-label">重试次数</div>
+          </div>
+        </div>
+
+        <div class="retry-progress-section">
+          <div class="retry-progress-bar">
+            <div class="retry-progress-fill" :style.width="retryProgress + '%'"></div>
+          </div>
+          <div class="retry-progress-text">
+            {{retryStep}} ({{retryCompletedCount}} / {{retryTotalCount}})
+          </div>
+        </div>
+
+        <o-if :value="retryItems.length > 0">
+          <div class="retry-items">
+            <o-fill :value="retryItems">
+              <div class="retry-item" class:completed="$data.status === 'completed'" class:failed="$data.status === 'failed'">
+                <div class="retry-item-header">
+                  <div>
+                    <div class="retry-item-title">{{$data.articleName}} - 块 #{{$data.blockIndex}}</div>
+                    <div class="retry-item-lang">{{$data.langName}}</div>
+                  </div>
+                  <div>
+                    <o-if :value="$data.status === 'translating'">
+                      <span class="status-badge translating">翻译中</span>
+                    </o-if>
+                    <o-if :value="$data.status === 'completed'">
+                      <span class="status-badge completed">完成</span>
+                    </o-if>
+                    <o-if :value="$data.status === 'failed'">
+                      <span class="status-badge failed">失败</span>
+                    </o-if>
+                  </div>
+                </div>
+                <div class="retry-item-preview">{{$data.preview}}</div>
+                <o-if :value="$data.streamContent">
+                  <div class="retry-item-stream">{{$data.streamContent}}</div>
+                </o-if>
+              </div>
+            </o-fill>
+          </div>
+        </o-if>
+
+        <div class="retry-actions">
+          <p-button variant="outlined" on:click="stopRetry">
+            停止重试
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </o-if>
+
   <div class="container">
     <div class="left">
       <div class="header">
@@ -241,15 +462,11 @@
             <div class="stat-label">已翻译块</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value" style="color: var(--md-sys-color-error)">
-              {{stats.issueBlocks}}
-            </div>
+            <div class="stat-value" style="color: var(--md-sys-color-error)">{{stats.issueBlocks}}</div>
             <div class="stat-label">异常块</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value" style="color: var(--md-sys-color-warning)">
-              {{retryCount}}
-            </div>
+            <div class="stat-value" style="color: var(--md-sys-color-warning)">{{retryAttemptCount}}</div>
             <div class="stat-label">重试次数</div>
           </div>
         </div>
@@ -259,10 +476,9 @@
         <p-button
           variant="contained"
           on:click="retryAllIssues"
-          attr:disabled="isRetrying || stats.issueBlocks === 0"
+          attr:disabled="isRetrying || isChecking || stats.issueBlocks === 0"
         >
-          <o-if :value="isRetrying">重试中...</o-if>
-          <o-else>一键重试异常块</o-else>
+          一键重试异常块
         </p-button>
         <p-button
           variant="outlined"
@@ -402,11 +618,18 @@
           currentLangName: "",
           isChecking: true,
           isRetrying: false,
+          shouldStopRetry: false,
           checkProgress: 0,
           checkStep: "",
           checkedCount: 0,
           totalToCheck: 0,
-          retryCount: 0,
+          retryAttemptCount: 0,
+          retryCompletedCount: 0,
+          retryTotalCount: 0,
+          retrySuccessCount: 0,
+          retryFailedCount: 0,
+          retryStep: "",
+          retryItems: [],
           stats: {
             totalBlocks: 0,
             issueBlocks: 0,
@@ -421,12 +644,21 @@
           },
         },
         proto: {
+          get retryProgress() {
+            if (this.retryTotalCount === 0) return 0;
+            return Math.round((this.retryCompletedCount / this.retryTotalCount) * 100);
+          },
           getStorage(lang) {
             const key = "translates-" + lang + this.projectPath;
             if (!this._storages[key]) {
               this._storages[key] = new EverCache(key);
             }
             return this._storages[key];
+          },
+          getPreview(text) {
+            if (!text) return "";
+            const preview = text.trim().substring(0, 100);
+            return preview.length < text.trim().length ? preview + "..." : preview;
           },
           async loadArticles() {
             this.isChecking = true;
@@ -573,8 +805,6 @@
                 },
               );
 
-              this.retryCount++;
-
               const index = this.issueBlocks.findIndex(
                 (b) =>
                   b.block.rawHash === issueBlock.block.rawHash &&
@@ -619,31 +849,180 @@
                   }
                 }
               }
+
+              return { success: true };
             } catch (error) {
               console.error("Retry failed:", error);
-              alert("重试失败: " + error.message);
+              return { success: false, error: error.message };
             }
           },
           async retryAllIssues() {
             this.isRetrying = true;
-            const allIssueBlocks = [];
+            this.shouldStopRetry = false;
+            this.retryCompletedCount = 0;
+            this.retrySuccessCount = 0;
+            this.retryFailedCount = 0;
+            this.retryItems = [];
 
+            const allIssueBlocks = [];
             for (const article of this.articleList) {
               for (const issue of article.issueData) {
-                allIssueBlocks.push(issue);
+                allIssueBlocks.push({
+                  ...issue,
+                  articleName: article.name,
+                });
               }
             }
 
+            this.retryTotalCount = allIssueBlocks.length;
+
+            if (this.retryTotalCount === 0) {
+              this.isRetrying = false;
+              return;
+            }
+
+            const keys = (await storage.getItem("ai-keys")) || [];
+            let concurrencyLimit = 3;
+            if (keys.length > 0) {
+              const totalConcurrency = keys.reduce((sum, key) => {
+                return sum + (key.concurrency || 1);
+              }, 0);
+              concurrencyLimit = Math.max(3, totalConcurrency);
+            }
+
+            const executingTasks = new Set();
+
+            const translateBlock = async (issueBlock) => {
+              if (this.shouldStopRetry) {
+                return { stopped: true };
+              }
+
+              const retryItem = {
+                articleName: issueBlock.articleName,
+                blockIndex: issueBlock.blockIndex,
+                lang: issueBlock.lang,
+                langName: issueBlock.langName,
+                preview: this.getPreview(issueBlock.block.raw),
+                streamContent: "",
+                status: "translating",
+                issueBlock: issueBlock,
+              };
+
+              this.retryItems = [...this.retryItems, retryItem];
+              this.retryStep = `翻译 ${issueBlock.langName}...`;
+
+              const langStorage = this.getStorage(issueBlock.lang);
+
+              try {
+                await translate(
+                  issueBlock.block.raw,
+                  this.config.writingLang,
+                  issueBlock.lang,
+                  ({ provider, id, model, content, done }) => {
+                    if (this.shouldStopRetry) return;
+
+                    const index = this.retryItems.findIndex(
+                      (t) =>
+                        t.articleName === retryItem.articleName &&
+                        t.blockIndex === retryItem.blockIndex &&
+                        t.lang === retryItem.lang,
+                    );
+                    if (index !== -1) {
+                      this.retryItems[index].streamContent = content;
+                    }
+
+                    if (done) {
+                      langStorage.setItem(issueBlock.block.rawHash, {
+                        text: content,
+                        provider: provider,
+                        model: model,
+                        id: id,
+                        editedText: "",
+                      });
+                    }
+                  },
+                );
+
+                if (this.shouldStopRetry) {
+                  this.retryItems = this.retryItems.filter(
+                    (t) =>
+                      t.articleName !== retryItem.articleName ||
+                      t.blockIndex !== retryItem.blockIndex ||
+                      t.lang !== retryItem.lang,
+                  );
+                  return { stopped: true };
+                }
+
+                this.retryCompletedCount++;
+                this.retrySuccessCount++;
+
+                const index = this.retryItems.findIndex(
+                  (t) =>
+                    t.articleName === retryItem.articleName &&
+                    t.blockIndex === retryItem.blockIndex &&
+                    t.lang === retryItem.lang,
+                );
+                if (index !== -1) {
+                  this.retryItems[index].status = "completed";
+                }
+
+                return { stopped: false, success: true };
+              } catch (error) {
+                console.error("Translation failed:", error);
+                
+                this.retryCompletedCount++;
+                this.retryFailedCount++;
+
+                const index = this.retryItems.findIndex(
+                  (t) =>
+                    t.articleName === retryItem.articleName &&
+                    t.blockIndex === retryItem.blockIndex &&
+                    t.lang === retryItem.lang,
+                );
+                if (index !== -1) {
+                  this.retryItems[index].status = "failed";
+                }
+
+                return { stopped: false, success: false };
+              }
+            };
+
             for (const issueBlock of allIssueBlocks) {
-              await this.retrySingleBlock(issueBlock);
+              if (this.shouldStopRetry) break;
+
+              const task = translateBlock(issueBlock)
+                .then((result) => {
+                  if (result?.stopped) {
+                    executingTasks.delete(task);
+                  }
+                  return result;
+                })
+                .finally(() => {
+                  executingTasks.delete(task);
+                });
+
+              executingTasks.add(task);
+
+              if (executingTasks.size >= concurrencyLimit) {
+                await Promise.race(executingTasks);
+              }
+            }
+
+            if (executingTasks.size > 0 && !this.shouldStopRetry) {
+              await Promise.all(executingTasks);
             }
 
             this.isRetrying = false;
-            this.retryCount++;
+            this.retryAttemptCount++;
 
-            if (this.articleList.length > 0) {
+            if (!this.shouldStopRetry) {
               await this.loadArticles();
             }
+          },
+          stopRetry() {
+            this.shouldStopRetry = true;
+            this.retryItems = [];
+            this.isRetrying = false;
           },
           goToNext() {
             this.emit("next-step", { composed: true });
