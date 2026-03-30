@@ -361,15 +361,12 @@
                 刷新状态
               </p-button>
             </o-if>
-            <o-if
-              :value="!isTranslating && !isGenerating && totalTranslatedBlocks > 0"
-            >
-              <p-button variant="outlined" on:click="goToNext">
-                下一步
-              </p-button>
-            </o-if>
             <o-if :value="!isTranslating && totalTranslatedBlocks > 0">
-              <p-button variant="outlined" on:click="clearAllCache">
+              <p-button
+                variant="outlined"
+                color="error"
+                on:click="clearAllCache"
+              >
                 清除所有缓存
               </p-button>
             </o-if>
