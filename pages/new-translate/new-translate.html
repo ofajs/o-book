@@ -108,7 +108,7 @@
     export default async ({ load, query }) => {
       return {
         data: {
-          step: 0, // 0:入口提示 1: 检查翻译 2: 进行翻译 3: 检查翻译结果 4: 生成文档 5: 完成
+          step: 0, // 0:入口提示 1: 检查翻译和进行翻译 2: 检查翻译结果 4: 生成文档 5: 完成
         },
         attached() {
           this.emit("set-active-id", {
