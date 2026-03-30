@@ -177,11 +177,17 @@ const RULES = [
   },
 ];
 
-export const checkTranslation = (original, translated, writingLang) => {
+export const checkTranslation = (
+  original,
+  translated,
+  writingLang,
+  targetLang,
+) => {
   const issues = [];
   for (const rule of RULES) {
     const shouldCheck =
-      rule.id !== "chinese-in-translation" || writingLang === "cn";
+      rule.id !== "chinese-in-translation" ||
+      (writingLang === "cn" && targetLang !== "t-cn");
     if (!shouldCheck) {
       continue;
     }
@@ -225,7 +231,12 @@ export const checkBlock = async (
     return null;
   }
 
-  const issues = checkTranslation(block.raw, translatedText, writingLang);
+  const issues = checkTranslation(
+    block.raw,
+    translatedText,
+    writingLang,
+    targetLang,
+  );
 
   if (issues.length === 0) {
     return null;

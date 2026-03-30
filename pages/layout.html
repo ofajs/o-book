@@ -41,6 +41,15 @@
         </o-if>
         <o-if :value="activeId !== 'start'">
           <p-nav-item
+            attr:active-item="activeId === 'new-translate'"
+            on:click="goto('./new-translate/new-translate.html?path='+query.path)"
+          >
+            智能翻译
+            <n-icon icon="mingcute:ai-line" slot="icon"></n-icon>
+          </p-nav-item>
+        </o-if>
+        <o-if :value="activeId !== 'start'">
+          <p-nav-item
             attr:active-item="activeId === 'config'"
             on:click="goto('./config/config.html?path='+query.path)"
           >

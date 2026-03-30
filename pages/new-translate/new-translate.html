@@ -1,0 +1,26 @@
+<template page>
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  new translate
+  <script>
+    export const parent = "../layout.html";
+
+    export default async ({ load, query }) => {
+      return {
+        data: {},
+        attached() {
+          this.emit("set-active-id", {
+            composed: true,
+            data: {
+              name: "new-translate",
+              query: { ...query },
+            },
+          });
+        },
+      };
+    };
+  </script>
+</template>
