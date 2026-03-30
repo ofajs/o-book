@@ -4,8 +4,10 @@ const RULES = [
     name: "HTML被代码块包裹",
     description: "纯HTML代码被错误地用 ``` 包裹",
     check: (original, translated) => {
-      const isOriginalHtml = original.trim().startsWith("<") && original.trim().endsWith(">");
-      const hasCodeBlock = translated.includes("```html") || translated.includes("```XML");
+      const isOriginalHtml =
+        original.trim().startsWith("<") && original.trim().endsWith(">");
+      const hasCodeBlock =
+        translated.includes("```html") || translated.includes("```XML");
       if (isOriginalHtml && hasCodeBlock) {
         return {
           hasIssue: true,
@@ -38,7 +40,8 @@ const RULES = [
     description: "翻译后出现过多的连续空行",
     check: (original, translated) => {
       const originalBlankLines = (original.match(/\n\s*\n\s*\n/g) || []).length;
-      const translatedBlankLines = (translated.match(/\n\s*\n\s*\n/g) || []).length;
+      const translatedBlankLines = (translated.match(/\n\s*\n\s*\n/g) || [])
+        .length;
       if (translatedBlankLines > originalBlankLines + 1) {
         return {
           hasIssue: true,
@@ -95,7 +98,8 @@ const RULES = [
     description: "Markdown链接格式被破坏",
     check: (original, translated) => {
       const originalLinks = original.match(/\[([^\]]+)\]\(([^)]+)\)/g) || [];
-      const translatedLinks = translated.match(/\[([^\]]+)\]\(([^)]+)\)/g) || [];
+      const translatedLinks =
+        translated.match(/\[([^\]]+)\]\(([^)]+)\)/g) || [];
       if (originalLinks.length !== translatedLinks.length) {
         return {
           hasIssue: true,
@@ -111,7 +115,8 @@ const RULES = [
     description: "Markdown图片格式被破坏",
     check: (original, translated) => {
       const originalImages = original.match(/!\[([^\]]*)\]\(([^)]+)\)/g) || [];
-      const translatedImages = translated.match(/!\[([^\]]*)\]\(([^)]+)\)/g) || [];
+      const translatedImages =
+        translated.match(/!\[([^\]]*)\]\(([^)]+)\)/g) || [];
       if (originalImages.length !== translatedImages.length) {
         return {
           hasIssue: true,
@@ -175,7 +180,8 @@ const RULES = [
 export const checkTranslation = (original, translated, writingLang) => {
   const issues = [];
   for (const rule of RULES) {
-    const shouldCheck = rule.id !== "chinese-in-translation" || writingLang === "zh";
+    const shouldCheck =
+      rule.id !== "chinese-in-translation" || writingLang === "cn";
     if (!shouldCheck) {
       continue;
     }
@@ -192,7 +198,13 @@ export const checkTranslation = (original, translated, writingLang) => {
   return issues;
 };
 
-export const checkBlock = async (block, storage, targetLang, projectPath, writingLang) => {
+export const checkBlock = async (
+  block,
+  storage,
+  targetLang,
+  projectPath,
+  writingLang,
+) => {
   if (!block || !block.raw) {
     return null;
   }
@@ -205,7 +217,9 @@ export const checkBlock = async (block, storage, targetLang, projectPath, writin
   }
 
   const translatedText =
-    typeof cachedData === "string" ? cachedData : cachedData.editedText || cachedData.text || "";
+    typeof cachedData === "string"
+      ? cachedData
+      : cachedData.editedText || cachedData.text || "";
 
   if (!translatedText) {
     return null;
