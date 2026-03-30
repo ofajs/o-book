@@ -17,11 +17,16 @@
       color: var(--md-sys-color-normal);
       margin: 0 16px;
     }
+
+    .step.active {
+      font-weight: bold;
+      color: var(--md-sys-color-primary);
+    }
   </style>
 
   <div class="step-container">
     <div class="step" class:active="step === 0">欢迎</div>
-    <div class="step">检查和翻译</div>
+    <div class="step" class:active="step === 1">检查和翻译</div>
   </div>
 
   <o-if :value="step === 0">
