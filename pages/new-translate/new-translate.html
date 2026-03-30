@@ -77,7 +77,17 @@
       <div class="step-connector"></div>
       <div class="step" class:active="step === 1">
         <div class="step-number">2</div>
-        <span>检查和翻译</span>
+        <span>翻译</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" class:active="step === 2">
+        <div class="step-number">3</div>
+        <span>检验</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" class:active="step === 3">
+        <div class="step-number">4</div>
+        <span>生成文档</span>
       </div>
     </div>
   </div>
@@ -99,7 +109,10 @@
     </div>
   </o-if>
   <o-else-if :value="step === 1">
-    <o-page src="./translate-all.html"></o-page>
+    <o-page src="./translate-all.html" on:click-next="step = 2"></o-page>
+  </o-else-if>
+  <o-else-if :value="step === 2">
+    <o-page src="./translate-checker.html"></o-page>
   </o-else-if>
 
   <script>
