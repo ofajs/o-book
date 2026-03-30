@@ -1,3 +1,5 @@
+import { ChineseChecker } from "./chinese-checker.js";
+
 const RULES = [
   {
     id: "html-wrapped-in-code-block",
@@ -163,10 +165,9 @@ const RULES = [
     name: "翻译结果包含中文",
     description: "翻译结果中不应该出现中文字符",
     check: (original, translated) => {
-      const chineseRegex = /[\u4e00-\u9fa5]/;
-      const hasChinese = chineseRegex.test(translated);
+      const hasChinese = ChineseChecker.hasChinese(translated);
       if (hasChinese) {
-        const chineseMatches = translated.match(chineseRegex) || [];
+        const chineseMatches = ChineseChecker.getAllChinese(translated);
         return {
           hasIssue: true,
           message: `翻译结果包含 ${chineseMatches.length} 个中文字符`,
