@@ -124,11 +124,6 @@
       font-size: 48px;
       margin-bottom: 16px;
     }
-    .loading {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--md-sys-color-on-surface-variant);
-    }
     .button-container {
       display: flex;
       gap: 12px;
@@ -173,8 +168,19 @@
 
   <div class="container">
     <o-if :value="loading">
-      <div class="loading">
-        <div>正在加载项目数据...</div>
+      <div class="status-card">
+        <div class="status-title">正在加载项目数据</div>
+        <div class="check-progress">
+          <div class="check-progress-text">
+            {{loadingStep}}
+          </div>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              :style.width="loadingProgress + '%'"
+            ></div>
+          </div>
+        </div>
       </div>
     </o-if>
     <o-else-if :value="!loading && allArticles.length === 0">
@@ -308,6 +314,8 @@
         data: {
           projectPath: "",
           loading: true,
+          loadingStep: "初始化...",
+          loadingProgress: 0,
           checkingStatus: false,
           checkingLangIndex: 0,
           checkingLangName: "",
@@ -342,13 +350,21 @@
           async loadProjectData() {
             try {
               this.loading = true;
+              this.loadingProgress = 0;
+              this.loadingStep = "获取项目句柄...";
               const handle = await get(this.projectPath);
+              this.loadingProgress = 10;
+
+              this.loadingStep = "加载配置数据...";
               this.config = await getData(handle);
-              
+              this.loadingProgress = 20;
+
+              this.loadingStep = "加载文章数据...";
               const articleList = await getArticleData(
                 await handle.get(this.config.writingLang),
                 { isRoot: true },
               );
+              this.loadingProgress = 40;
 
               if (!articleList || articleList.length === 0) {
                 this.allArticles = [];
@@ -356,9 +372,12 @@
                 return;
               }
 
+              this.loadingStep = "计算内容块数量...";
               this.allArticles = articleList;
               this.totalBlocks = this.calculateTotalBlocks();
-              
+              this.loadingProgress = 50;
+
+              this.loadingStep = "准备检查翻译状态...";
               this.targetLanguages = this.config.languages.filter(
                 lang => lang !== this.config.writingLang
               );
@@ -397,16 +416,26 @@
             this.totalLangs = this.targetLanguages.length;
             this.languageStats = [];
 
+            const baseProgress = 50;
+            const progressPerLang = this.targetLanguages.length > 0 
+              ? 50 / this.targetLanguages.length 
+              : 0;
+
             for (let i = 0; i < this.targetLanguages.length; i++) {
               const lang = this.targetLanguages[i];
               this.checkingLangIndex = i + 1;
               this.checkingLangName = LANGUAGES[lang] || lang;
+              this.loadingStep = `检查 ${this.checkingLangName} 翻译状态...`;
 
               const stat = await this.checkLanguageStatus(lang);
               this.languageStats = [...this.languageStats, stat];
+              
+              this.loadingProgress = Math.round(baseProgress + (i + 1) * progressPerLang);
             }
 
             this.checkingStatus = false;
+            this.loadingProgress = 100;
+            this.loadingStep = "加载完成";
           },
           async checkLanguageStatus(lang) {
             const storage = this.getStorage(lang);
