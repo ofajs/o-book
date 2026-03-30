@@ -5,28 +5,81 @@
       display: block;
     }
     .step-container {
-      padding-top: 32px;
+      padding: 32px 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100%;
     }
+    .step-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .step {
-      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
       font-weight: 500;
-      color: var(--md-sys-color-normal);
-      margin: 0 16px;
+      color: var(--md-sys-color-on-surface-variant);
+      padding: 8px 16px;
+      border-radius: 24px;
+      background-color: var(--md-sys-color-surface-container);
+      transition: all 0.3s ease;
     }
 
     .step.active {
-      font-weight: bold;
-      color: var(--md-sys-color-primary);
+      font-weight: 600;
+      color: var(--md-sys-color-on-primary-container);
+      background-color: var(--md-sys-color-primary-container);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 600;
+      background-color: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface-variant);
+      transition: all 0.3s ease;
+    }
+
+    .step.active .step-number {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+    }
+
+    .step-connector {
+      width: 32px;
+      height: 2px;
+      background-color: var(--md-sys-color-outline-variant);
+      border-radius: 1px;
+    }
+
+    /* .step.active + .step-connector,
+    .step-connector + .step.active {
+      background-color: var(--md-sys-color-primary);
+    } */
   </style>
 
   <div class="step-container">
-    <div class="step" class:active="step === 0">欢迎</div>
-    <div class="step" class:active="step === 1">检查和翻译</div>
+    <div class="step-wrapper">
+      <div class="step" class:active="step === 0">
+        <div class="step-number">1</div>
+        <span>欢迎</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" class:active="step === 1">
+        <div class="step-number">2</div>
+        <span>检查和翻译</span>
+      </div>
+    </div>
   </div>
 
   <o-if :value="step === 0">
