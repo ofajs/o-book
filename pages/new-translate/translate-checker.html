@@ -1,6 +1,7 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <l-m src="../translate/translate-block.html"></l-m>
   <style>
     :host {
@@ -226,26 +227,9 @@
       gap: 8px;
       margin-top: 8px;
     }
-    .retry-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: var(--md-sys-color-surface);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      box-sizing: border-box;
-    }
-    .retry-card {
-      width: 100%;
-      max-width: 600px;
-      padding: 24px;
-      background-color: var(--md-sys-color-surface-container);
-      border-radius: 16px;
+    .retry-dialog {
+      width: 600px;
+      max-width: 90vw;
     }
     .retry-title {
       font-size: 18px;
@@ -255,21 +239,29 @@
     }
     .retry-stats {
       display: flex;
-      gap: 24px;
+      gap: 16px;
       margin-bottom: 16px;
+      flex-wrap: wrap;
     }
     .retry-stat {
       display: flex;
       flex-direction: column;
+      flex: 1;
+      min-width: 80px;
+      padding: 12px;
+      background-color: var(--md-sys-color-surface-container);
+      border-radius: 8px;
+      text-align: center;
     }
     .retry-stat-value {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 500;
       color: var(--md-sys-color-primary);
     }
     .retry-stat-label {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--md-sys-color-on-surface-variant);
+      margin-top: 4px;
     }
     .retry-progress-section {
       margin-bottom: 16px;
@@ -292,13 +284,14 @@
       margin-bottom: 8px;
     }
     .retry-items {
-      max-height: 300px;
+      max-height: 250px;
       overflow-y: auto;
+      margin-bottom: 16px;
     }
     .retry-item {
-      padding: 12px 16px;
+      padding: 12px;
       border-radius: 8px;
-      background-color: var(--md-sys-color-surface);
+      background-color: var(--md-sys-color-surface-container);
       margin-bottom: 8px;
       border-left: 4px solid var(--md-sys-color-primary);
     }
@@ -328,7 +321,7 @@
       color: var(--md-sys-color-on-surface-variant);
       margin-top: 4px;
       padding: 6px 8px;
-      background-color: var(--md-sys-color-surface-container);
+      background-color: var(--md-sys-color-surface);
       border-radius: 4px;
       max-height: 60px;
       overflow: auto;
@@ -371,82 +364,83 @@
     .retry-actions {
       display: flex;
       gap: 12px;
-      justify-content: center;
-      margin-top: 16px;
+      justify-content: flex-end;
     }
   </style>
 
-  <o-if :value="isRetrying">
-    <div class="retry-overlay">
-      <div class="retry-card">
-        <div class="retry-title">正在重试翻译异常块</div>
-        
-        <div class="retry-stats">
-          <div class="retry-stat">
-            <div class="retry-stat-value">{{retryProgress}}%</div>
-            <div class="retry-stat-label">进度</div>
-          </div>
-          <div class="retry-stat">
-            <div class="retry-stat-value" style="color: var(--md-sys-color-success)">{{retrySuccessCount}}</div>
-            <div class="retry-stat-label">成功</div>
-          </div>
-          <div class="retry-stat">
-            <div class="retry-stat-value" style="color: var(--md-sys-color-error)">{{retryFailedCount}}</div>
-            <div class="retry-stat-label">失败</div>
-          </div>
-          <div class="retry-stat">
-            <div class="retry-stat-value" style="color: var(--md-sys-color-warning)">{{retryAttemptCount}}</div>
-            <div class="retry-stat-label">重试次数</div>
-          </div>
+  <p-dialog :open="isRetrying" on:click-mask="stopRetry">
+    <div class="retry-dialog">
+      <div class="retry-title">正在重试翻译异常块</div>
+      
+      <div class="retry-stats">
+        <div class="retry-stat">
+          <div class="retry-stat-value">{{retryProgress}}%</div>
+          <div class="retry-stat-label">进度</div>
         </div>
-
-        <div class="retry-progress-section">
-          <div class="retry-progress-bar">
-            <div class="retry-progress-fill" :style.width="retryProgress + '%'"></div>
-          </div>
-          <div class="retry-progress-text">
-            {{retryStep}} ({{retryCompletedCount}} / {{retryTotalCount}})
-          </div>
+        <div class="retry-stat">
+          <div class="retry-stat-value" style="color: var(--md-sys-color-success)">{{retrySuccessCount}}</div>
+          <div class="retry-stat-label">成功</div>
         </div>
-
-        <o-if :value="retryItems.length > 0">
-          <div class="retry-items">
-            <o-fill :value="retryItems">
-              <div class="retry-item" class:completed="$data.status === 'completed'" class:failed="$data.status === 'failed'">
-                <div class="retry-item-header">
-                  <div>
-                    <div class="retry-item-title">{{$data.articleName}} - 块 #{{$data.blockIndex}}</div>
-                    <div class="retry-item-lang">{{$data.langName}}</div>
-                  </div>
-                  <div>
-                    <o-if :value="$data.status === 'translating'">
-                      <span class="status-badge translating">翻译中</span>
-                    </o-if>
-                    <o-if :value="$data.status === 'completed'">
-                      <span class="status-badge completed">完成</span>
-                    </o-if>
-                    <o-if :value="$data.status === 'failed'">
-                      <span class="status-badge failed">失败</span>
-                    </o-if>
-                  </div>
-                </div>
-                <div class="retry-item-preview">{{$data.preview}}</div>
-                <o-if :value="$data.streamContent">
-                  <div class="retry-item-stream">{{$data.streamContent}}</div>
-                </o-if>
-              </div>
-            </o-fill>
-          </div>
-        </o-if>
-
-        <div class="retry-actions">
-          <p-button variant="outlined" on:click="stopRetry">
-            停止重试
-          </p-button>
+        <div class="retry-stat">
+          <div class="retry-stat-value" style="color: var(--md-sys-color-error)">{{retryFailedCount}}</div>
+          <div class="retry-stat-label">失败</div>
+        </div>
+        <div class="retry-stat">
+          <div class="retry-stat-value" style="color: var(--md-sys-color-warning)">{{retryRemainingCount}}</div>
+          <div class="retry-stat-label">剩余错误</div>
+        </div>
+        <div class="retry-stat">
+          <div class="retry-stat-value" style="color: var(--md-sys-color-normal)">{{retryAttemptCount}}</div>
+          <div class="retry-stat-label">重试次数</div>
         </div>
       </div>
+
+      <div class="retry-progress-section">
+        <div class="retry-progress-bar">
+          <div class="retry-progress-fill" :style.width="retryProgress + '%'"></div>
+        </div>
+        <div class="retry-progress-text">
+          {{retryStep}} ({{retryCompletedCount}} / {{retryTotalCount}})
+        </div>
+      </div>
+
+      <o-if :value="retryItems.length > 0">
+        <div class="retry-items">
+          <o-fill :value="retryItems">
+            <div class="retry-item" class:completed="$data.status === 'completed'" class:failed="$data.status === 'failed'">
+              <div class="retry-item-header">
+                <div>
+                  <div class="retry-item-title">{{$data.articleName}} - 块 #{{$data.blockIndex}}</div>
+                  <div class="retry-item-lang">{{$data.langName}}</div>
+                </div>
+                <div>
+                  <o-if :value="$data.status === 'translating'">
+                    <span class="status-badge translating">翻译中</span>
+                  </o-if>
+                  <o-if :value="$data.status === 'completed'">
+                    <span class="status-badge completed">完成</span>
+                  </o-if>
+                  <o-if :value="$data.status === 'failed'">
+                    <span class="status-badge failed">失败</span>
+                  </o-if>
+                </div>
+              </div>
+              <div class="retry-item-preview">{{$data.preview}}</div>
+              <o-if :value="$data.streamContent">
+                <div class="retry-item-stream">{{$data.streamContent}}</div>
+              </o-if>
+            </div>
+          </o-fill>
+        </div>
+      </o-if>
+
+      <div class="retry-actions">
+        <p-button variant="outlined" on:click="stopRetry">
+          停止重试
+        </p-button>
+      </div>
     </div>
-  </o-if>
+  </p-dialog>
 
   <div class="container">
     <div class="left">
@@ -624,7 +618,6 @@
           checkedCount: 0,
           totalToCheck: 0,
           retryAttemptCount: 0,
-          retryCompletedCount: 0,
           retryTotalCount: 0,
           retrySuccessCount: 0,
           retryFailedCount: 0,
@@ -647,6 +640,12 @@
           get retryProgress() {
             if (this.retryTotalCount === 0) return 0;
             return Math.round((this.retryCompletedCount / this.retryTotalCount) * 100);
+          },
+          get retryRemainingCount() {
+            return this.retryTotalCount - this.retryCompletedCount;
+          },
+          get retryCompletedCount() {
+            return this.retrySuccessCount + this.retryFailedCount;
           },
           getStorage(lang) {
             const key = "translates-" + lang + this.projectPath;
@@ -953,7 +952,6 @@
                   return { stopped: true };
                 }
 
-                this.retryCompletedCount++;
                 this.retrySuccessCount++;
 
                 const index = this.retryItems.findIndex(
@@ -969,8 +967,7 @@
                 return { stopped: false, success: true };
               } catch (error) {
                 console.error("Translation failed:", error);
-                
-                this.retryCompletedCount++;
+
                 this.retryFailedCount++;
 
                 const index = this.retryItems.findIndex(
