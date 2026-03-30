@@ -188,7 +188,7 @@ export const checkTranslation = (
   for (const rule of RULES) {
     const shouldCheck =
       rule.id !== "chinese-in-translation" ||
-      (writingLang === "cn" && targetLang !== "t-cn");
+      (writingLang === "cn" && targetLang !== "t-cn" && targetLang !== "ja");
     if (!shouldCheck) {
       continue;
     }

@@ -9,7 +9,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100%;
     }
     .step-wrapper {
       display: flex;
@@ -61,11 +60,6 @@
       background-color: var(--md-sys-color-outline-variant);
       border-radius: 1px;
     }
-
-    /* .step.active + .step-connector,
-    .step-connector + .step.active {
-      background-color: var(--md-sys-color-primary);
-    } */
   </style>
 
   <div class="step-container">
@@ -92,6 +86,8 @@
     </div>
   </div>
 
+  <o-provider name="project-data" :project-path="projectPath"></o-provider>
+
   <o-if :value="step === 0">
     <div
       style="
@@ -109,10 +105,13 @@
     </div>
   </o-if>
   <o-else-if :value="step === 1">
-    <o-page src="./translate-all.html" on:click-next="step = 2"></o-page>
+    <o-page src="./translate-all.html" on:next-step="step = 2"></o-page>
   </o-else-if>
   <o-else-if :value="step === 2">
-    <o-page src="./translate-checker.html"></o-page>
+    <o-page src="./translate-checker.html" on:next-step="step = 3"></o-page>
+  </o-else-if>
+  <o-else-if :value="step === 3">
+    <o-page src="./translate-generate.html"></o-page>
   </o-else-if>
 
   <script>
@@ -121,7 +120,8 @@
     export default async ({ load, query }) => {
       return {
         data: {
-          step: 0, // 0:入口提示 1: 检查翻译和进行翻译 2: 检查翻译结果 4: 生成文档 5: 完成
+          step: 0,
+          projectPath: query.path || "",
         },
         attached() {
           this.emit("set-active-id", {

@@ -1,0 +1,596 @@
+<template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
+  <l-m src="../translate/translate-block.html"></l-m>
+  <style>
+    :host {
+      display: block;
+      height: 100%;
+    }
+    .container {
+      display: flex;
+      gap: 16px;
+      height: 100%;
+      padding: 16px;
+    }
+    .left {
+      width: 320px;
+      flex-shrink: 0;
+      overflow: auto;
+    }
+    .article-content {
+      flex: 1;
+      overflow: auto;
+      padding-right: 16px;
+    }
+    .header {
+      margin-bottom: 16px;
+    }
+    .header h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .header p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .stats-card {
+      padding: 16px;
+      background-color: var(--md-sys-color-surface-container);
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .stats-row {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 12px;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--md-sys-color-primary);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .retry-count {
+      padding: 4px 12px;
+      background-color: var(--md-sys-color-warning-container);
+      color: var(--md-sys-color-on-warning-container);
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-left: 12px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .progress-section {
+      margin-bottom: 16px;
+    }
+    .progress-bar {
+      height: 8px;
+      background-color: var(--md-sys-color-surface-container-highest);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-fill {
+      height: 100%;
+      background-color: var(--md-sys-color-primary);
+      transition: width 0.3s ease;
+    }
+    .progress-text {
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    p-list-item {
+      border-radius: 30px;
+    }
+    p-list-item[active-item] {
+      background-color: var(--md-sys-color-primary-container);
+    }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-issue-count {
+      padding: 2px 6px;
+      font-size: 11px;
+      border-radius: 10px;
+      background-color: var(--md-sys-color-error);
+      color: var(--md-sys-color-on-error);
+      font-weight: 500;
+      margin-left: 8px;
+    }
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--md-sys-color-on-surface-variant);
+      text-align: center;
+      padding: 32px;
+    }
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .article-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .article-title {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .issue-count {
+      padding: 4px 12px;
+      font-size: 12px;
+      border-radius: 16px;
+      background-color: var(--md-sys-color-error-container);
+      color: var(--md-sys-color-on-error-container);
+      font-weight: 500;
+    }
+    .issue-block-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .issue-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .issue-tag {
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      background-color: var(--md-sys-color-error-container);
+      color: var(--md-sys-color-on-error-container);
+      font-weight: 500;
+    }
+    .lang-badge {
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      font-weight: 500;
+      margin-left: 8px;
+    }
+    .block-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+  </style>
+  <div class="container">
+    <div class="left">
+      <div class="header">
+        <h3>翻译检查器</h3>
+        <p>检查所有语言的翻译质量问题</p>
+      </div>
+
+      <div class="stats-card">
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-value">{{stats.totalBlocks}}</div>
+            <div class="stat-label">已翻译块</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" style="color: var(--md-sys-color-error)">{{stats.issueBlocks}}</div>
+            <div class="stat-label">异常块</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" style="color: var(--md-sys-color-warning)">{{retryCount}}</div>
+            <div class="stat-label">重试次数</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <p-button
+          variant="contained"
+          on:click="retryAllIssues"
+          attr:disabled="isRetrying || stats.issueBlocks === 0"
+        >
+          <o-if :value="isRetrying">重试中...</o-if>
+          <o-else>一键重试异常块</o-else>
+        </p-button>
+        <p-button
+          variant="outlined"
+          on:click="refreshCheck"
+          attr:disabled="isRetrying || isChecking"
+        >
+          重新检查
+        </p-button>
+      </div>
+
+      <o-if :value="isChecking">
+        <div class="progress-section">
+          <div class="progress-bar">
+            <div class="progress-fill" :style.width="checkProgress + '%'"></div>
+          </div>
+          <div class="progress-text">
+            正在检查: {{checkStep}} ({{checkedCount}} / {{totalToCheck}})
+          </div>
+        </div>
+      </o-if>
+
+      <h4 style="margin: 16px 0 8px 0; font-size: 12px; color: var(--md-sys-color-on-surface-variant);">
+        有异常的文件 ({{articleList.length}})
+      </h4>
+      <p-list>
+        <o-fill :value="articleList">
+          <p-list-item
+            button
+            on:click="$host.clickItem($data)"
+            attr:active-item="$host.activeArticlePath === $data.path && $host.activeLang === $data.lang"
+          >
+            <div class="file-item">
+              <span class="file-name">{{$data.name}} ({{$data.langName}})</span>
+              <span class="file-issue-count">{{$data.issueCount}}</span>
+            </div>
+          </p-list-item>
+        </o-fill>
+      </p-list>
+    </div>
+
+    <div class="article-content">
+      <o-if :value="isChecking">
+        <div class="loading">检查中...</div>
+      </o-if>
+      <o-else-if :value="!isChecking && issueBlocks.length === 0 && stats.totalBlocks > 0">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
+            没有发现异常
+          </div>
+          <div style="font-size: 14px">所有翻译块都通过了检查</div>
+          <div style="margin-top: 24px;">
+            <p-button variant="contained" on:click="goToNext">
+              下一步
+            </p-button>
+          </div>
+        </div>
+      </o-else-if>
+      <o-else-if :value="!isChecking && stats.totalBlocks === 0">
+        <div class="empty-state">
+          <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
+            暂无翻译数据
+          </div>
+          <div style="font-size: 14px">请先完成翻译</div>
+        </div>
+      </o-else-if>
+      <o-else>
+        <div class="article-header">
+          <div class="article-title">{{currentArticleName}}</div>
+          <div>
+            <span class="issue-count">{{issueBlocks.length}} 个异常块</span>
+            <span class="lang-badge">{{currentLangName}}</span>
+          </div>
+        </div>
+        <o-fill :value="issueBlocks">
+          <div class="issue-block-wrapper">
+            <div class="issue-tags">
+              <o-fill :value="$data.issues">
+                <span class="issue-tag">{{$data.ruleName}}</span>
+              </o-fill>
+            </div>
+            <translate-block
+              :item="$data.block"
+              :target-lang="$data.lang"
+              :writing-lang="$host.config.writingLang"
+              :project-path="$host.projectPath"
+            ></translate-block>
+            <div class="block-actions">
+              <p-button
+                size="small"
+                variant="outlined"
+                on:click="$host.retrySingleBlock($data)"
+              >
+                重新翻译
+              </p-button>
+            </div>
+          </div>
+        </o-fill>
+      </o-else>
+    </div>
+  </div>
+
+  <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
+  <script>
+    import { LANGUAGES, translate } from "../translate/util/translate.js";
+    import { getArticleData } from "../translate/util/article-data.js";
+    import { checkBlock } from "../translate/util/check-translation.js";
+    import { EverCache, storage } from "/gh/kirakiray/ever-cache/src/main.js";
+
+    export default async ({ load }) => {
+      const { get } = await load("/nos/fs/main.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+
+      return {
+        data: {
+          projectPath: "",
+          config: null,
+          allArticles: [],
+          targetLanguages: [],
+          articleList: [],
+          activeArticlePath: "",
+          activeLang: "",
+          issueBlocks: [],
+          currentArticleName: "",
+          currentLangName: "",
+          isChecking: true,
+          isRetrying: false,
+          checkProgress: 0,
+          checkStep: "",
+          checkedCount: 0,
+          totalToCheck: 0,
+          retryCount: 0,
+          stats: {
+            totalBlocks: 0,
+            issueBlocks: 0,
+          },
+          _storages: {},
+        },
+        watch: {
+          projectPath() {
+            if (this.projectPath) {
+              this.loadArticles();
+            }
+          },
+        },
+        proto: {
+          getStorage(lang) {
+            const key = "translates-" + lang + this.projectPath;
+            if (!this._storages[key]) {
+              this._storages[key] = new EverCache(key);
+            }
+            return this._storages[key];
+          },
+          async loadArticles() {
+            this.isChecking = true;
+            this.checkProgress = 0;
+            this.checkedCount = 0;
+            this.articleList = [];
+            this.issueBlocks = [];
+            this.stats = { totalBlocks: 0, issueBlocks: 0 };
+
+            try {
+              const handle = await get(this.projectPath);
+              this.config = await getData(handle);
+              const articleList = await getArticleData(
+                await handle.get(this.config.writingLang),
+                { isRoot: true },
+              );
+
+              if (!articleList || articleList.length === 0) {
+                this.allArticles = [];
+                this.isChecking = false;
+                return;
+              }
+
+              this.allArticles = articleList;
+              this.targetLanguages = this.config.languages.filter(
+                lang => lang !== this.config.writingLang
+              );
+
+              await this.checkAllLanguages();
+            } catch (error) {
+              console.error("Failed to load articles:", error);
+              this.allArticles = [];
+            } finally {
+              this.isChecking = false;
+            }
+          },
+          async checkAllLanguages() {
+            const articlesWithIssues = [];
+            let totalTranslatedBlocks = 0;
+            let totalIssueBlocks = 0;
+
+            const totalChecks = this.allArticles.length * this.targetLanguages.length;
+            this.totalToCheck = totalChecks;
+            let currentCheck = 0;
+
+            for (const lang of this.targetLanguages) {
+                const langStorage = this.getStorage(lang);
+                const langName = LANGUAGES[lang] || lang;
+
+                for (const article of this.allArticles) {
+                  currentCheck++;
+                  this.checkedCount = currentCheck;
+                  this.checkStep = `检查 ${article.name} (${langName})`;
+                  this.checkProgress = Math.round((currentCheck / totalChecks) * 100);
+
+                  if (!article.blocks || article.blocks.length === 0) continue;
+
+                  const issueData = [];
+                  for (let i = 0; i < article.blocks.length; i++) {
+                    const block = article.blocks[i];
+                    const result = await checkBlock(
+                      block,
+                      langStorage,
+                      lang,
+                      this.projectPath,
+                      this.config.writingLang,
+                    );
+                    if (result) {
+                      totalTranslatedBlocks++;
+                      result.fileName = article.name;
+                      result.blockIndex = i + 1;
+                      result.lang = lang;
+                      result.langName = langName;
+                      issueData.push(result);
+                      totalIssueBlocks++;
+                    } else {
+                      const cachedData = await langStorage.getItem(block.rawHash);
+                      if (cachedData) {
+                        totalTranslatedBlocks++;
+                      }
+                    }
+                  }
+
+                  if (issueData.length > 0) {
+                    articlesWithIssues.push({
+                      name: article.name,
+                      path: article.path,
+                      realPath: article.realPath,
+                      lang: lang,
+                      langName: langName,
+                      issueCount: issueData.length,
+                      issueData: issueData,
+                    });
+                  }
+                }
+              }
+
+              this.articleList = articlesWithIssues;
+              this.stats = {
+                totalBlocks: totalTranslatedBlocks,
+                issueBlocks: totalIssueBlocks,
+              };
+
+              if (articlesWithIssues.length > 0) {
+                this.clickItem(articlesWithIssues[0]);
+              } else {
+                this.issueBlocks = [];
+                this.currentArticleName = "";
+                this.activeArticlePath = "";
+                this.activeLang = "";
+              }
+          },
+          clickItem(item) {
+            this.activeArticlePath = item.path;
+            this.activeLang = item.lang;
+            this.currentArticleName = item.name;
+            this.currentLangName = item.langName;
+            this.issueBlocks = item.issueData || [];
+          },
+          async refreshCheck() {
+            await this.loadArticles();
+          },
+          async retrySingleBlock(issueBlock) {
+            const langStorage = this.getStorage(issueBlock.lang);
+            
+            try {
+              await translate(
+                issueBlock.block.raw,
+                this.config.writingLang,
+                issueBlock.lang,
+                ({ provider, id, model, content, done }) => {
+                  if (done) {
+                    langStorage.setItem(issueBlock.block.rawHash, {
+                      text: content,
+                      provider: provider,
+                      model: model,
+                      id: id,
+                      editedText: "",
+                    });
+                  }
+                },
+              );
+
+              this.retryCount++;
+              
+              const index = this.issueBlocks.findIndex(
+                b => b.block.rawHash === issueBlock.block.rawHash && b.lang === issueBlock.lang
+              );
+              if (index !== -1) {
+                this.issueBlocks = this.issueBlocks.filter((_, i) => i !== index);
+                this.stats.issueBlocks--;
+              }
+
+              const articleItem = this.articleList.find(
+                a => a.path === this.activeArticlePath && a.lang === this.activeLang
+              );
+              if (articleItem) {
+                articleItem.issueData = articleItem.issueData.filter(
+                  b => !(b.block.rawHash === issueBlock.block.rawHash && b.lang === issueBlock.lang)
+                );
+                articleItem.issueCount = articleItem.issueData.length;
+                if (articleItem.issueCount === 0) {
+                  this.articleList = this.articleList.filter(
+                    a => !(a.path === this.activeArticlePath && a.lang === this.activeLang)
+                  );
+                  if (this.articleList.length > 0) {
+                    this.clickItem(this.articleList[0]);
+                  } else {
+                    this.issueBlocks = [];
+                    this.currentArticleName = "";
+                    this.activeArticlePath = "";
+                    this.activeLang = "";
+                  }
+                }
+              }
+            } catch (error) {
+              console.error("Retry failed:", error);
+              alert("重试失败: " + error.message);
+            }
+          },
+          async retryAllIssues() {
+            this.isRetrying = true;
+            const allIssueBlocks = [];
+            
+            for (const article of this.articleList) {
+              for (const issue of article.issueData) {
+                allIssueBlocks.push(issue);
+              }
+            }
+
+            for (const issueBlock of allIssueBlocks) {
+              await this.retrySingleBlock(issueBlock);
+            }
+
+            this.isRetrying = false;
+            this.retryCount++;
+            
+            if (this.articleList.length > 0) {
+              await this.loadArticles();
+            }
+          },
+          goToNext() {
+            this.emit("next-step", { composed: true });
+          },
+        },
+        attached() {
+          if (this.projectPath) {
+            this.loadArticles();
+          }
+        },
+      };
+    };
+  </script>
+</template>

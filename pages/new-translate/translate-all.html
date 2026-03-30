@@ -216,8 +216,13 @@
       animation: pulse 1.5s ease-in-out infinite;
     }
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+      0%,
+      100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
     }
     .status-badge {
       padding: 4px 12px;
@@ -248,6 +253,15 @@
       font-size: 12px;
       color: var(--md-sys-color-error);
     }
+    .next-step-section {
+      text-align: center;
+      padding: 32px;
+    }
+    .next-step-section p {
+      font-size: 14px;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-bottom: 16px;
+    }
   </style>
 
   <div class="container">
@@ -255,9 +269,7 @@
       <div class="status-card">
         <div class="status-title">正在加载项目数据</div>
         <div class="check-progress">
-          <div class="check-progress-text">
-            {{loadingStep}}
-          </div>
+          <div class="check-progress-text">{{loadingStep}}</div>
           <div class="progress-bar">
             <div
               class="progress-fill"
@@ -279,7 +291,8 @@
           <div class="status-title">正在检查翻译状态</div>
           <div class="check-progress">
             <div class="check-progress-text">
-              正在检查 {{checkingLangName}} ({{checkingLangIndex}} / {{totalLangs}})
+              正在检查 {{checkingLangName}} ({{checkingLangIndex}} /
+              {{totalLangs}})
             </div>
             <div class="progress-bar">
               <div
@@ -297,26 +310,35 @@
             项目共包含 <strong>{{totalBlocks}}</strong> 个内容块，
             <strong>{{targetLanguages.length}}</strong> 种目标语言
           </div>
-          
+
           <div class="summary-card">
             <div class="summary-item">
               <div class="summary-number">{{totalTranslatedBlocks}}</div>
               <div class="summary-label">已翻译块数</div>
             </div>
             <div class="summary-item">
-              <div class="summary-number" style="color: var(--md-sys-color-normal)">
+              <div
+                class="summary-number"
+                style="color: var(--md-sys-color-normal)"
+              >
                 {{totalUntranslatedBlocks}}
               </div>
               <div class="summary-label">待翻译块数</div>
             </div>
             <div class="summary-item">
-              <div class="summary-number" style="color: var(--md-sys-color-success)">
+              <div
+                class="summary-number"
+                style="color: var(--md-sys-color-success)"
+              >
                 {{completedLanguagesCount}}
               </div>
               <div class="summary-label">已完成语言</div>
             </div>
             <div class="summary-item">
-              <div class="summary-number" style="color: var(--md-sys-color-warning)">
+              <div
+                class="summary-number"
+                style="color: var(--md-sys-color-warning)"
+              >
                 {{inProgressLanguagesCount}}
               </div>
               <div class="summary-label">进行中语言</div>
@@ -339,9 +361,11 @@
                 刷新状态
               </p-button>
             </o-if>
-            <o-if :value="!isTranslating && !isGenerating && totalTranslatedBlocks > 0">
-              <p-button variant="outlined" on:click="generateAllFiles">
-                生成翻译文档
+            <o-if
+              :value="!isTranslating && !isGenerating && totalTranslatedBlocks > 0"
+            >
+              <p-button variant="outlined" on:click="goToNext">
+                下一步
               </p-button>
             </o-if>
             <o-if :value="!isTranslating && totalTranslatedBlocks > 0">
@@ -352,33 +376,24 @@
           </div>
         </div>
 
-        <o-if :value="isGenerating">
-          <div class="status-card">
-            <div class="status-title">生成翻译文档</div>
-            <div class="check-progress">
-              <div class="check-progress-text">
-                {{generatingStep}} ({{generatedCount}} / {{totalToGenerate}})
-              </div>
-              <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  :style.width="generatingProgress + '%'"
-                ></div>
-              </div>
-            </div>
-            <o-if :value="generatedFiles.length > 0">
-              <div class="translating-section">
-                <o-fill :value="generatedFiles.slice(-5)">
-                  <div class="translating-item completed">
-                    <div class="translating-item-header">
-                      <div class="translating-item-title">{{$data.name}}</div>
-                      <div class="status-badge completed">已生成</div>
-                    </div>
-                    <div class="translating-item-lang">{{$data.langName}}</div>
-                  </div>
-                </o-fill>
-              </div>
-            </o-if>
+        <o-if
+          :value="totalUntranslatedBlocks === 0 && !isTranslating && !isGenerating"
+        >
+          <div class="next-step-section">
+            <p>所有内容块已翻译完成，可以进入下一步进行检查。</p>
+            <p-button variant="contained" on:click="goToNext">
+              下一步
+            </p-button>
+          </div>
+        </o-if>
+        <o-if
+          :value="totalUntranslatedBlocks > 0 && !isTranslating && !isGenerating && languageStats.length === 0"
+        >
+          <div class="next-step-section">
+            <p>没有找到目标语言配置，请检查项目配置。</p>
+            <p-button variant="outlined" on:click="refreshStatus">
+              刷新状态
+            </p-button>
           </div>
         </o-if>
 
@@ -387,7 +402,8 @@
             <div class="status-title">翻译进度</div>
             <div class="check-progress">
               <div class="check-progress-text">
-                {{translatingStep}} ({{translatedInSession}} / {{totalToTranslate}})
+                {{translatingStep}} ({{translatedInSession}} /
+                {{totalToTranslate}})
               </div>
               <div class="progress-bar">
                 <div
@@ -403,12 +419,18 @@
                   <div class="translating-item">
                     <div class="translating-item-header">
                       <div>
-                        <div class="translating-item-title">{{$data.articleName}} - 块 #{{$data.blockIndex + 1}}</div>
-                        <div class="translating-item-lang">{{$data.langName}}</div>
+                        <div class="translating-item-title">
+                          {{$data.articleName}} - 块 #{{$data.blockIndex + 1}}
+                        </div>
+                        <div class="translating-item-lang">
+                          {{$data.langName}}
+                        </div>
                       </div>
                       <div class="status-badge translating">翻译中</div>
                     </div>
-                    <div class="translating-item-preview">{{$data.preview}}</div>
+                    <div class="translating-item-preview">
+                      {{$data.preview}}
+                    </div>
                     <o-if :value="$data.streamContent">
                       <div class="stream-content">{{$data.streamContent}}</div>
                     </o-if>
@@ -428,23 +450,35 @@
               <div class="failed-item">
                 <div class="translating-item-header">
                   <div>
-                    <div class="translating-item-title">{{$data.articleName}} - 块 #{{$data.blockIndex + 1}}</div>
+                    <div class="translating-item-title">
+                      {{$data.articleName}} - 块 #{{$data.blockIndex + 1}}
+                    </div>
                     <div class="translating-item-lang">{{$data.langName}}</div>
                   </div>
-                  <div class="status-badge" style="background-color: var(--md-sys-color-error); color: var(--md-sys-color-on-error);">
+                  <div
+                    class="status-badge"
+                    style="
+                      background-color: var(--md-sys-color-error);
+                      color: var(--md-sys-color-on-error);
+                    "
+                  >
                     失败
                   </div>
                 </div>
                 <div class="translating-item-preview">{{$data.preview}}</div>
                 <div class="error-text">错误: {{$data.error}}</div>
-                <div style="margin-top: 8px;">
-                  <p-button size="small" variant="outlined" on:click="$host.retryFailedItem($data)">
+                <div style="margin-top: 8px">
+                  <p-button
+                    size="small"
+                    variant="outlined"
+                    on:click="$host.retryFailedItem($data)"
+                  >
                     重试
                   </p-button>
                 </div>
               </div>
             </o-fill>
-            <div style="margin-top: 12px; text-align: center;">
+            <div style="margin-top: 12px; text-align: center">
               <p-button variant="outlined" on:click="retryAllFailed">
                 重试全部失败项
               </p-button>
@@ -485,7 +519,10 @@
                     <div class="lang-stat-label">待翻译</div>
                   </div>
                   <div class="lang-stat">
-                    <div class="lang-stat-number" style="color: var(--md-sys-color-primary)">
+                    <div
+                      class="lang-stat-number"
+                      style="color: var(--md-sys-color-primary)"
+                    >
                       {{$data.progress}}%
                     </div>
                     <div class="lang-stat-label">进度</div>
@@ -499,7 +536,7 @@
                   ></div>
                 </div>
                 <o-if :value="!$host.isTranslating && $data.translated > 0">
-                  <div style="margin-top: 8px;">
+                  <div style="margin-top: 8px">
                     <p-button
                       size="small"
                       variant="outlined"
@@ -552,11 +589,6 @@
           totalToTranslate: 0,
           translatingStep: "",
           isGenerating: false,
-          generatingStep: "",
-          generatedCount: 0,
-          totalToGenerate: 0,
-          generatedFiles: [],
-          _rootHandle: null,
         },
         watch: {
           projectPath() {
@@ -567,24 +599,31 @@
         },
         proto: {
           get totalTranslatedBlocks() {
-            return this.languageStats.reduce((sum, stat) => sum + stat.translated, 0);
+            return this.languageStats.reduce(
+              (sum, stat) => sum + stat.translated,
+              0,
+            );
           },
           get totalUntranslatedBlocks() {
-            return this.languageStats.reduce((sum, stat) => sum + stat.untranslated, 0);
+            return this.languageStats.reduce(
+              (sum, stat) => sum + stat.untranslated,
+              0,
+            );
           },
           get completedLanguagesCount() {
-            return this.languageStats.filter(stat => stat.progress === 100).length;
+            return this.languageStats.filter((stat) => stat.progress === 100)
+              .length;
           },
           get inProgressLanguagesCount() {
-            return this.languageStats.filter(stat => stat.progress > 0 && stat.progress < 100).length;
+            return this.languageStats.filter(
+              (stat) => stat.progress > 0 && stat.progress < 100,
+            ).length;
           },
           get translationProgress() {
             if (this.totalToTranslate === 0) return 0;
-            return Math.round((this.translatedInSession / this.totalToTranslate) * 100);
-          },
-          get generatingProgress() {
-            if (this.totalToGenerate === 0) return 0;
-            return Math.round((this.generatedCount / this.totalToGenerate) * 100);
+            return Math.round(
+              (this.translatedInSession / this.totalToTranslate) * 100,
+            );
           },
           async loadProjectData() {
             try {
@@ -618,7 +657,7 @@
 
               this.loadingStep = "准备检查翻译状态...";
               this.targetLanguages = this.config.languages.filter(
-                lang => lang !== this.config.writingLang
+                (lang) => lang !== this.config.writingLang,
               );
 
               await this.checkAllLanguagesStatus();
@@ -632,7 +671,11 @@
           calculateTotalBlocks() {
             let total = 0;
             for (const article of this.allArticles) {
-              if (article.isTemp && article.blocks && article.blocks.length > 0) {
+              if (
+                article.isTemp &&
+                article.blocks &&
+                article.blocks.length > 0
+              ) {
                 total++;
               } else if (article.blocks && article.blocks.length > 0) {
                 for (const block of article.blocks) {
@@ -656,9 +699,10 @@
             this.languageStats = [];
 
             const baseProgress = 50;
-            const progressPerLang = this.targetLanguages.length > 0 
-              ? 50 / this.targetLanguages.length 
-              : 0;
+            const progressPerLang =
+              this.targetLanguages.length > 0
+                ? 50 / this.targetLanguages.length
+                : 0;
 
             for (let i = 0; i < this.targetLanguages.length; i++) {
               const lang = this.targetLanguages[i];
@@ -668,8 +712,10 @@
 
               const stat = await this.checkLanguageStatus(lang);
               this.languageStats = [...this.languageStats, stat];
-              
-              this.loadingProgress = Math.round(baseProgress + (i + 1) * progressPerLang);
+
+              this.loadingProgress = Math.round(
+                baseProgress + (i + 1) * progressPerLang,
+              );
             }
 
             this.checkingStatus = false;
@@ -682,8 +728,14 @@
             let untranslated = 0;
 
             for (const article of this.allArticles) {
-              if (article.isTemp && article.blocks && article.blocks.length > 0) {
-                const cachedData = await storage.getItem(article.blocks[0].rawHash);
+              if (
+                article.isTemp &&
+                article.blocks &&
+                article.blocks.length > 0
+              ) {
+                const cachedData = await storage.getItem(
+                  article.blocks[0].rawHash,
+                );
                 if (cachedData) {
                   translated++;
                 } else {
@@ -703,7 +755,8 @@
             }
 
             const total = translated + untranslated;
-            const progress = total > 0 ? Math.round((translated / total) * 100) : 0;
+            const progress =
+              total > 0 ? Math.round((translated / total) * 100) : 0;
 
             return {
               languageCode: lang,
@@ -720,7 +773,9 @@
           getPreview(text) {
             if (!text) return "";
             const preview = text.trim().substring(0, 100);
-            return preview.length < text.trim().length ? preview + "..." : preview;
+            return preview.length < text.trim().length
+              ? preview + "..."
+              : preview;
           },
           async startTranslation() {
             this.isTranslating = true;
@@ -737,8 +792,14 @@
               const langName = LANGUAGES[lang] || lang;
 
               for (const article of this.allArticles) {
-                if (article.isTemp && article.blocks && article.blocks.length > 0) {
-                  const cachedData = await langStorage.getItem(article.blocks[0].rawHash);
+                if (
+                  article.isTemp &&
+                  article.blocks &&
+                  article.blocks.length > 0
+                ) {
+                  const cachedData = await langStorage.getItem(
+                    article.blocks[0].rawHash,
+                  );
                   if (!cachedData) {
                     untranslatedBlocks.push({
                       article,
@@ -799,7 +860,10 @@
                 streamContent: "",
               };
 
-              this.translatingItems = [...this.translatingItems, translatingItem];
+              this.translatingItems = [
+                ...this.translatingItems,
+                translatingItem,
+              ];
               this.translatingStep = `翻译 ${item.langName}...`;
 
               try {
@@ -845,11 +909,15 @@
 
                 this.translatedInSession++;
 
-                const langStat = this.languageStats.find(s => s.languageCode === item.lang);
+                const langStat = this.languageStats.find(
+                  (s) => s.languageCode === item.lang,
+                );
                 if (langStat) {
                   langStat.translated++;
                   langStat.untranslated--;
-                  langStat.progress = Math.round((langStat.translated / langStat.total) * 100);
+                  langStat.progress = Math.round(
+                    (langStat.translated / langStat.total) * 100,
+                  );
                 }
 
                 this.translatingItems = this.translatingItems.filter(
@@ -950,11 +1018,15 @@
 
               this.translatedInSession++;
 
-              const langStat = this.languageStats.find(s => s.languageCode === failedItem.item.lang);
+              const langStat = this.languageStats.find(
+                (s) => s.languageCode === failedItem.item.lang,
+              );
               if (langStat) {
                 langStat.translated++;
                 langStat.untranslated--;
-                langStat.progress = Math.round((langStat.translated / langStat.total) * 100);
+                langStat.progress = Math.round(
+                  (langStat.translated / langStat.total) * 100,
+                );
               }
 
               this.translatingItems = this.translatingItems.filter(
@@ -986,7 +1058,9 @@
             }
           },
           async clearLanguageCache(lang) {
-            const langStat = this.languageStats.find(s => s.languageCode === lang);
+            const langStat = this.languageStats.find(
+              (s) => s.languageCode === lang,
+            );
             if (!langStat) return;
 
             const confirmed = await confirm(
@@ -1028,115 +1102,8 @@
               alert("清除缓存失败: " + error.message);
             }
           },
-          async generateAllFiles() {
-            this.isGenerating = true;
-            this.generatedCount = 0;
-            this.generatedFiles = [];
-            this.generatingStep = "准备生成文件...";
-
-            try {
-              if (!this._rootHandle) {
-                this._rootHandle = await get(this.projectPath);
-              }
-
-              const totalFiles = this.allArticles.length * this.targetLanguages.length;
-              this.totalToGenerate = totalFiles;
-
-              for (const lang of this.targetLanguages) {
-                const langName = LANGUAGES[lang] || lang;
-                const langStorage = this.getStorage(lang);
-
-                const targetLangHandle = await this._rootHandle.get(lang, {
-                  create: "dir",
-                });
-
-                for (const article of this.allArticles) {
-                  this.generatingStep = `生成 ${article.name} (${langName})`;
-
-                  try {
-                    await this.generateSingleFile(article, targetLangHandle, langStorage, lang, langName);
-                    this.generatedFiles = [...this.generatedFiles, {
-                      name: article.name,
-                      lang,
-                      langName,
-                    }];
-                  } catch (error) {
-                    console.error(`Failed to generate ${article.name} for ${langName}:`, error);
-                  }
-
-                  this.generatedCount++;
-                }
-              }
-
-              alert("翻译文档生成完成！");
-            } catch (error) {
-              console.error("Failed to generate files:", error);
-              alert("生成文件失败: " + error.message);
-            } finally {
-              this.isGenerating = false;
-              this.generatingStep = "";
-            }
-          },
-          async generateSingleFile(article, targetLangHandle, langStorage, lang, langName) {
-            const translatedBlocks = [];
-
-            for (const block of article.blocks) {
-              if (block.type === "space") {
-                translatedBlocks.push(block.raw);
-                continue;
-              }
-
-              const cachedData = await langStorage.getItem(block.rawHash);
-              if (cachedData) {
-                const text = typeof cachedData === "string"
-                  ? cachedData
-                  : cachedData.editedText || cachedData.text || "";
-                translatedBlocks.push(text);
-              } else {
-                translatedBlocks.push(block.raw);
-              }
-            }
-
-            let content;
-            if (article.isTemp && article.blocks.length > 0) {
-              content = translatedBlocks[0] || "";
-            } else if (article.replaceContent) {
-              const joinTranslatedBlocks = (blocks) => {
-                return blocks.map(e => {
-                  if (e.startsWith("#") || (e.startsWith("<") && e.endsWith(">"))) {
-                    return e + "\n\n";
-                  }
-                  return e;
-                }).join("");
-              };
-              content = article.replaceContent.replace("${temp}", joinTranslatedBlocks(translatedBlocks));
-            } else {
-              const joinTranslatedBlocks = (blocks) => {
-                return blocks.map(e => {
-                  if (e.startsWith("#") || (e.startsWith("<") && e.endsWith(">"))) {
-                    return e + "\n\n";
-                  }
-                  return e;
-                }).join("");
-              };
-              content = joinTranslatedBlocks(translatedBlocks);
-            }
-
-            const targetPath = article.path.split("/").slice(0, -1).join("/");
-            if (targetPath) {
-              const targetDirHandle = await targetLangHandle.get(targetPath, {
-                create: "dir",
-              });
-              const fileHandle = await targetDirHandle.get(article.name, {
-                create: "file",
-              });
-              await fileHandle.write(content);
-            } else {
-              const fileHandle = await targetLangHandle.get(article.name, {
-                create: "file",
-              });
-              await fileHandle.write(content);
-            }
+          goToNext() {
+            this.emit("next-step", { composed: true });
           },
         },
         detached() {
