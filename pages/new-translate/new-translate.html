@@ -1,16 +1,57 @@
 <template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
     :host {
       display: block;
     }
+    .step-container {
+      padding-top: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+    .step {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--md-sys-color-normal);
+      margin: 0 16px;
+    }
   </style>
-  new translate
+
+  <div class="step-container">
+    <div class="step" class:active="step === 0">欢迎</div>
+    <div class="step">检查和翻译</div>
+  </div>
+
+  <o-if :value="step === 0">
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 60vh;
+      "
+    >
+      <p>
+        欢迎使用文档自动翻译工具！本工具可将您的文档从源语言翻译为您指定的所有目标语言。
+      </p>
+      <p-button on:click="step = 1"> 下一步 </p-button>
+    </div>
+  </o-if>
+  <o-else-if :value="step === 1">
+    <o-page src="./translate-all.html"></o-page>
+  </o-else-if>
+
   <script>
     export const parent = "../layout.html";
 
     export default async ({ load, query }) => {
       return {
-        data: {},
+        data: {
+          step: 0, // 0:入口提示 1: 检查翻译 2: 进行翻译 3: 检查翻译结果 4: 生成文档 5: 完成
+        },
         attached() {
           this.emit("set-active-id", {
             composed: true,
