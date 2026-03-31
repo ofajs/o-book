@@ -2,7 +2,7 @@
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
-  <l-m src="../translate/translate-block.html"></l-m>
+  <l-m src="./translate-block.html"></l-m>
   <style>
     :host {
       display: block;
@@ -632,9 +632,9 @@
 
   <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
   <script>
-    import { LANGUAGES, translate } from "../translate/util/translate.js";
-    import { getArticleData } from "../translate/util/article-data.js";
-    import { checkBlock } from "../translate/util/check-translation.js";
+    import { LANGUAGES, translate } from "./util/translate.js";
+    import { getArticleData } from "./util/article-data.js";
+    import { checkBlock } from "./util/check-translation.js";
     import { EverCache, storage } from "/gh/kirakiray/ever-cache/src/main.js";
 
     export default async ({ load }) => {
