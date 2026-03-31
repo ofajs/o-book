@@ -57,7 +57,7 @@
     .step-connector {
       width: 32px;
       height: 2px;
-      background-color: var(--md-sys-color-outline-variant);
+      background-color: var(--md-sys-color-primary);
       border-radius: 1px;
     }
   </style>
@@ -81,6 +81,11 @@
       <div class="step-connector"></div>
       <div class="step" class:active="step === 3">
         <div class="step-number">4</div>
+        <span>手动修改</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" class:active="step === 4">
+        <div class="step-number">5</div>
         <span>生成文档</span>
       </div>
     </div>
@@ -111,6 +116,9 @@
     <o-page src="./translate-checker.html" on:next-step="step = 3"></o-page>
   </o-else-if>
   <o-else-if :value="step === 3">
+    <o-page src="./translate-edit.html" on:next-step="step = 4"></o-page>
+  </o-else-if>
+  <o-else-if :value="step === 4">
     <o-page
       src="./translate-generate.html"
       on:click-go-back="clickGoBack"
