@@ -317,6 +317,15 @@
       font-size: 11px;
       color: var(--md-sys-color-on-surface-variant);
     }
+    .retry-item-model {
+      font-size: 10px;
+      color: var(--md-sys-color-primary);
+      margin-top: 2px;
+      padding: 2px 6px;
+      background-color: var(--md-sys-color-primary-container);
+      border-radius: 4px;
+      display: inline-block;
+    }
     .retry-item-preview {
       font-size: 12px;
       color: var(--md-sys-color-on-surface-variant);
@@ -447,6 +456,9 @@
                     {{$data.articleName}} - 块 #{{$data.blockIndex}}
                   </div>
                   <div class="retry-item-lang">{{$data.langName}}</div>
+                  <o-if :value="$data.model">
+                    <div class="retry-item-model">模型：{{$data.model}}</div>
+                  </o-if>
                 </div>
                 <div>
                   <o-if :value="$data.status === 'translating'">
@@ -937,6 +949,7 @@
                 langName: issueBlock.langName,
                 preview: this.getPreview(issueBlock.block.raw),
                 streamContent: "",
+                model: "",
                 status: "translating",
                 issueBlock: issueBlock,
               };
@@ -962,6 +975,9 @@
                     );
                     if (index !== -1) {
                       this.retryItems[index].streamContent = content;
+                      if (model && model !== "local") {
+                        this.retryItems[index].model = model;
+                      }
                     }
 
                     if (done) {
