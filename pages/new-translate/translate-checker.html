@@ -230,6 +230,8 @@
     .retry-dialog {
       width: 600px;
       max-width: 90vw;
+      min-height: 80vh;
+      max-height: 90vh;
     }
     .retry-title {
       font-size: 18px;
@@ -284,7 +286,6 @@
       margin-bottom: 8px;
     }
     .retry-items {
-      max-height: 250px;
       overflow-y: auto;
       margin-bottom: 16px;
     }
@@ -373,7 +374,7 @@
     }
   </style>
 
-  <p-dialog :open="isRetrying" on:click-mask="stopRetry">
+  <p-dialog :open="isRetrying">
     <div class="retry-dialog">
       <div class="retry-title">正在重试翻译异常块</div>
 
@@ -479,8 +480,8 @@
       <div class="header">
         <h3>翻译检查器</h3>
         <p>
-          由于采用 AI
-          翻译，可能会存在一些细微的翻译问题。本模块用于检查所有语言的翻译质量。
+          由于采用 AI 翻译，难免会出现一些小问题。<br />
+          这里可以帮助您发现并修复这些问题。
         </p>
       </div>
 
@@ -611,15 +612,6 @@
               :writing-lang="$host.config.writingLang"
               :project-path="$host.projectPath"
             ></translate-block>
-            <div class="block-actions">
-              <p-button
-                size="small"
-                variant="outlined"
-                on:click="$host.retrySingleBlock($data)"
-              >
-                重新翻译
-              </p-button>
-            </div>
           </div>
         </o-fill>
       </o-else>
@@ -901,7 +893,6 @@
           async retryAllIssues() {
             this.isRetrying = true;
             this.shouldStopRetry = false;
-            this.retryCompletedCount = 0;
             this.retrySuccessCount = 0;
             this.retryFailedCount = 0;
             this.retryItems = [];
