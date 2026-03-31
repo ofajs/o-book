@@ -80,8 +80,8 @@
         <span>检验</span>
       </div>
       <div class="step-connector"></div>
-      <div class="step" class:active="step === 4">
-        <div class="step-number">5</div>
+      <div class="step" class:active="step === 3">
+        <div class="step-number">4</div>
         <span>生成文档</span>
       </div>
     </div>
@@ -97,12 +97,13 @@
         align-items: center;
         justify-content: center;
         height: 60vh;
+        font-size: 22px;
       "
     >
       <p>
         欢迎使用文档自动翻译工具！本工具可将您的文档从源语言翻译为您指定的所有目标语言。
       </p>
-      <div style="display: flex">
+      <div style="display: flex; margin-top: 16px">
         <p-button on:click="step = 1"> 下一步 </p-button>
         <p-button
           on:click="editMode = true"
@@ -120,7 +121,7 @@
   <o-else-if :value="step === 2">
     <o-page src="./translate-checker.html" on:next-step="step = 3"></o-page>
   </o-else-if>
-  <o-else-if :value="step === 4">
+  <o-else-if :value="step === 3">
     <o-page
       src="./translate-generate.html"
       on:click-go-back="clickGoBack"
