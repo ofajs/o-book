@@ -145,8 +145,6 @@
     .article-lang {
       padding: 4px 12px;
       border-radius: 16px;
-      background-color: var(--md-sys-color-primary-container);
-      color: var(--md-sys-color-on-primary-container);
       font-size: 12px;
       font-weight: 500;
     }
@@ -157,21 +155,6 @@
       <div class="header">
         <h3>手动修改翻译</h3>
         <p>选择语言并编辑翻译内容</p>
-      </div>
-
-      <div class="lang-selector">
-        <div class="lang-label">选择语言</div>
-        <p-button-group>
-          <o-fill :value="targetLanguages">
-            <p-button
-              on:click="$host.setTargetLang($data)"
-              attr:variant="$host.targetLang === $data ? 'contained' : 'outlined'"
-              size="small"
-            >
-              {{$host.getLangWord($data)}}
-            </p-button>
-          </o-fill>
-        </p-button-group>
       </div>
 
       <div class="search-box">
@@ -239,7 +222,19 @@
       <o-else>
         <div class="article-header">
           <div class="article-title">{{currentArticleName}}</div>
-          <div class="article-lang">{{getLangWord(targetLang)}}</div>
+          <div class="article-lang">
+            <p-select
+              sync:value="targetLang"
+              placeholder="选择语言"
+              style="width: 120px"
+            >
+              <o-fill :value="targetLanguages">
+                <p-option attr:value="$data"
+                  >{{$host.getLangWord($data)}}</p-option
+                >
+              </o-fill>
+            </p-select>
+          </div>
         </div>
         <o-fill :value="filteredCurrentBlocks">
           <translate-block

@@ -127,11 +127,18 @@
     ></o-page>
   </o-else-if>
 
-  <p-dialog :open="editMode">
-    <o-page
-      src="./translate-edit.html"
-      style="width: 90vw; height: 90vh"
-    ></o-page>
+  <p-dialog :open="editMode" on:click-mask="editMode = false">
+    <div style="position: relative; width: 90vw; height: 90vh">
+      <o-page src="./translate-edit.html"></o-page>
+      <p-button
+        icon
+        variant="text"
+        on:click="editMode = false"
+        style="position: absolute; right: 0; top: 0; z-index: 2"
+      >
+        <n-icon icon="material-symbols:close-rounded"></n-icon>
+      </p-button>
+    </div>
   </p-dialog>
 
   <script>
@@ -157,6 +164,7 @@
               query: { ...query },
             },
           });
+          this.style.transform = "";
         },
       };
     };
