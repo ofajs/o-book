@@ -167,7 +167,7 @@
               attr:variant="$host.targetLang === $data ? 'contained' : 'outlined'"
               size="small"
             >
-              {{$data.name}}
+              {{$data}}
             </p-button>
           </o-fill>
         </p-button-group>
@@ -201,7 +201,9 @@
           >
             <div class="file-item">
               <span class="file-name">{{$data.name}}</span>
-              <span class="file-translated-count">{{$data.translatedCount}}</span>
+              <span class="file-translated-count"
+                >{{$data.translatedCount}}</span
+              >
             </div>
           </p-list-item>
         </o-fill>
@@ -236,7 +238,7 @@
       <o-else>
         <div class="article-header">
           <div class="article-title">{{currentArticleName}}</div>
-          <div class="article-lang">{{currentLangName}}</div>
+          <div class="article-lang">{{targetLang}}</div>
         </div>
         <o-fill :value="filteredCurrentBlocks">
           <translate-block
@@ -271,7 +273,6 @@
           activeArticlePath: "",
           currentBlocks: [],
           currentArticleName: "",
-          currentLangName: "",
           loading: true,
           _originArticleData: null,
           _storages: {},
@@ -360,10 +361,10 @@
           },
           async updateArticleList() {
             const articleListWithCount = [];
-            
+
             for (const article of this._originArticleData) {
               if (!article.blocks || article.blocks.length === 0) continue;
-              
+
               let translatedCount = 0;
               for (const block of article.blocks) {
                 if (block.type === "space") continue;
@@ -373,15 +374,15 @@
                   translatedCount++;
                 }
               }
-              
+
               articleListWithCount.push({
                 ...article,
                 translatedCount,
               });
             }
-            
+
             this.articleList = articleListWithCount;
-            
+
             if (this.activeArticlePath) {
               const article = articleListWithCount.find(
                 (a) => a.path === this.activeArticlePath,
@@ -397,19 +398,19 @@
           },
           async loadArticleBlocks() {
             if (!this.activeArticlePath) return;
-            
+
             const article = this._originArticleData.find(
               (a) => a.path === this.activeArticlePath,
             );
-            
+
             if (!article || !article.blocks) {
               this.currentBlocks = [];
               return;
             }
-            
+
             const storage = this.getStorage(this.targetLang);
             const blocksWithTranslation = [];
-            
+
             for (const block of article.blocks) {
               const cachedData = await storage.getItem(block.rawHash);
               blocksWithTranslation.push({
@@ -418,7 +419,7 @@
                 translation: cachedData || null,
               });
             }
-            
+
             this.currentBlocks = blocksWithTranslation;
           },
           setTargetLang(lang) {

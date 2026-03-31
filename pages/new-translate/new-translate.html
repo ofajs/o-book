@@ -1,5 +1,6 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <style>
     :host {
       display: block;
@@ -79,11 +80,6 @@
         <span>检验</span>
       </div>
       <div class="step-connector"></div>
-      <div class="step" class:active="step === 3">
-        <div class="step-number">4</div>
-        <span>手动修改</span>
-      </div>
-      <div class="step-connector"></div>
       <div class="step" class:active="step === 4">
         <div class="step-number">5</div>
         <span>生成文档</span>
@@ -106,7 +102,16 @@
       <p>
         欢迎使用文档自动翻译工具！本工具可将您的文档从源语言翻译为您指定的所有目标语言。
       </p>
-      <p-button on:click="step = 1"> 下一步 </p-button>
+      <div style="display: flex">
+        <p-button on:click="step = 1"> 下一步 </p-button>
+        <p-button
+          on:click="editMode = true"
+          style="margin-left: 8px"
+          variant="outlined"
+        >
+          编辑翻译
+        </p-button>
+      </div>
     </div>
   </o-if>
   <o-else-if :value="step === 1">
@@ -115,15 +120,19 @@
   <o-else-if :value="step === 2">
     <o-page src="./translate-checker.html" on:next-step="step = 3"></o-page>
   </o-else-if>
-  <o-else-if :value="step === 3">
-    <o-page src="./translate-edit.html" on:next-step="step = 4"></o-page>
-  </o-else-if>
   <o-else-if :value="step === 4">
     <o-page
       src="./translate-generate.html"
       on:click-go-back="clickGoBack"
     ></o-page>
   </o-else-if>
+
+  <p-dialog :open="editMode">
+    <o-page
+      src="./translate-edit.html"
+      style="width: 90vw; height: 90vh"
+    ></o-page>
+  </p-dialog>
 
   <script>
     export const parent = "../layout.html";
@@ -132,6 +141,7 @@
       return {
         data: {
           step: 0,
+          editMode: false,
           projectPath: query.path || "",
         },
         proto: {
