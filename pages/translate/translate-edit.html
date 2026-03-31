@@ -1,30 +1,86 @@
 <template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/group.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
+  <l-m src="./translate-block.html"></l-m>
   <style>
     :host {
       display: block;
       height: 100%;
     }
-
     .layout {
       display: flex;
       gap: 16px;
       height: 100%;
+      padding: 16px;
+      box-sizing: border-box;
+      overflow: hidden;
     }
     .left {
-      margin-left: 16px;
-      width: 300px;
-      height: 100%;
+      width: 320px;
       flex-shrink: 0;
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 100%;
+      padding-right: 4px;
     }
-    .search-box {
-      margin-bottom: 12px;
+    .left::-webkit-scrollbar {
+      width: 6px;
+    }
+    .left::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .left::-webkit-scrollbar-thumb {
+      background: var(--md-sys-color-outline-variant);
+      border-radius: 3px;
+    }
+    .left::-webkit-scrollbar-thumb:hover {
+      background: var(--md-sys-color-outline);
     }
     .article-content {
       flex: 1;
-      padding-right: 16px;
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 100%;
+      padding-right: 4px;
+    }
+    .article-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    .article-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .article-content::-webkit-scrollbar-thumb {
+      background: var(--md-sys-color-outline-variant);
+      border-radius: 3px;
+    }
+    .article-content::-webkit-scrollbar-thumb:hover {
+      background: var(--md-sys-color-outline);
+    }
+    .header {
+      margin-bottom: 16px;
+    }
+    .header h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .header p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .lang-selector {
+      margin-bottom: 16px;
+    }
+    .lang-label {
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-bottom: 8px;
+    }
+    .search-box {
+      margin-bottom: 12px;
     }
     p-list-item {
       border-radius: 30px;
@@ -32,10 +88,75 @@
     p-list-item[active-item] {
       background-color: var(--md-sys-color-primary-container);
     }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-translated-count {
+      padding: 2px 6px;
+      font-size: 11px;
+      border-radius: 10px;
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      font-weight: 500;
+      margin-left: 8px;
+    }
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--md-sys-color-on-surface-variant);
+      text-align: center;
+      padding: 32px;
+    }
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .article-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .article-title {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .article-lang {
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+    }
   </style>
+
   <div class="layout">
     <div class="left">
-      <h3 style="margin: 0 0 16px 0; font-size: 14px">需要翻译的文件</h3>
+      <div class="header">
+        <h3>手动修改翻译</h3>
+        <p>选择语言并编辑翻译内容</p>
+      </div>
+
       <div class="search-box">
         <p-input
           sync:value="searchKeyword"
@@ -45,6 +166,16 @@
           <n-icon slot="prefix" icon="material-symbols:search"></n-icon>
         </p-input>
       </div>
+
+      <h4
+        style="
+          margin: 16px 0 8px 0;
+          font-size: 12px;
+          color: var(--md-sys-color-on-surface-variant);
+        "
+      >
+        文章列表 ({{filteredArticleList.length}})
+      </h4>
       <p-list>
         <o-fill :value="filteredArticleList">
           <p-list-item
@@ -52,25 +183,76 @@
             on:click="$host.clickItem($data)"
             attr:active-item="$host.activeArticlePath === $data.path"
           >
-            {{$data.name}}
+            <div class="file-item">
+              <span class="file-name">{{$data.name}}</span>
+              <span class="file-translated-count"
+                >{{$data.translatedCount}}</span
+              >
+            </div>
           </p-list-item>
         </o-fill>
       </p-list>
     </div>
+
     <div class="article-content">
-      <o-fill :value="filteredCurrentBlocks">
-        <translate-block
-          :item="$data"
-          :target-lang="$host.targetLang"
-          :writing-lang="$host.config.writingLang"
-        ></translate-block>
-      </o-fill>
+      <o-if :value="loading">
+        <div class="loading">加载中...</div>
+      </o-if>
+      <o-else-if :value="!loading && !activeArticlePath">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+            />
+          </svg>
+          <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
+            选择一篇文章开始编辑
+          </div>
+          <div style="font-size: 14px">从左侧列表选择要编辑的文章</div>
+        </div>
+      </o-else-if>
+      <o-else-if :value="!loading && currentBlocks.length === 0">
+        <div class="empty-state">
+          <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
+            暂无翻译数据
+          </div>
+          <div style="font-size: 14px">该文章还没有翻译内容</div>
+        </div>
+      </o-else-if>
+      <o-else>
+        <div class="article-header">
+          <div class="article-title">{{currentArticleName}}</div>
+          <div class="article-lang">
+            <p-select
+              sync:value="targetLang"
+              placeholder="选择语言"
+              style="width: 120px"
+            >
+              <o-fill :value="targetLanguages">
+                <p-option attr:value="$data"
+                  >{{$host.getLangWord($data)}}</p-option
+                >
+              </o-fill>
+            </p-select>
+          </div>
+        </div>
+        <o-fill :value="filteredCurrentBlocks">
+          <translate-block
+            :item="$data"
+            :target-lang="$host.targetLang"
+            :writing-lang="$host.config.writingLang"
+            :project-path="$host.projectPath"
+          ></translate-block>
+        </o-fill>
+      </o-else>
     </div>
   </div>
+
+  <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
   <script>
-    import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
+    import { LANGUAGES } from "./util/translate.js";
     import { getArticleData } from "./util/article-data.js";
-    import { transformArticle } from "./util/transform.js";
+    import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
 
     export default async ({ load }) => {
       const { get } = await load("/nos/fs/main.js");
@@ -79,21 +261,34 @@
       return {
         data: {
           projectPath: "",
-          targetLang: "", // 翻译到目标语言
-          articleList: [], // 所有的文章数据
-          searchKeyword: "", // 搜索关键词
-          activeArticlePath: sessionStorage.getItem("activeArticlePath") || "", // 当前选中文章路径
-          currentBlocks: [], // 当前选中文章数据
-          _originArticleData: null, // 原始文章数据
+          config: null,
+          targetLang: "",
+          targetLanguages: [],
+          articleList: [],
+          searchKeyword: "",
+          activeArticlePath: "",
+          currentBlocks: [],
+          currentArticleName: "",
+          loading: true,
+          _originArticleData: null,
+          _storages: {},
         },
         watch: {
+          projectPath() {
+            if (this.projectPath) {
+              this.loadArticles();
+            }
+          },
           targetLang(newLang) {
             if (newLang && this.projectPath) {
-              this.loadArticle();
+              this.loadArticleBlocks();
             }
           },
         },
         proto: {
+          getLangWord(lang) {
+            return LANGUAGES[lang] || lang;
+          },
           get filteredArticleList() {
             if (!this.searchKeyword || !this.searchKeyword.trim()) {
               return this.articleList;
@@ -121,19 +316,15 @@
               return block.raw.toLowerCase().includes(keyword);
             });
           },
-          clickItem(item) {
-            this.activeArticlePath = item.path;
-            sessionStorage.setItem("activeArticlePath", item.path);
-
-            // 从_originArticleData中获取当前选中的文章数据
-            const article = this._originArticleData.find(
-              (a) => a.path === item.path,
-            );
-            if (article) {
-              this.currentBlocks = article.blocks;
+          getStorage(lang) {
+            const key = "translates-" + lang + this.projectPath;
+            if (!this._storages[key]) {
+              this._storages[key] = new EverCache(key);
             }
+            return this._storages[key];
           },
-          async loadArticle() {
+          async loadArticles() {
+            this.loading = true;
             try {
               const handle = await get(this.projectPath);
               this.config = await getData(handle);
@@ -143,35 +334,109 @@
               );
 
               if (!articleList || articleList.length === 0) {
-                console.warn("No articles found");
                 this.articleList = [];
                 this._originArticleData = null;
+                this.loading = false;
                 return;
               }
 
               this._originArticleData = articleList;
-              this.articleList = articleList.map(transformArticle);
-              if (this.activeArticlePath) {
-                const article = articleList.find(
-                  (a) => a.path === this.activeArticlePath,
-                );
-                if (article) {
-                  this.clickItem(article);
-                } else {
-                  this.clickItem(articleList[0]);
-                }
-              } else {
-                this.clickItem(articleList[0]);
+              this.targetLanguages = this.config.languages.filter(
+                (lang) => lang !== this.config.writingLang,
+              );
+
+              if (this.targetLanguages.length > 0) {
+                this.targetLang = this.targetLanguages[0];
               }
+
+              await this.updateArticleList();
             } catch (error) {
-              console.error("Failed to load article:", error);
+              console.error("Failed to load articles:", error);
               this.articleList = [];
               this._originArticleData = null;
+            } finally {
+              this.loading = false;
             }
+          },
+          async updateArticleList() {
+            const articleListWithCount = [];
+
+            for (const article of this._originArticleData) {
+              if (!article.blocks || article.blocks.length === 0) continue;
+
+              let translatedCount = 0;
+              for (const block of article.blocks) {
+                if (block.type === "space") continue;
+                const storage = this.getStorage(this.targetLang);
+                const cachedData = await storage.getItem(block.rawHash);
+                if (cachedData) {
+                  translatedCount++;
+                }
+              }
+
+              articleListWithCount.push({
+                ...article,
+                translatedCount,
+              });
+            }
+
+            this.articleList = articleListWithCount;
+
+            if (this.activeArticlePath) {
+              const article = articleListWithCount.find(
+                (a) => a.path === this.activeArticlePath,
+              );
+              if (article) {
+                this.clickItem(article);
+              } else if (articleListWithCount.length > 0) {
+                this.clickItem(articleListWithCount[0]);
+              }
+            } else if (articleListWithCount.length > 0) {
+              this.clickItem(articleListWithCount[0]);
+            }
+          },
+          async loadArticleBlocks() {
+            if (!this.activeArticlePath) return;
+
+            const article = this._originArticleData.find(
+              (a) => a.path === this.activeArticlePath,
+            );
+
+            if (!article || !article.blocks) {
+              this.currentBlocks = [];
+              return;
+            }
+
+            const storage = this.getStorage(this.targetLang);
+            const blocksWithTranslation = [];
+
+            for (const block of article.blocks) {
+              const cachedData = await storage.getItem(block.rawHash);
+              blocksWithTranslation.push({
+                ...block,
+                translated: !!cachedData,
+                translation: cachedData || null,
+              });
+            }
+
+            this.currentBlocks = blocksWithTranslation;
+          },
+          setTargetLang(lang) {
+            this.targetLang = lang;
+          },
+          clickItem(item) {
+            this.activeArticlePath = item.path;
+            this.currentArticleName = item.name;
+            this.loadArticleBlocks();
+          },
+          goToNext() {
+            this.emit("next-step", { composed: true });
           },
         },
         attached() {
-          this.loadArticle();
+          if (this.projectPath) {
+            this.loadArticles();
+          }
         },
       };
     };
