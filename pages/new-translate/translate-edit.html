@@ -167,7 +167,7 @@
               attr:variant="$host.targetLang === $data ? 'contained' : 'outlined'"
               size="small"
             >
-              {{$data}}
+              {{$host.getLangWord($data)}}
             </p-button>
           </o-fill>
         </p-button-group>
@@ -238,7 +238,7 @@
       <o-else>
         <div class="article-header">
           <div class="article-title">{{currentArticleName}}</div>
-          <div class="article-lang">{{targetLang}}</div>
+          <div class="article-lang">{{getLangWord(targetLang)}}</div>
         </div>
         <o-fill :value="filteredCurrentBlocks">
           <translate-block
@@ -290,6 +290,9 @@
           },
         },
         proto: {
+          getLangWord(lang) {
+            return LANGUAGES[lang] || lang;
+          },
           get filteredArticleList() {
             if (!this.searchKeyword || !this.searchKeyword.trim()) {
               return this.articleList;
