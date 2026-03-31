@@ -360,6 +360,7 @@
             }
 
             const targetPath = article.path.split("/").slice(0, -1).join("/");
+            
             if (targetPath) {
               const targetDirHandle = await targetLangHandle.get(targetPath, {
                 create: "dir",
@@ -367,12 +368,23 @@
               const fileHandle = await targetDirHandle.get(article.name, {
                 create: "file",
               });
-              await fileHandle.write(content);
+
+              const originContent = await fileHandle.text();
+
+              if (originContent !== content) {
+                await fileHandle.write(content);
+              }
+              
             } else {
               const fileHandle = await targetLangHandle.get(article.name, {
                 create: "file",
               });
-              await fileHandle.write(content);
+
+              const originContent = await fileHandle.text();
+
+              if (originContent !== content) {
+                await fileHandle.write(content);
+              }
             }
           },
           async retryFailed() {
@@ -407,7 +419,7 @@
             this.isGenerating = false;
           },
           goBack() {
-            this.emit("go-back");
+            this.emit("click-go-back");
           },
         },
       };

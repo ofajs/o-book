@@ -111,7 +111,10 @@
     <o-page src="./translate-checker.html" on:next-step="step = 3"></o-page>
   </o-else-if>
   <o-else-if :value="step === 3">
-    <o-page src="./translate-generate.html"></o-page>
+    <o-page
+      src="./translate-generate.html"
+      on:click-go-back="clickGoBack"
+    ></o-page>
   </o-else-if>
 
   <script>
@@ -122,6 +125,11 @@
         data: {
           step: 0,
           projectPath: query.path || "",
+        },
+        proto: {
+          clickGoBack() {
+            this.goto(`../dashboard/dashboard.html?path=${query.path}`);
+          },
         },
         attached() {
           this.emit("set-active-id", {
