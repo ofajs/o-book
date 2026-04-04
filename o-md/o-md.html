@@ -5,8 +5,8 @@
     }
   </style>
 
+<link rel="stylesheet" href="../css/github-markdown.css" />
   <link rel="stylesheet" href="../css/hljs.css" />
-  <link rel="stylesheet" href="../css/github-markdown.css" />
 
   <div :html="htmlContent" class="markdown-body"></div>
 
@@ -21,6 +21,16 @@
       const { default: hljs } = await load(
         "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm",
       );
+
+      if (!$("link[href*='hljs.css']")) {
+        const hljsUrlObj = new URL("../css/hljs.css", url);
+        $("head").push(`<link rel="stylesheet" href="${hljsUrlObj.href}" />`);
+      }
+
+      if (!$("link[href*='github-markdown.css']")) {
+        const mdUrlObj = new URL("../css/github-markdown.css", url);
+        $("head").push(`<link rel="stylesheet" href="${mdUrlObj.href}" />`);
+      }
 
       marked.use({
         renderer: {
