@@ -1,4 +1,4 @@
-<template page>
+<template component>
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
@@ -102,6 +102,7 @@
         },
         watch: {
           open(val) {
+            debugger;
             if (val) {
               this.initializing = false;
             }
