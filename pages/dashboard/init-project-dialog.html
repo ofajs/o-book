@@ -184,8 +184,12 @@
             const config = {
               name: projectName,
               writingLang: writingLang,
-              primaryLang: writingLang === "en" ? "en" : writingLang,
+              primaryLang: "en",
+              github: null,
               languages: [writingLang],
+              logoImg: "./logo.svg",
+              logoName: projectName,
+              googleAnalytics: null,
             };
 
             if (writingLang !== "en") {
