@@ -6,8 +6,9 @@
   </style>
 
   <link rel="stylesheet" href="../css/hljs.css" />
+  <link rel="stylesheet" href="../css/github-markdown.css" />
 
-  <div :html="htmlContent"></div>
+  <div :html="htmlContent" class="markdown-body"></div>
 
   <script>
     export default async ({ load, url }) => {
