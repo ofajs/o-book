@@ -4,10 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OBook</title>
-    <script src="/gh/kirakiray/ofa.js/dist/ofa.js#debug"></script>
-    <script src="/gh/kirakiray/ofa.js/libs/router/dist/router.min.js"></script>
+    <script type="module">
+      const config = await fetch("/__config")
+        .then((e) => e.json())
+        .catch(() => {
+          window.location.href = "/_install.html";
+        });
+    </script>
+    <script src="/gh/ofajs/ofa.js/dist/ofa.mjs#debug" type="module"></script>
     <script
-      src="https://core.noneos.com/_install/register.js"
+      src="/gh/ofajs/ofa.js/libs/router/dist/router.min.mjs"
       type="module"
     ></script>
     <style>
