@@ -5,17 +5,47 @@
     }
   </style>
 
+  <link rel="stylesheet" href="../../css/hljs.css" />
+
   <div :html="htmlContent"></div>
 
   <script>
-    // import { marked } from "https://cdn.jsdelivr.net/npm/marked@17.0.1/lib/marked.esm.js";
-
     export default async ({ load, url }) => {
       // url 当前模块的url
       // load 和 异步 import 的功能差不多一样，但是支持json 文件，并且和 l-m 是一样的功能
       const { marked } = await load(
         "https://cdn.jsdelivr.net/npm/marked@17.0.1/lib/marked.esm.js",
       );
+
+      const { default: hljs } = await load(
+        "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm",
+      );
+
+      marked.use({
+        renderer: {
+          code({ text, lang }) {
+            const code = text || "";
+            const language = lang || null;
+
+            if (language && hljs.getLanguage(language)) {
+              try {
+                const highlighted = hljs.highlight(code, { language }).value;
+                return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`;
+              } catch (e) {
+                console.warn(`Highlight error for language ${language}:`, e);
+              }
+            }
+
+            try {
+              const highlighted = hljs.highlightAuto(code).value;
+              return `<pre><code class="hljs">${highlighted}</code></pre>`;
+            } catch (e) {
+              console.warn("Auto highlight error:", e);
+              return `<pre><code>${code}</code></pre>`;
+            }
+          },
+        },
+      });
 
       return {
         tag: "o-md",

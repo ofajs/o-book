@@ -1,5 +1,6 @@
 @media (prefers-color-scheme: light) {
-  html {
+  html,
+  .hljs {
     --hljs-bg: #f0f0f0;
     --hljs-color: #444;
     --hljs-keyword: #000;
@@ -83,7 +84,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  html {
+  html,
+  .hljs {
     --hljs-bg: #171b21;
     --hljs-color: #dcdcdc;
     --hljs-keyword: #569cd6;
