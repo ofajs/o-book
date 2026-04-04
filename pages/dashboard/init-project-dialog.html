@@ -1,0 +1,367 @@
+<template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
+  <style>
+    .init-dialog {
+      width: 400px;
+      max-width: 90vw;
+    }
+
+    .init-form {
+      padding: 16px 0;
+    }
+
+    .form-item {
+      margin-bottom: 16px;
+    }
+
+    .form-item label {
+      display: block;
+      font-size: 12px;
+      color: var(--md-sys-color-normal);
+      margin-bottom: 4px;
+    }
+
+    .form-item p-select {
+      width: 100%;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding-top: 16px;
+    }
+
+    .hint-text {
+      font-size: 12px;
+      color: var(--md-ref-palette-normal40);
+      margin-top: 8px;
+    }
+  </style>
+
+  <p-dialog :open="open" on:click-mask="handleClose">
+    <div class="init-dialog">
+      <h3 style="margin: 0 0 8px; font-size: 16px">初始化项目</h3>
+      <p
+        style="
+          color: var(--md-ref-palette-normal40);
+          font-size: 14px;
+          margin-bottom: 16px;
+        "
+      >
+        当前目录为空或结构不正确，将为您创建基础项目结构。
+      </p>
+      <div class="init-form">
+        <div class="form-item">
+          <label>项目名称</label>
+          <p-input
+            sync:value="projectName"
+            placeholder="请输入项目名称"
+          ></p-input>
+        </div>
+        <div class="form-item">
+          <label>创作语言</label>
+          <p-select sync:value="writingLang">
+            <x-fill :value="languageOptions">
+              <p-option attr:value="$data.value">{{$data.label}}</p-option>
+            </x-fill>
+          </p-select>
+          <p class="hint-text">创作语言是您撰写文档的主要语言</p>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <p-button variant="outlined" on:click="handleClose">取消</p-button>
+        <p-button on:click="handleInit" attr:disabled="initializing">
+          {{initializing ? '初始化中...' : '确认初始化'}}
+        </p-button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <script>
+    import yaml from "/npm/js-yaml@4.1.1/dist/js-yaml.min.mjs";
+
+    export default async ({ load }) => {
+      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+      const { LANGUAGES } = await load("../translate/util/translate.js");
+
+      return {
+        data: {
+          open: false,
+          writingLang: "cn",
+          projectName: "My Documentation",
+          initializing: false,
+          _handle: null,
+          languageOptions: Object.entries(LANGUAGES).map(([value, label]) => ({
+            value,
+            label,
+          })),
+        },
+        watch: {
+          open(val) {
+            if (val) {
+              this.initializing = false;
+            }
+          },
+        },
+        proto: {
+          handleClose() {
+            this.open = false;
+          },
+          async handleInit() {
+            if (this.initializing) return;
+
+            this.initializing = true;
+
+            try {
+              await this.initProject(
+                this._handle,
+                this.writingLang,
+                this.projectName,
+              );
+
+              toast({
+                color: "success",
+                message: "项目初始化成功",
+              });
+
+              this.open = false;
+
+              this.emit("init-success", {
+                data: {
+                  handle: this._handle,
+                },
+                bubbles: true,
+                composed: true,
+              });
+            } catch (error) {
+              toast({
+                color: "error",
+                message: "初始化失败: " + error.message,
+              });
+            } finally {
+              this.initializing = false;
+            }
+          },
+          async initProject(handle, writingLang, projectName) {
+            const langDir = await handle.get(writingLang, { create: "dir" });
+
+            const configContent = this.generateRootConfig(
+              projectName,
+              writingLang,
+            );
+            const configFile = await handle.get("_config.yaml", {
+              create: "file",
+            });
+            await configFile.write(configContent);
+
+            const langConfigContent = this.generateLangConfig();
+            const langConfigFile = await langDir.get("_config.yaml", {
+              create: "file",
+            });
+            await langConfigFile.write(langConfigContent);
+
+            const indexContent = this.generateIndexHtml(
+              projectName,
+              writingLang,
+            );
+            const indexFile = await langDir.get("index.html", {
+              create: "file",
+            });
+            await indexFile.write(indexContent);
+
+            const readmeContent = this.generateReadme(writingLang);
+            const readmeFile = await langDir.get("README.md", {
+              create: "file",
+            });
+            await readmeFile.write(readmeContent);
+          },
+          generateRootConfig(projectName, writingLang) {
+            const config = {
+              name: projectName,
+              writingLang: writingLang,
+              primaryLang: writingLang === "en" ? "en" : writingLang,
+              languages: [writingLang],
+            };
+
+            if (writingLang !== "en") {
+              config.languages.push("en");
+            }
+
+            return yaml.dump(config);
+          },
+          generateLangConfig() {
+            const config = {
+              index: "./index.html",
+            };
+
+            return yaml.dump(config);
+          },
+          generateIndexHtml(projectName, writingLang) {
+            const titles = {
+              cn: `${projectName} - 文档`,
+              en: `${projectName} - Documentation`,
+              "t-cn": `${projectName} - 文檔`,
+              ja: `${projectName} - ドキュメント`,
+              ko: `${projectName} - 문서`,
+              es: `${projectName} - Documentación`,
+              fr: `${projectName} - Documentation`,
+              de: `${projectName} - Dokumentation`,
+            };
+
+            const welcomes = {
+              cn: "欢迎使用文档系统",
+              en: "Welcome to the documentation",
+              "t-cn": "歡迎使用文檔系統",
+              ja: "ドキュメントへようこそ",
+              ko: "문서에 오신 것을 환영합니다",
+              es: "Bienvenido a la documentación",
+              fr: "Bienvenue dans la documentation",
+              de: "Willkommen in der Dokumentation",
+            };
+
+            const getStarted = {
+              cn: "开始使用",
+              en: "Get Started",
+              "t-cn": "開始使用",
+              ja: "始める",
+              ko: "시작하기",
+              es: "Comenzar",
+              fr: "Commencer",
+              de: "Loslegen",
+            };
+
+            const title = titles[writingLang] || titles.en;
+            const welcome = welcomes[writingLang] || welcomes.en;
+            const startText = getStarted[writingLang] || getStarted.en;
+
+            return `<!doctype html>
+<html lang="${writingLang}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${title}</title>
+  </head>
+  <body>
+    <center-block>
+      <h2>${projectName}</h2>
+      <p>${welcome}</p>
+      <div style="padding: 16px">
+        <p-button size="large">
+          <a href="./README.md">${startText}</a>
+        </p-button>
+      </div>
+    </center-block>
+  </body>
+</html>`;
+          },
+          generateReadme(writingLang) {
+            const contents = {
+              cn: `# 欢迎
+
+这是您的第一篇文档。
+
+## 开始写作
+
+您可以在这里开始撰写您的文档内容。
+
+- 支持标准的 Markdown 语法
+- 可以创建多级目录结构
+- 支持代码高亮
+`,
+              en: `# Welcome
+
+This is your first document.
+
+## Get Started
+
+You can start writing your documentation here.
+
+- Supports standard Markdown syntax
+- Can create multi-level directory structures
+- Supports code highlighting
+`,
+              "t-cn": `# 歡迎
+
+這是您的第一篇文檔。
+
+## 開始寫作
+
+您可以在這裡開始撰寫您的文檔內容。
+
+- 支持標準的 Markdown 語法
+- 可以創建多級目錄結構
+- 支持代碼高亮
+`,
+              ja: `# ようこそ
+
+これは最初のドキュメントです。
+
+## 始めに
+
+ここからドキュメントの作成を始めましょう。
+
+- 標準のMarkdown構文をサポート
+- 複数レベルのディレクトリ構造を作成可能
+- コードハイライトをサポート
+`,
+              ko: `# 환영합니다
+
+이것은 첫 번째 문서입니다.
+
+## 시작하기
+
+여기에서 문서 작성을 시작할 수 있습니다.
+
+- 표준 Markdown 구문 지원
+- 다중 레벨 디렉토리 구조 생성 가능
+- 코드 하이라이트 지원
+`,
+              es: `# Bienvenido
+
+Este es su primer documento.
+
+## Comenzar
+
+Puede comenzar a escribir su documentación aquí.
+
+- Soporta sintaxis Markdown estándar
+- Puede crear estructuras de directorios de múltiples niveles
+- Soporta resaltado de código
+`,
+              fr: `# Bienvenue
+
+Ceci est votre premier document.
+
+## Commencer
+
+Vous pouvez commencer à rédiger votre documentation ici.
+
+- Prend en charge la syntaxe Markdown standard
+- Peut créer des structures de répertoires à plusieurs niveaux
+- Prend en charge la coloration syntaxique
+`,
+              de: `# Willkommen
+
+Dies ist Ihr erstes Dokument.
+
+## Loslegen
+
+Sie können hier mit dem Schreiben Ihrer Dokumentation beginnen.
+
+- Unterstützt Standard-Markdown-Syntax
+- Kann mehrstufige Verzeichnisstrukturen erstellen
+- Unterstützt Code-Hervorhebung
+`,
+            };
+
+            return contents[writingLang] || contents.en;
+          },
+        },
+      };
+    };
+  </script>
+</template>
