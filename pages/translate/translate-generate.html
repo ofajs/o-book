@@ -1,0 +1,428 @@
+<template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <style>
+    :host {
+      display: block;
+      height: 100%;
+      padding: 16px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .status-card {
+      padding: 24px;
+      border-radius: 12px;
+      background-color: var(--md-sys-color-surface);
+      margin-bottom: 16px;
+    }
+    .status-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: var(--md-sys-color-on-surface);
+    }
+    .status-content {
+      font-size: 14px;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-bottom: 16px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: var(--md-sys-color-surface-variant);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-fill {
+      height: 100%;
+      background-color: var(--md-sys-color-primary);
+      transition: width 0.3s ease;
+    }
+    .progress-fill.completed {
+      background-color: var(--md-sys-color-success);
+    }
+    .progress-text {
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-bottom: 8px;
+    }
+    .button-container {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    .file-list {
+      margin-top: 16px;
+      max-height: 300px;
+      overflow: auto;
+    }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background-color: var(--md-sys-color-surface-container);
+      border-radius: 4px;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    .file-name {
+      color: var(--md-sys-color-on-surface);
+    }
+    .file-lang {
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 12px;
+    }
+    .file-status {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .file-status.success {
+      background-color: var(--md-sys-color-success-container);
+      color: var(--md-sys-color-on-success-container);
+    }
+    .file-status.error {
+      background-color: var(--md-sys-color-error-container);
+      color: var(--md-sys-color-on-error-container);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+  </style>
+
+  <div class="container">
+    <o-if :value="loading">
+      <div class="status-card">
+        <div class="status-title">正在加载...</div>
+      </div>
+    </o-if>
+    <o-else-if :value="!loading && allArticles.length === 0">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div>暂无文章数据</div>
+      </div>
+    </o-else-if>
+    <o-else>
+      <div class="status-card">
+        <div class="status-title">生成翻译文档</div>
+        <div class="status-content">
+          将为 <strong>{{targetLanguages.length}}</strong> 种目标语言生成翻译文档
+        </div>
+
+        <o-if :value="isGenerating">
+          <div class="progress-bar">
+            <div class="progress-fill" :style.width="generatingProgress + '%'"></div>
+          </div>
+          <div class="progress-text">
+            {{generatingStep}} ({{generatedCount}} / {{totalToGenerate}})
+          </div>
+        </o-if>
+
+        <o-if :value="isComplete">
+          <div class="progress-bar">
+            <div class="progress-fill completed" style.width: 100%"></div>
+          </div>
+          <div class="progress-text" style="color: var(--md-sys-color-success)">
+            所有文档已生成完成！
+          </div>
+        </o-if>
+
+        <div class="button-container">
+          <o-if :value="!isGenerating && !isComplete">
+            <p-button variant="contained" on:click="startGeneration">
+              开始生成
+            </p-button>
+          </o-if>
+          <o-if :value="isComplete">
+            <p-button variant="contained" on:click="goBack">
+              返回
+            </p-button>
+          </o-if>
+        </div>
+      </div>
+
+      <o-if :value="generatedFiles.length > 0">
+        <div class="status-card">
+          <div class="status-title">已生成的文件 ({{generatedFiles.length}})</div>
+          <div class="file-list">
+            <o-fill :value="generatedFiles.slice(-10)">
+              <div class="file-item">
+                <div>
+                  <span class="file-name">{{$data.name}}</span>
+                  <span class="file-lang"> ({{$data.langName}})</span>
+                </div>
+                <span class="file-status success">成功</span>
+              </div>
+            </o-fill>
+          </div>
+        </div>
+      </o-if>
+
+      <o-if :value="failedFiles.length > 0">
+        <div class="status-card">
+          <div class="status-title" style="color: var(--md-sys-color-error)">
+            生成失败的文件 ({{failedFiles.length}})
+          </div>
+          <div class="file-list">
+            <o-fill :value="failedFiles">
+              <div class="file-item">
+                <div>
+                  <span class="file-name">{{$data.name}}</span>
+                  <span class="file-lang"> ({{$data.langName}})</span>
+                </div>
+                <span class="file-status error">失败</span>
+              </div>
+            </o-fill>
+          </div>
+          <div style="margin-top: 12px; text-align: center">
+            <p-button variant="outlined" on:click="retryFailed">
+              重试失败项
+            </p-button>
+          </div>
+        </div>
+      </o-if>
+    </o-else>
+  </div>
+
+  <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
+  <script>
+    import { LANGUAGES } from "./util/translate.js";
+    import { getArticleData } from "./util/article-data.js";
+    import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
+
+    export default async ({ load, query }) => {
+      const { get } = await load("/nos/fs/main.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+
+      return {
+        data: {
+          projectPath: "",
+          loading: true,
+          config: null,
+          allArticles: [],
+          targetLanguages: [],
+          isGenerating: false,
+          isComplete: false,
+          generatingStep: "",
+          generatedCount: 0,
+          totalToGenerate: 0,
+          generatedFiles: [],
+          failedFiles: [],
+          _storages: {},
+          _rootHandle: null,
+        },
+        watch: {
+          projectPath() {
+            if (this.projectPath) {
+              this.loadProjectData();
+            }
+          },
+        },
+        proto: {
+          get generatingProgress() {
+            if (this.totalToGenerate === 0) return 0;
+            return Math.round((this.generatedCount / this.totalToGenerate) * 100);
+          },
+          getStorage(lang) {
+            const key = "translates-" + lang + this.projectPath;
+            if (!this._storages[key]) {
+              this._storages[key] = new EverCache(key);
+            }
+            return this._storages[key];
+          },
+          async loadProjectData() {
+            this.loading = true;
+            try {
+              const handle = await get(this.projectPath);
+              this._rootHandle = handle;
+              this.config = await getData(handle);
+              const articleList = await getArticleData(
+                await handle.get(this.config.writingLang),
+                { isRoot: true },
+              );
+              this.allArticles = articleList || [];
+              this.targetLanguages = this.config.languages.filter(
+                lang => lang !== this.config.writingLang
+              );
+            } catch (error) {
+              console.error("Failed to load project data:", error);
+              this.allArticles = [];
+            } finally {
+              this.loading = false;
+            }
+          },
+          async startGeneration() {
+            this.isGenerating = true;
+            this.generatedCount = 0;
+            this.generatedFiles = [];
+            this.failedFiles = [];
+            this.generatingStep = "准备生成文件...";
+
+            try {
+              const totalFiles = this.allArticles.length * this.targetLanguages.length;
+              this.totalToGenerate = totalFiles;
+
+              for (const lang of this.targetLanguages) {
+                const langName = LANGUAGES[lang] || lang;
+                const langStorage = this.getStorage(lang);
+                const targetLangHandle = await this._rootHandle.get(lang, {
+                  create: "dir",
+                });
+
+                for (const article of this.allArticles) {
+                  this.generatingStep = `生成 ${article.name} (${langName})`;
+
+                  try {
+                    await this.generateSingleFile(article, targetLangHandle, langStorage, lang, langName);
+                    this.generatedFiles = [...this.generatedFiles, {
+                      name: article.name,
+                      lang,
+                      langName,
+                    }];
+                  } catch (error) {
+                    console.error(`Failed to generate ${article.name} for ${langName}:`, error);
+                    this.failedFiles = [...this.failedFiles, {
+                      name: article.name,
+                      lang,
+                      langName,
+                    }];
+                  }
+
+                  this.generatedCount++;
+                }
+              }
+
+              if (this.failedFiles.length === 0) {
+                this.isComplete = true;
+              }
+            } catch (error) {
+              console.error("Failed to generate files:", error);
+              alert("生成文件失败: " + error.message);
+            } finally {
+              this.isGenerating = false;
+              this.generatingStep = "";
+            }
+          },
+          async generateSingleFile(article, targetLangHandle, langStorage, lang, langName) {
+            const translatedBlocks = [];
+
+            for (const block of article.blocks) {
+              if (block.type === "space") {
+                translatedBlocks.push(block.raw);
+                continue;
+              }
+
+              const cachedData = await langStorage.getItem(block.rawHash);
+              if (cachedData) {
+                const text = typeof cachedData === "string"
+                  ? cachedData
+                  : cachedData.editedText || cachedData.text || "";
+                translatedBlocks.push(text);
+              } else {
+                translatedBlocks.push(block.raw);
+              }
+            }
+
+            let content;
+            if (article.isTemp && article.blocks.length > 0) {
+              content = translatedBlocks[0] || "";
+            } else if (article.replaceContent) {
+              const joinTranslatedBlocks = (blocks) => {
+                return blocks.map(e => {
+                  if (e.startsWith("#") || (e.startsWith("<") && e.endsWith(">"))) {
+                    return e + "\n\n";
+                  }
+                  return e;
+                }).join("");
+              };
+              content = article.replaceContent.replace("${temp}", joinTranslatedBlocks(translatedBlocks));
+            } else {
+              const joinTranslatedBlocks = (blocks) => {
+                return blocks.map(e => {
+                  if (e.startsWith("#") || (e.startsWith("<") && e.endsWith(">"))) {
+                    return e + "\n\n";
+                  }
+                  return e;
+                }).join("");
+              };
+              content = joinTranslatedBlocks(translatedBlocks);
+            }
+
+            const targetPath = article.path.split("/").slice(0, -1).join("/");
+            
+            if (targetPath) {
+              const targetDirHandle = await targetLangHandle.get(targetPath, {
+                create: "dir",
+              });
+              const fileHandle = await targetDirHandle.get(article.name, {
+                create: "file",
+              });
+
+              const originContent = await fileHandle.text();
+
+              if (originContent !== content) {
+                await fileHandle.write(content);
+              }
+              
+            } else {
+              const fileHandle = await targetLangHandle.get(article.name, {
+                create: "file",
+              });
+
+              const originContent = await fileHandle.text();
+
+              if (originContent !== content) {
+                await fileHandle.write(content);
+              }
+            }
+          },
+          async retryFailed() {
+            this.isGenerating = true;
+            this.generatingStep = "重试失败的文件...";
+
+            const itemsToRetry = [...this.failedFiles];
+            this.failedFiles = [];
+
+            for (const item of itemsToRetry) {
+              const langStorage = this.getStorage(item.lang);
+              const article = this.allArticles.find(a => a.name === item.name);
+              
+              if (!article) continue;
+
+              try {
+                const targetLangHandle = await this._rootHandle.get(item.lang, {
+                  create: "dir",
+                });
+                await this.generateSingleFile(article, targetLangHandle, langStorage, item.lang, item.langName);
+                this.generatedFiles = [...this.generatedFiles, item];
+              } catch (error) {
+                console.error(`Retry failed for ${item.name}:`, error);
+                this.failedFiles = [...this.failedFiles, item];
+              }
+            }
+
+            if (this.failedFiles.length === 0) {
+              this.isComplete = true;
+            }
+
+            this.isGenerating = false;
+          },
+          goBack() {
+            this.emit("click-go-back");
+          },
+        },
+      };
+    };
+  </script>
+</template>

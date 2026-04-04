@@ -1,1 +1,0 @@
-這個組件用於展示多個文件，可以預覽其中的一個HTML頁面。在組件中，`main`屬性的`<a>`標簽代表首先選中的文件，而`previewer`代表要預覽的HTML文件。您可以參考[ofa.js官網源代碼](https://github.com/kirakiray/ofa-v4-docs/edit/main/docs/en/index.md)中的使用示例：

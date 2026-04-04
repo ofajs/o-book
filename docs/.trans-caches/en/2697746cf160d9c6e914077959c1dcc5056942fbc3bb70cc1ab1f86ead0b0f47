@@ -1,7 +1,0 @@
-```html
-<files-viewer style="width:100%">
-    <a href="../footer.html" preview></a>
-    <a href="../en/config.json" main></a>
-    <a href="../publics/logo.svg"></a>
-</files-viewer>
-```

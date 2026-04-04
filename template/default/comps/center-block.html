@@ -1,0 +1,52 @@
+<template component>
+  <style>
+    :host {
+      display: block;
+      padding: 128px 16px;
+    }
+
+    .container {
+      max-width: var(--container-max-width, 1200px);
+      display: block;
+      /* display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center; */
+      text-align: center;
+      margin: 0 auto;
+    }
+
+    ::slotted(p) {
+      font-size: 20px;
+    }
+
+    ::slotted(h2) {
+      font-size: 36px;
+    }
+  </style>
+  <match-var pui-real-theme="dark">
+    <style>
+      :host(:nth-of-type(2n)) {
+        background-color: var(--md-ref-palette-primary20);
+      }
+    </style>
+  </match-var>
+  <match-var pui-real-theme="light">
+    <style>
+      :host(:nth-of-type(2n)) {
+        background-color: var(--md-ref-palette-primary90);
+      }
+    </style>
+  </match-var>
+  <div class="container">
+    <slot></slot>
+  </div>
+  <script>
+    export default async ({ load }) => {
+      return {
+        tag: "center-block",
+        data: {},
+      };
+    };
+  </script>
+</template>

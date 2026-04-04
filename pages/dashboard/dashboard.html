@@ -1,0 +1,289 @@
+<template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/progress/progress.html"></l-m>
+  <style>
+    :host {
+      display: block;
+    }
+
+    .toolbar {
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+    }
+
+    .toolbar-btn {
+      margin-left: 8px;
+    }
+  </style>
+  <div class="toolbar">
+    <p-select
+      attr:disabled="generating"
+      sync:value="lang"
+      style="width: 200px; margin-right: 16px"
+    >
+      <label> 切换语言 </label>
+      <o-fill :value="languages">
+        <p-option attr:value="$data">{{$host.languageMap[$data]}}</p-option>
+      </o-fill>
+    </p-select>
+    <p-button
+      class="toolbar-btn"
+      on:click="openConfigDialog"
+      variant="outlined"
+      attr:disabled="generating"
+    >
+      <n-icon icon="material-symbols:settings" slot="prefix"></n-icon>
+      项目配置
+    </p-button>
+    <p-button
+      class="toolbar-btn"
+      on:click="openAnalyticsDialog"
+      variant="outlined"
+      attr:disabled="generating"
+    >
+      <n-icon icon="material-symbols:analytics" slot="prefix"></n-icon>
+      谷歌统计
+    </p-button>
+    <p-button
+      variant="outlined"
+      style="margin-left: 8px"
+      on:click="generateAll"
+      attr:disabled="generating"
+    >
+      <x-if :value="generating">
+        <p-progress
+          type="circle"
+          slot="prefix"
+          style="--circle-size: 20"
+          attr:value="generatingProgress"
+          variant="determinate"
+        ></p-progress>
+      </x-if>
+      <x-else>
+        <n-icon icon="hugeicons:ai-content-generator-01" slot="prefix"></n-icon>
+      </x-else>
+      重新生成全站页面
+    </p-button>
+  </div>
+
+  <o-page
+    :project-path="projectPath"
+    :lang="finalLang"
+    src="./article-list.html"
+  ></o-page>
+
+  <o-page
+    src="./project-config-dialog.html"
+    sync:open="showConfigDialog"
+    :project-path="projectPath"
+    on:config-saved="onConfigSaved"
+  ></o-page>
+
+  <o-page
+    src="./analytics-dialog.html"
+    sync:open="showAnalyticsDialog"
+    :project-path="projectPath"
+  ></o-page>
+
+  <script>
+    export const parent = "../layout.html";
+
+    export default async ({ load, query }) => {
+      const { get } = await load("/nos/fs/handle/mount/mount.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+      const { getArticleData } = await load(
+        "../translate/util/article-data.js",
+      );
+      const { EverCache } = await load("/gh/kirakiray/ever-cache/src/main.js");
+      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+      const { LANGUAGES } = await load("../translate/util/translate.js");
+      const { buildWebsite } = await load("./generate.js");
+
+      const storages = {};
+      const getStorage = (lang, projectPath) => {
+        const key = "translates-" + lang + projectPath;
+        if (storages[key]) {
+          return storages[key];
+        }
+        const storage = (storages[key] = new EverCache(key));
+        return storage;
+      };
+
+      return {
+        data: {
+          showConfigDialog: false,
+          showAnalyticsDialog: false,
+          projectPath: query.path,
+          lang: sessionStorage.getItem(`dashboard-lang-${query.path}`) || "cn",
+          finalLang:
+            sessionStorage.getItem(`dashboard-lang-${query.path}`) || "cn",
+          _storage: null,
+          _checkingLang: false,
+          languageMap: LANGUAGES,
+          languages: [],
+          generating: false,
+          generatingProgress: 0,
+        },
+        watch: {
+          async lang(newLang) {
+            if (this._checkingLang) return;
+            if (newLang === this.finalLang) return;
+
+            this._checkingLang = true;
+
+            const oldLang = this.finalLang;
+            const handle = await get(this.projectPath);
+            const config = await getData(handle);
+
+            if (newLang === config.writingLang) {
+              this.finalLang = newLang;
+              sessionStorage.setItem(
+                `dashboard-lang-${this.projectPath}`,
+                newLang,
+              );
+              this._checkingLang = false;
+              return;
+            }
+
+            const storage = getStorage(newLang, this.projectPath);
+
+            const articleList = await getArticleData(
+              await handle.get(config.writingLang),
+              { isRoot: true },
+            );
+
+            let total = 0;
+            let translated = 0;
+
+            for (const article of articleList || []) {
+              if (
+                article.isTemp &&
+                article.blocks &&
+                article.blocks.length > 0
+              ) {
+                total++;
+                const cachedData = await storage.getItem(
+                  article.blocks[0].rawHash,
+                );
+                if (cachedData) {
+                  translated++;
+                }
+              } else if (article.blocks && article.blocks.length > 0) {
+                for (const block of article.blocks) {
+                  if (block.type === "space") continue;
+                  total++;
+                  const cachedData = await storage.getItem(block.rawHash);
+                  if (cachedData) {
+                    translated++;
+                  }
+                }
+              }
+            }
+
+            const untranslatedCount = total - translated;
+            const isCompleted = untranslatedCount === 0 && total > 0;
+
+            if (isCompleted) {
+              this.finalLang = newLang;
+              sessionStorage.setItem(
+                `dashboard-lang-${this.projectPath}`,
+                newLang,
+              );
+            } else {
+              this.lang = oldLang;
+              toast({
+                color: "error",
+                message: `翻译未完成，还有 ${untranslatedCount} 个内容块待翻译，无法切换语言`,
+              });
+            }
+
+            this._checkingLang = false;
+          },
+        },
+        proto: {
+          openConfigDialog() {
+            this.showConfigDialog = true;
+          },
+          openAnalyticsDialog() {
+            this.showAnalyticsDialog = true;
+          },
+          async reloadLangs() {
+            const handle = await get(this.projectPath);
+            const config = await getData(handle);
+            this.languages = config.languages || [];
+            this.lang = config.writingLang;
+            this.finalLang = config.writingLang;
+          },
+          onConfigSaved() {
+            this.reloadLangs();
+          },
+          async generateAll() {
+            if (this.generating) return;
+
+            this.generating = true;
+            this.generatingProgress = 0;
+
+            const handle = await get(this.projectPath);
+            const config = await getData(handle);
+            const languages = config.languages || [];
+
+            if (languages.length === 0) {
+              toast({
+                color: "error",
+                message: "没有配置任何语言",
+              });
+              this.generating = false;
+              return;
+            }
+
+            const websiteHandle = await handle.get("website", {
+              create: "dir",
+            });
+
+            let completed = 0;
+            const total = languages.length;
+
+            for (const lang of languages) {
+              try {
+                await buildWebsite({
+                  topHandle: handle,
+                  lang,
+                  websiteHandle,
+                });
+              } catch (e) {
+                console.error(`生成 ${lang} 失败:`, e);
+                toast({
+                  color: "error",
+                  message: `生成 ${LANGUAGES[lang] || lang} 失败`,
+                });
+              }
+              completed++;
+              this.generatingProgress = Math.round((completed / total) * 100);
+            }
+
+            this.generating = false;
+
+            toast({
+              color: "success",
+              message: "所有语言生成完成",
+            });
+          },
+        },
+        attached() {
+          this.emit("set-active-id", {
+            composed: true,
+            data: {
+              name: "dashboard",
+              query: { ...query },
+            },
+          });
+
+          this.reloadLangs();
+        },
+        detached() {},
+      };
+    };
+  </script>
+</template>

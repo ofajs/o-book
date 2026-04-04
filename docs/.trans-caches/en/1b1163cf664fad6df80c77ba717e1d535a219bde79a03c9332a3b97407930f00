@@ -1,1 +1,0 @@
-This component is used to preview HTML code. You can place multiple code blocks in it, and the final preview effect is that all code blocks are concatenated in order. You can refer to the usage example in the [ofa.js official website source code](https://github.com/kirakiray/ofa-v4-docs/edit/main/docs/en/index.md):

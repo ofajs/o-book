@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OBook</title>
+    <script src="/gh/kirakiray/ofa.js/dist/ofa.js#debug"></script>
+    <script src="/gh/kirakiray/ofa.js/libs/router/dist/router.min.js"></script>
+    <script
+      src="https://core.noneos.com/_install/register.js"
+      type="module"
+    ></script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          Segoe UI,
+          Microsoft Yahei,
+          Helvetica,
+          Arial,
+          sans-serif,
+          Apple Color Emoji,
+          Segoe UI Emoji;
+      }
+    </style>
+    <link rel="stylesheet" href="css/palette.css" pui-colors="" />
+    <link rel="stylesheet" href="css/theme.css" />
+  </head>
+
+  <body>
+    <o-router fix-body>
+      <o-app src="./app-config.js"></o-app>
+    </o-router>
+  </body>
+</html>

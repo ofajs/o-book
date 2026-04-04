@@ -1,0 +1,485 @@
+<template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <style>
+    :host {
+      display: block;
+      height: 100%;
+      padding: 16px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .header {
+      margin-bottom: 16px;
+    }
+    .header h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .header p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .stats-card {
+      padding: 16px;
+      background-color: var(--md-sys-color-surface-container-highest);
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .stats-row {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 12px;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--md-sys-color-primary);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .progress-section {
+      margin-bottom: 16px;
+    }
+    .progress-bar {
+      height: 8px;
+      background-color: var(--md-sys-color-surface-container-highest);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-fill {
+      height: 100%;
+      background-color: var(--md-sys-color-primary);
+      transition: width 0.3s ease;
+    }
+    .progress-text {
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .file-list {
+      flex: 1;
+      overflow: auto;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: 8px;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+    .file-item:last-child {
+      border-bottom: none;
+    }
+    .file-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .file-icon.pending {
+      color: var(--md-sys-color-normal);
+    }
+    .file-icon.success {
+      color: var(--md-sys-color-success);
+    }
+    .file-icon.error {
+      color: var(--md-sys-color-error);
+    }
+    .file-name {
+      flex: 1;
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-status {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 12px;
+    }
+    .file-status.pending {
+      background-color: var(--md-sys-color-surface-container-highest);
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .file-status.success {
+      background-color: var(--md-sys-color-success-container);
+      color: var(--md-sys-color-on-success-container);
+    }
+    .file-status.error {
+      background-color: var(--md-sys-color-error-container);
+      color: var(--md-sys-color-on-error-container);
+    }
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--md-sys-color-on-surface-variant);
+      text-align: center;
+    }
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+  </style>
+  <div class="container">
+    <o-if :value="loading">
+      <div class="loading">加载中...</div>
+    </o-if>
+    <o-else>
+      <div class="header">
+        <h3>生成翻译文档</h3>
+        <p>将所有翻译后的内容生成到目标语言目录 ({{targetLang}})</p>
+      </div>
+
+      <div class="stats-card">
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-value">{{stats.totalFiles}}</div>
+            <div class="stat-label">总文件数</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" style="color: var(--md-sys-color-success)">{{stats.translatedBlocks}}</div>
+            <div class="stat-label">已翻译块</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" style="color: var(--md-sys-color-error)">{{stats.untranslatedBlocks}}</div>
+            <div class="stat-label">未翻译块</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" style="color: var(--md-sys-color-success)">{{stats.generatedFiles}}</div>
+            <div class="stat-label">已生成</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <p-button
+          variant="contained"
+          on:click="generateFiles"
+          attr:disabled="generating || stats.translatedBlocks === 0"
+        >
+          <o-if :value="generating">生成中...</o-if>
+          <o-else>生成翻译文档</o-else>
+        </p-button>
+        <p-button
+          variant="outlined"
+          on:click="refreshStatus"
+          attr:disabled="generating"
+        >
+          刷新状态
+        </p-button>
+      </div>
+
+      <o-if :value="generating">
+        <div class="progress-section">
+          <div class="progress-bar">
+            <div class="progress-fill" :style.width="progressPercent + '%'"></div>
+          </div>
+          <div class="progress-text">
+            正在生成: {{currentFile || '准备中...'}} ({{generatedCount}}/{{totalToGenerate}})
+          </div>
+        </div>
+      </o-if>
+
+      <div class="file-list">
+        <o-fill :value="fileList">
+          <div class="file-item">
+            <o-if :value="$data.status === 'pending'">
+              <svg class="file-icon pending" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+              </svg>
+            </o-if>
+            <o-else-if :value="$data.status === 'success'">
+              <svg class="file-icon success" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+              </svg>
+            </o-else-if>
+            <o-else>
+              <svg class="file-icon error" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+            </o-else>
+            <div class="file-name">{{$data.name}}</div>
+            <div class="file-status" :class="$data.status">
+              <o-if :value="$data.status === 'pending'">待生成</o-if>
+              <o-else-if :value="$data.status === 'success'">已生成</o-if>
+              <o-else>失败</o-else>
+            </div>
+          </div>
+        </o-fill>
+      </div>
+    </o-else>
+  </div>
+
+  <o-consumer name="project-data" watch:project-path="projectPath"></o-consumer>
+  <script>
+    import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
+    import { getArticleData } from "./util/article-data.js";
+    import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
+
+    export default async ({ load }) => {
+      const { get } = await load("/nos/fs/main.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+
+      return {
+        data: {
+          projectPath: "",
+          targetLang: "",
+          loading: true,
+          generating: false,
+          allArticles: [],
+          fileList: [],
+          stats: {
+            totalFiles: 0,
+            translatedBlocks: 0,
+            untranslatedBlocks: 0,
+            generatedFiles: 0,
+          },
+          generatedCount: 0,
+          totalToGenerate: 0,
+          currentFile: "",
+          config: null,
+          _storage: null,
+          _rootHandle: null,
+        },
+        watch: {
+          projectPath() {
+            if (this.projectPath) {
+              this._storage = getStorage(this.targetLang + this.projectPath);
+              this.loadArticles();
+            }
+          },
+          targetLang(newLang) {
+            if (newLang && this.projectPath) {
+              this._storage = getStorage(newLang + this.projectPath);
+              this.loadArticles();
+            }
+          },
+        },
+        proto: {
+          get progressPercent() {
+            if (this.totalToGenerate === 0) return 0;
+            return Math.round((this.generatedCount / this.totalToGenerate) * 100);
+          },
+          async loadArticles() {
+            try {
+              this.loading = true;
+              const handle = await get(this.projectPath);
+              this._rootHandle = handle;
+              this.config = await getData(handle);
+              const articleList = await getArticleData(
+                await handle.get(this.config.writingLang),
+                { isRoot: true },
+              );
+
+              if (!articleList || articleList.length === 0) {
+                this.allArticles = [];
+                this.fileList = [];
+                this.loading = false;
+                return;
+              }
+
+              this.allArticles = articleList;
+              await this.checkTranslationStatus();
+            } catch (error) {
+              console.error("Failed to load articles:", error);
+              this.allArticles = [];
+              this.fileList = [];
+            } finally {
+              this.loading = false;
+            }
+          },
+          async checkTranslationStatus() {
+            let totalFiles = this.allArticles.length;
+            let translatedBlocks = 0;
+            let untranslatedBlocks = 0;
+            const fileList = [];
+
+            for (const article of this.allArticles) {
+              let articleTranslated = 0;
+              let articleTotal = 0;
+
+              if (article.isTemp && article.blocks && article.blocks.length > 0) {
+                articleTotal = 1;
+                const cachedData = await this._storage.getItem(article.blocks[0].rawHash);
+                if (cachedData) {
+                  articleTranslated = 1;
+                  translatedBlocks++;
+                } else {
+                  untranslatedBlocks++;
+                }
+              } else if (article.blocks && article.blocks.length > 0) {
+                for (const block of article.blocks) {
+                  if (block.type === "space") continue;
+                  articleTotal++;
+                  const cachedData = await this._storage.getItem(block.rawHash);
+                  if (cachedData) {
+                    articleTranslated++;
+                    translatedBlocks++;
+                  } else {
+                    untranslatedBlocks++;
+                  }
+                }
+              }
+
+              fileList.push({
+                name: article.name,
+                path: article.path,
+                realPath: article.realPath,
+                isTemp: article.isTemp,
+                blocks: article.blocks,
+                replaceContent: article.replaceContent,
+                translatedBlocks: articleTranslated,
+                totalBlocks: articleTotal,
+                status: articleTranslated === articleTotal ? "pending" : "pending",
+              });
+            }
+
+            this.fileList = fileList;
+            this.stats = {
+              totalFiles,
+              translatedBlocks,
+              untranslatedBlocks,
+              generatedFiles: 0,
+            };
+          },
+          async refreshStatus() {
+            await this.loadArticles();
+          },
+          async generateFiles() {
+            this.generating = true;
+            this.generatedCount = 0;
+            this.totalToGenerate = this.fileList.length;
+            this.stats.generatedFiles = 0;
+
+            try {
+              const targetLangHandle = await this._rootHandle.get(this.targetLang, {
+                create: "dir",
+              });
+
+              for (const fileItem of this.fileList) {
+                this.currentFile = fileItem.name;
+
+                try {
+                  await this.generateSingleFile(fileItem, targetLangHandle);
+                  fileItem.status = "success";
+                  this.stats.generatedFiles++;
+                } catch (error) {
+                  console.error(`Failed to generate ${fileItem.name}:`, error);
+                  fileItem.status = "error";
+                }
+
+                this.generatedCount++;
+                this.fileList = [...this.fileList];
+              }
+            } catch (error) {
+              console.error("Failed to generate files:", error);
+            } finally {
+              this.generating = false;
+              this.currentFile = "";
+            }
+          },
+          async generateSingleFile(fileItem, targetLangHandle) {
+            const joinTranslatedBlocks = (blocks) => {
+              return blocks.map(e=>{
+                if(e.startsWith("#") || (e.startsWith("<") && e.endsWith(">"))) {
+                    return e + "\n\n";
+                }
+                return e;
+              }).join("");
+            };
+
+            const translatedBlocks = [];
+
+            for (const block of fileItem.blocks) {
+              if (block.type === "space") {
+                translatedBlocks.push(block.raw);
+                continue;
+              }
+
+              const cachedData = await this._storage.getItem(block.rawHash);
+              if (cachedData) {
+                const text = typeof cachedData === "string"
+                  ? cachedData
+                  : cachedData.editedText || cachedData.text || "";
+                translatedBlocks.push(text);
+              } else {
+                translatedBlocks.push(block.raw);
+              }
+            }
+
+            let content;
+            if (fileItem.isTemp && fileItem.blocks.length > 0) {
+              content = translatedBlocks[0] || "";
+            } else if (fileItem.replaceContent) {
+              content = fileItem.replaceContent.replace("${temp}", joinTranslatedBlocks(translatedBlocks));
+            } else {
+              content = joinTranslatedBlocks(translatedBlocks);
+            }
+
+            const pathParts = fileItem.path.split("/");
+            let currentHandle = targetLangHandle;
+
+            for (let i = 0; i < pathParts.length - 1; i++) {
+              currentHandle = await currentHandle.get(pathParts[i], {
+                create: "dir",
+              });
+            }
+
+            const fileName = pathParts[pathParts.length - 1];
+            const outputFileHandle = await currentHandle.get(fileName, {
+              create: "file",
+            });
+
+            const existingContent = await outputFileHandle.text().catch(() => "");
+
+            if (existingContent === content) {
+              return;
+            }
+
+
+            await outputFileHandle.write(content);
+          },
+        },
+      };
+    };
+
+    const storages = {};
+    const getStorage = (projectPath) => {
+      const key = "translates-" + projectPath;
+      if (storages[key]) {
+        return storages[key];
+      }
+      const storage = (storages[key] = new EverCache(key));
+      return storage;
+    };
+  </script>
+</template>

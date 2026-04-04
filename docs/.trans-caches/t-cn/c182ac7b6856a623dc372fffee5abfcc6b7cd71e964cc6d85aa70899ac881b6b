@@ -1,7 +1,0 @@
-```html
-<!-- /publics/my-comp.html -->
-<!-- 您開發的自定義組件 -->
-<template component>
-  ...
-</template>
-```

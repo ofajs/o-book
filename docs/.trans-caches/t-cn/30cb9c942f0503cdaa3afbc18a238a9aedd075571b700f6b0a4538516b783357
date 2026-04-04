@@ -1,1 +1,0 @@
-由於 obook 基於 [ofa.js](https://ofajs.com/) 開發，因此 obook 文檔支持使用 [ofa.js](https://ofajs.com/) 開發的組件。您可以使用 `l-m` 組件來引用這些自定義組件，並通過像使用 HTML 標簽一樣將其包裹起來。以下是一個使用 [simp-block](https://cdn.jsdelivr.net/npm/obook/blocks/simp-block.html) 組件的示例：

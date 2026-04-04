@@ -1,5 +1,0 @@
-1. Open the [LiveServer](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension page, click install, and then VSCode will automatically open and install the extension.
-
-2. Unzip the downloaded project and open the folder with VSCode.
-
-3. In VSCode, right-click on the `_preview.html` file in the root directory and select `open with live server`. After the page is initialized, you can click on the links on the page to preview.

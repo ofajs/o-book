@@ -1,0 +1,179 @@
+<template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
+  <style>
+    :host {
+      display: block;
+      height: 100%;
+    }
+
+    .layout {
+      display: flex;
+      gap: 16px;
+      height: 100%;
+    }
+    .left {
+      margin-left: 16px;
+      width: 300px;
+      height: 100%;
+      flex-shrink: 0;
+      overflow: auto;
+    }
+    .search-box {
+      margin-bottom: 12px;
+    }
+    .article-content {
+      flex: 1;
+      padding-right: 16px;
+      overflow: auto;
+    }
+    p-list-item {
+      border-radius: 30px;
+    }
+    p-list-item[active-item] {
+      background-color: var(--md-sys-color-primary-container);
+    }
+  </style>
+  <div class="layout">
+    <div class="left">
+      <h3 style="margin: 0 0 16px 0; font-size: 14px">需要翻译的文件</h3>
+      <div class="search-box">
+        <p-input
+          sync:value="searchKeyword"
+          placeholder="搜索文章内容..."
+          style="width: 100%"
+        >
+          <n-icon slot="prefix" icon="material-symbols:search"></n-icon>
+        </p-input>
+      </div>
+      <p-list>
+        <o-fill :value="filteredArticleList">
+          <p-list-item
+            button
+            on:click="$host.clickItem($data)"
+            attr:active-item="$host.activeArticlePath === $data.path"
+          >
+            {{$data.name}}
+          </p-list-item>
+        </o-fill>
+      </p-list>
+    </div>
+    <div class="article-content">
+      <o-fill :value="filteredCurrentBlocks">
+        <translate-block
+          :item="$data"
+          :target-lang="$host.targetLang"
+          :writing-lang="$host.config.writingLang"
+        ></translate-block>
+      </o-fill>
+    </div>
+  </div>
+  <script>
+    import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
+    import { getArticleData } from "./util/article-data.js";
+    import { transformArticle } from "./util/transform.js";
+
+    export default async ({ load }) => {
+      const { get } = await load("/nos/fs/main.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+
+      return {
+        data: {
+          projectPath: "",
+          targetLang: "", // 翻译到目标语言
+          articleList: [], // 所有的文章数据
+          searchKeyword: "", // 搜索关键词
+          activeArticlePath: sessionStorage.getItem("activeArticlePath") || "", // 当前选中文章路径
+          currentBlocks: [], // 当前选中文章数据
+          _originArticleData: null, // 原始文章数据
+        },
+        watch: {
+          targetLang(newLang) {
+            if (newLang && this.projectPath) {
+              this.loadArticle();
+            }
+          },
+        },
+        proto: {
+          get filteredArticleList() {
+            if (!this.searchKeyword || !this.searchKeyword.trim()) {
+              return this.articleList;
+            }
+            const keyword = this.searchKeyword.toLowerCase().trim();
+            return this.articleList.filter((article) => {
+              if (!this._originArticleData) return false;
+              const originArticle = this._originArticleData.find(
+                (a) => a.path === article.path,
+              );
+              if (!originArticle || !originArticle.blocks) return false;
+              return originArticle.blocks.some((block) => {
+                if (!block.raw) return false;
+                return block.raw.toLowerCase().includes(keyword);
+              });
+            });
+          },
+          get filteredCurrentBlocks() {
+            if (!this.searchKeyword || !this.searchKeyword.trim()) {
+              return this.currentBlocks;
+            }
+            const keyword = this.searchKeyword.toLowerCase().trim();
+            return this.currentBlocks.filter((block) => {
+              if (!block.raw) return false;
+              return block.raw.toLowerCase().includes(keyword);
+            });
+          },
+          clickItem(item) {
+            this.activeArticlePath = item.path;
+            sessionStorage.setItem("activeArticlePath", item.path);
+
+            // 从_originArticleData中获取当前选中的文章数据
+            const article = this._originArticleData.find(
+              (a) => a.path === item.path,
+            );
+            if (article) {
+              this.currentBlocks = article.blocks;
+            }
+          },
+          async loadArticle() {
+            try {
+              const handle = await get(this.projectPath);
+              this.config = await getData(handle);
+              const articleList = await getArticleData(
+                await handle.get(this.config.writingLang),
+                { isRoot: true },
+              );
+
+              if (!articleList || articleList.length === 0) {
+                console.warn("No articles found");
+                this.articleList = [];
+                this._originArticleData = null;
+                return;
+              }
+
+              this._originArticleData = articleList;
+              this.articleList = articleList.map(transformArticle);
+              if (this.activeArticlePath) {
+                const article = articleList.find(
+                  (a) => a.path === this.activeArticlePath,
+                );
+                if (article) {
+                  this.clickItem(article);
+                } else {
+                  this.clickItem(articleList[0]);
+                }
+              } else {
+                this.clickItem(articleList[0]);
+              }
+            } catch (error) {
+              console.error("Failed to load article:", error);
+              this.articleList = [];
+              this._originArticleData = null;
+            }
+          },
+        },
+        attached() {
+          this.loadArticle();
+        },
+      };
+    };
+  </script>
+</template>

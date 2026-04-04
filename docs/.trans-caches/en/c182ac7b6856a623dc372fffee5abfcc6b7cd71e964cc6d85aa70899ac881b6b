@@ -1,7 +1,0 @@
-```html
-<!-- /publics/my-comp.html -->
-<!-- Your custom component that you developed -->
-<template component>
-  ...
-</template>
-```

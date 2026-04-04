@@ -1,1 +1,0 @@
-這是一個專門用於預覽ofa.js組件的組件。您可以在其中指定組件名稱（`comp-name`），然後插入組件代碼塊。您可以參考[ofa.js官網源代碼](https://github.com/kirakiray/ofa-v4-docs/edit/main/docs/en/index.md)中的使用示例：

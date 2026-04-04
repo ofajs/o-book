@@ -1,0 +1,181 @@
+<template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/group.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
+  <l-m src="./translate-block.html"></l-m>
+  <style>
+    :host {
+      display: block;
+      height: 100%;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      height: 50px;
+      font-size: 14px;
+    }
+    .article-content {
+      position: relative;
+      flex: 1;
+    }
+    .article-content o-page {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <div class="container">
+    <div class="top">
+      <div>
+        写作语言:
+        <span style="color: var(--md-sys-color-primary)">
+          {{languageMap[config.writingLang]}}
+        </span>
+      </div>
+      <div style="margin-left: 16px; display: flex; align-items: center">
+        翻译到:
+        <p-select size="small" sync:value="targetLang">
+          <x-fill :value="targetLangOptions">
+            <p-option attr:value="$data">{{$host.languageMap[$data]}}</p-option>
+          </x-fill>
+        </p-select>
+      </div>
+      <p-button-group size="small" style="margin-left: 16px">
+        <p-button
+          on:click="changeActiveId('translate-all')"
+          attr:variant="activeId === 'translate-all' ? 'contained' : 'outlined'"
+        >
+          翻译全部
+        </p-button>
+        <p-button
+          on:click="changeActiveId('checker')"
+          attr:variant="activeId === 'checker' ? 'contained' : 'outlined'"
+        >
+          检查翻译
+        </p-button>
+        <p-button
+          on:click="changeActiveId('build-file')"
+          attr:variant="activeId === 'build-file' ? 'contained' : 'outlined'"
+        >
+          生成翻译文档
+        </p-button>
+        <p-button
+          on:click="changeActiveId('edit')"
+          attr:variant="activeId === 'edit' ? 'contained' : 'outlined'"
+        >
+          编辑部份
+        </p-button>
+      </p-button-group>
+    </div>
+    <div class="article-content">
+      <o-if :value="activeId === 'translate-all'">
+        <o-page
+          :project-path="projectPath"
+          :target-lang="targetLang"
+          src="./translate-all.html"
+        ></o-page>
+      </o-if>
+      <o-else-if :value="activeId === 'edit'">
+        <o-page
+          :project-path="projectPath"
+          :target-lang="targetLang"
+          src="./translate-edit.html"
+        ></o-page>
+      </o-else-if>
+      <o-else-if :value="activeId === 'build-file'">
+        <o-page
+          :project-path="projectPath"
+          :target-lang="targetLang"
+          src="./build-file.html"
+        ></o-page>
+      </o-else-if>
+      <o-else-if :value="activeId === 'checker'">
+        <o-page
+          :project-path="projectPath"
+          :target-lang="targetLang"
+          src="./translate-checker.html"
+        ></o-page>
+      </o-else-if>
+    </div>
+  </div>
+  <script>
+    import { LANGUAGES } from "./util/translate.js";
+
+    export const parent = "../layout.html";
+
+    export default async ({ load, query }) => {
+      const { get } = await load("/nos/fs/main.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+
+      return {
+        data: {
+          activeId:
+            sessionStorage.getItem("translateActiveId") || "translate-all",
+          targetLang: "",
+          config: {
+            writingLang: "",
+            languages: [],
+          },
+          projectPath: query.path || "",
+          languageMap: LANGUAGES,
+        },
+        proto: {
+          get targetLangOptions() {
+            return this.config.languages.filter(
+              (lang) => lang !== this.config.writingLang,
+            );
+          },
+          changeActiveId(id) {
+            this.activeId = id;
+            sessionStorage.setItem("translateActiveId", id);
+          },
+        },
+        watch: {
+          targetLang(newLang) {
+            if (newLang) {
+              sessionStorage.setItem(
+                `translate-targetLang-${this.projectPath}`,
+                newLang,
+              );
+            }
+          },
+        },
+        async attached() {
+          this.emit("set-active-id", {
+            composed: true,
+            data: {
+              name: "translate",
+              query: { ...query },
+            },
+          });
+
+          const handle = await get(this.projectPath);
+          const config = await getData(handle);
+          this.config.writingLang = config.writingLang || "";
+          this.config.languages = config.languages || [];
+
+          const storedTargetLang = sessionStorage.getItem(
+            `translate-targetLang-${this.projectPath}`,
+          );
+          if (
+            storedTargetLang &&
+            this.config.languages.includes(storedTargetLang)
+          ) {
+            this.targetLang = storedTargetLang;
+          } else {
+            this.targetLang = this.targetLangOptions[0] || "";
+          }
+        },
+      };
+    };
+  </script>
+</template>

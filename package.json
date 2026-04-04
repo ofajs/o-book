@@ -1,55 +1,25 @@
 {
   "name": "obook",
-  "version": "2.1.44",
-  "type": "module",
+  "version": "3.0.0",
   "description": "A document system built on ofa.js (like gitbook)",
-  "main": "shell/index.js",
+  "type": "module",
+  "main": "index.html",
   "scripts": {
-    "bump": "node scripts/bump && npm i && node scripts/pack-standup",
-    "packs": "node scripts/pack-standup",
-    "build-doc": "node ./shell/index.js build",
-    "bddev": "nodemon --inspect ./shell/index.js build",
-    "trans": "node ./shell/index.js trans",
-    "dtrans": "nodemon --inspect ./shell/index.js trans"
+    "static": "http-server -p 30021 -c-1 --cors"
   },
   "author": "YAO",
   "license": "MIT",
-  "dependencies": {
-    "adm-zip": "^0.5.10",
-    "chinese-s2t": "^1.0.0",
-    "crypto": "^1.0.1",
-    "koa": "^2.14.2",
-    "koa-static": "^5.0.0",
-    "marked": "^9.0.3",
-    "open": "^9.1.0",
-    "puppeteer": "^21.2.1",
-    "rimraf": "^5.0.1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kirakiray/o-book.git"
-  },
-  "bin": {
-    "obook": "shell/index.js"
-  },
-  "obook": {
-    "input": "./docs/_preview.html",
-    "output": "../obook-website",
-    "port": 44035
-  },
-  "obook-translate": {
-    "caches": "./docs/.trans-caches",
-    "main": "cn",
-    "concurrent": 5,
-    "dirs": {
-      "cn": "./docs/cn",
-      "t-cn": "./docs/t-cn",
-      "en": "./docs/en"
-    }
   },
   "keywords": [
     "obook",
     "o-book",
     "document"
-  ]
+  ],
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "ofaApp": true
 }

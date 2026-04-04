@@ -1,0 +1,38 @@
+<template page>
+  <style>
+    :host {
+      position: relative;
+      display: block;
+      height: 100%;
+    }
+    o-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+  </style>
+  <o-page src="/nos-tool/ai/pages/key-manager.html"></o-page>
+  <script>
+    export const parent = "../layout.html";
+
+    export default async ({ load, query }) => {
+      return {
+        data: {},
+        proto: {},
+        async attached() {
+          this.emit("set-active-id", {
+            composed: true,
+            data: {
+              name: "config",
+              query: { ...query },
+            },
+          });
+        },
+        detached() {},
+      };
+    };
+  </script>
+</template>

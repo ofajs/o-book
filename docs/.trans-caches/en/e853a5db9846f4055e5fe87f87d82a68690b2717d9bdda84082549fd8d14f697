@@ -1,1 +1,0 @@
-`config.json` is the configuration file for the document site, which is used to configure the top navigation and other settings. The `navs` property is used to configure the navigation bar, where the `summary` property corresponds to the `SUMMARY.md` file path mentioned below. You can configure multiple navigation options.

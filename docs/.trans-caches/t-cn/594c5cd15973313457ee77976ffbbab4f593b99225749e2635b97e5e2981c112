@@ -1,1 +1,0 @@
-同上模式下，使用 `obook build` 命令將項目打包到 `package.json` 上定義的 `dist` 目錄。

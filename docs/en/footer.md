@@ -1,9 +1,0 @@
-- <img src="../publics/logo.svg" /> obook
-  - ©2023
-- Documentations
-  - [Introduction](./docs/index.md)
-  - [Introduction to Basic Files](./docs/base-files.md)
-  - [Introduction to Project Files](./docs/project-docs.md)
-- About ofa.js
-  - [ofa.js Official Website](https://ofajs.com/)
-  - [Creating Components](https://ofajs.com/en/cases/simple-component.html)

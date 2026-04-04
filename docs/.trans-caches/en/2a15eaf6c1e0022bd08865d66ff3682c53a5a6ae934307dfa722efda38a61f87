@@ -1,9 +1,0 @@
-```md
-- [Introduction](./index.md)
-- Start Project
-  - [Standard mode](./run-mode/base-mode.md)
-  - [Command line mode](./run-mode/cli-mode.md)
-  - [Web application mode](./run-mode/webapp-mode.md)
-- [Base files](./base-files.md)
-- [Project files](./project-docs.md)
-```

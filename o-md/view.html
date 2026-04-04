@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Markdown Viewer</title>
+    <script
+      src="https://cdn.jsdelivr.net/gh/ofajs/ofa.js/dist/ofa.min.mjs"
+      type="module"
+    ></script>
+    <link rel="stylesheet" href="../css/palette.css" />
+    <link rel="stylesheet" href="../css/theme.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+      }
+      o-md {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <l-m src="./o-md.html"></l-m>
+
+    <div
+      id="error"
+      style="display: none; color: red; text-align: center; padding: 20px"
+    >
+      No markdown link provided. Please add ?link=URL to the address.
+    </div>
+    <o-md id="viewer"></o-md>
+
+    <script type="module">
+      const params = new URLSearchParams(location.search);
+      const link = params.get("link");
+
+      if (link) {
+        $("#viewer").src = link;
+      } else {
+        $("#error").style.display = "block";
+      }
+    </script>
+  </body>
+</html>

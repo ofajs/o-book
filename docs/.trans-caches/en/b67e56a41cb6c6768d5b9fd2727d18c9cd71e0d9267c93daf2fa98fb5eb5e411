@@ -1,9 +1,0 @@
-```json
-{
-  "obook": {
-    "input": "./_preview.html", // Address of the project component preview page
-    "output": "./dist", // Output directory for packaging
-    "port": 44038  // Port number for previewing web pages, please make sure the port number does not conflict with other services
-  }
-}
-```

@@ -1,0 +1,288 @@
+<template page>
+  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <style>
+    :host {
+      display: block;
+      height: 100%;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .rotate-anime {
+      animation: rotate 1s linear infinite;
+    }
+
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .list-wrapper {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      padding: 16px;
+      overflow: auto;
+    }
+
+    .list-content {
+      min-width: 240px;
+      padding: 4px;
+    }
+
+    p-list-item {
+      border-radius: 8px;
+      margin: 2px 0;
+    }
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      padding: 8px 0;
+      margin: 0;
+      color: var(--md-ref-palette-normal40);
+    }
+
+    h2 p-button {
+      --p-button-height: 24px;
+      font-size: 12px;
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    .article-item {
+      color: var(--md-sys-color-primary);
+    }
+
+    n-icon[slot="prefix"] {
+      margin-right: 4px;
+      font-size: 16px;
+    }
+  </style>
+  <div class="container">
+    <div class="list-wrapper">
+      <div class="list-content">
+        <h2 style="display: flex; align-items: center">
+          顶部导航
+
+          <p-button
+            on:click="refreshPreview(true)"
+            size="mini"
+            variant="outlined"
+            attr:disabled="refreshing"
+          >
+            <n-icon
+              class="rotate-anime"
+              class:rotate-anime="refreshing"
+              icon="material-symbols:refresh"
+              slot="prefix"
+            ></n-icon>
+            重新生成
+          </p-button>
+        </h2>
+        <p-list style="--ladder-left: 8px">
+          <p-list-item button on:click="clickPreview()">
+            Home
+            <n-icon
+              icon="majesticons:open-line"
+              slot="suffix"
+              style="color: var(--md-sys-color-primary); font-size: 16px"
+            ></n-icon>
+          </p-list-item>
+          <o-fill :value="header" name="header-list-item"> </o-fill>
+        </p-list>
+        <template name="header-list-item">
+          <p-list-item
+            attr:button="!!$data.url"
+            on:click="$host.clickHeaderItem($data)"
+            attr:active-item="$host.activeHeader === $data.url"
+          >
+            {{$data.name}}
+            <x-if :value="$data.content && $data.content.length">
+              <i
+                toggle-collapse
+                triangle
+                slot="suffix"
+                style="transform: rotate(-90deg)"
+              ></i>
+            </x-if>
+            <x-else>
+              <n-icon icon="entypo:list" slot="suffix"></n-icon>
+            </x-else>
+            <p-list slot="childs">
+              <o-fill :value="$data.content" name="header-list-item"></o-fill>
+            </p-list>
+          </p-list-item>
+        </template>
+      </div>
+      <div class="list-content">
+        <style>
+          .navi-list {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            max-height: calc(100vh - 180px);
+          }
+
+          .navi-list p-list-item {
+            min-width: 200px;
+          }
+        </style>
+        <h2>导航对应列表</h2>
+        <p-list class="navi-list">
+          <o-fill :value="documentList" name="document-item"> </o-fill>
+        </p-list>
+      </div>
+
+      <template name="document-item">
+        <p-list-item
+          collapse-childs="open"
+          attr:button="$data.url"
+          on:click="$host.clickDocumentItem($data.url)"
+        >
+          <n-icon
+            class="article-item"
+            class:hide="!$data.url"
+            icon="material-symbols:article-outline"
+            slot="prefix"
+          ></n-icon>
+          <x-if :value="$data.content && $data.content.length > 0">
+            <i toggle-collapse triangle slot="suffix" style="z-index: 3"></i>
+          </x-if>
+          {{$data.name}}
+          <p-list slot="childs">
+            <o-fill :value="$data.content" name="document-item"></o-fill>
+          </p-list>
+        </p-list-item>
+      </template>
+    </div>
+  </div>
+
+  <script>
+    import { buildPreviewUrl, buildIndexPreviewUrl } from "./dashboard-data.js";
+
+    export default async ({ load, query }) => {
+      const { get } = await load("/nos/fs/handle/mount/mount.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+      const { buildWebsite, watchWebsite } = await load("./generate.js");
+      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+
+      return {
+        data: {
+          projectPath: query.path || "", // 项目路径
+          lang: "", // 查看网站的语言
+          header: [],
+          documentList: [],
+          activeHeader: "",
+          refreshing: false,
+          _topHandle: null,
+          _documentHandle: null,
+          _cancels: [],
+        },
+        watch: {
+          async lang(lang) {
+            if (!lang) {
+              return;
+            }
+
+            await this.setupProject();
+
+            await this.refreshPreview(false);
+          },
+        },
+        proto: {
+          clickPreview() {
+            window.open(buildIndexPreviewUrl(this.projectPath, this.lang), "_blank");
+          },
+          clickDocumentItem(url) {
+            if (!url) {
+              return;
+            }
+            window.open(
+              buildPreviewUrl(this.activeHeader, url, this.projectPath, this.lang),
+              "_blank",
+            );
+          },
+          clickHeaderItem(targetItem) {
+            if (!targetItem.url) {
+              return;
+            }
+            this.activeHeader = targetItem.url;
+
+            this.loadDocumentList(targetItem.url);
+          },
+          async loadDocumentList(url) {
+            const documentList = await getData(this._documentHandle, `${url}`);
+            this.documentList = Array.isArray(documentList) ? documentList : [];
+          },
+          async refreshPreview(bool) {
+            this.refreshing = true;
+
+            await buildWebsite({
+              topHandle: this._topHandle,
+              websiteHandle: await this._topHandle.get("website", {
+                create: "dir",
+              }),
+              lang: this.lang,
+            });
+
+            this.refreshing = false;
+
+            if (bool) {
+              toast({
+                color: "success",
+                message: "重新生成完毕",
+              });
+            }
+          },
+          async setupProject() {
+            this._topHandle = await get(this.projectPath);
+
+            const config = await getData(this._topHandle);
+
+            const langConfig = await getData(
+              this._topHandle,
+              `${this.lang}/_config.yaml`,
+            );
+
+            this._documentHandle = await this._topHandle.get(this.lang);
+
+            this.header = langConfig.header || [];
+
+            if (this.header[0]?.url) {
+              this.clickHeaderItem(this.header[0]);
+            }
+
+            this._cancels.forEach((cancel) => cancel());
+
+            this._cancels = await watchWebsite({
+              topHandle: this._topHandle,
+              websiteHandle: await this._topHandle.get("website", {
+                create: "dir",
+              }),
+              lang: this.lang,
+            });
+          },
+        },
+        // async attached() {
+        // },
+        detached() {
+          this._cancels?.forEach((cancel) => cancel());
+        },
+      };
+    };
+  </script>
+</template>

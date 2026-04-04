@@ -1,0 +1,370 @@
+<template page>
+  <l-m src="./translate-block.html"></l-m>
+  <style>
+    :host {
+      display: block;
+      height: 100%;
+    }
+
+    .layout {
+      display: flex;
+      gap: 16px;
+      height: 100%;
+    }
+    .left {
+      margin-left: 16px;
+      width: 300px;
+      height: 100%;
+      flex-shrink: 0;
+      overflow: auto;
+    }
+    .article-content {
+      flex: 1;
+      padding-right: 16px;
+      overflow: auto;
+    }
+    p-list-item {
+      border-radius: 30px;
+    }
+    p-list-item[active-item] {
+      background-color: var(--md-sys-color-primary-container);
+    }
+    .stats {
+      padding: 12px;
+      margin-bottom: 16px;
+      background-color: var(--md-sys-color-surface-container-highest);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .stats-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .stats-item:last-child {
+      margin-bottom: 0;
+    }
+    .stats-value {
+      font-weight: 500;
+      color: var(--md-sys-color-primary);
+    }
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--md-sys-color-on-surface-variant);
+      text-align: center;
+      padding: 32px;
+    }
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .article-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .article-title {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .issue-count {
+      padding: 4px 12px;
+      font-size: 12px;
+      border-radius: 16px;
+      background-color: var(--md-sys-color-error-container);
+      color: var(--md-sys-color-on-error-container);
+      font-weight: 500;
+    }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-issue-count {
+      padding: 2px 6px;
+      font-size: 11px;
+      border-radius: 10px;
+      background-color: var(--md-sys-color-error);
+      color: var(--md-sys-color-on-error);
+      font-weight: 500;
+      margin-left: 8px;
+    }
+    .issue-block-wrapper {
+      position: relative;
+    }
+    .issue-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .issue-tag {
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      background-color: var(--md-sys-color-error-container);
+      color: var(--md-sys-color-on-error-container);
+      font-weight: 500;
+    }
+  </style>
+  <div class="layout">
+    <div class="left">
+      <h3 style="margin: 0 0 16px 0; font-size: 14px">翻译检查器</h3>
+      <div class="stats">
+        <div class="stats-item">
+          <span>已检查文件</span>
+          <span class="stats-value">{{stats.totalFiles}}</span>
+        </div>
+        <div class="stats-item">
+          <span>已翻译块</span>
+          <span class="stats-value">{{stats.translatedBlocks}}</span>
+        </div>
+        <div class="stats-item">
+          <span>异常块</span>
+          <span class="stats-value" style="color: var(--md-sys-color-error)"
+            >{{stats.issueBlocks}}</span
+          >
+        </div>
+      </div>
+      <h4
+        style="
+          margin: 0 0 8px 0;
+          font-size: 12px;
+          color: var(--md-sys-color-on-surface-variant);
+        "
+      >
+        有异常的文件
+      </h4>
+      <p-list>
+        <o-fill :value="articleList">
+          <p-list-item
+            button
+            on:click="$host.clickItem($data)"
+            attr:active-item="$host.activeArticlePath === $data.path"
+          >
+            <div class="file-item">
+              <span class="file-name">{{$data.name}}</span>
+              <span class="file-issue-count">{{$data.issueCount}}</span>
+            </div>
+          </p-list-item>
+        </o-fill>
+      </p-list>
+    </div>
+    <div class="article-content">
+      <o-if :value="loading">
+        <div class="loading">检查中...</div>
+      </o-if>
+      <o-else-if :value="!loading && issueBlocks.length === 0">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+            />
+          </svg>
+          <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
+            没有发现异常
+          </div>
+          <div style="font-size: 14px">所有翻译块都通过了检查</div>
+        </div>
+      </o-else-if>
+      <o-else>
+        <div class="article-header">
+          <div class="article-title">{{currentArticleName}}</div>
+          <div class="issue-count">{{issueBlocks.length}} 个异常块</div>
+        </div>
+        <o-fill :value="issueBlocks">
+          <div class="issue-block-wrapper">
+            <div class="issue-tags">
+              <o-fill :value="$data.issues">
+                <span class="issue-tag">{{$data.ruleName}}</span>
+              </o-fill>
+            </div>
+            <translate-block
+              :item="$data.block"
+              :target-lang="$host.targetLang"
+              :writing-lang="$host.config.writingLang"
+            ></translate-block>
+          </div>
+        </o-fill>
+      </o-else>
+    </div>
+  </div>
+  <script>
+    import { marked } from "/npm/marked@17.0.1/lib/marked.esm.js";
+    import { getArticleData } from "./util/article-data.js";
+    import { transformArticle } from "./util/transform.js";
+    import { checkBlock } from "./util/check-translation.js";
+    import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
+
+    export default async ({ load }) => {
+      const { get } = await load("/nos/fs/main.js");
+      const { getData } = await load("../../util/yaml-handle.js");
+
+      return {
+        data: {
+          projectPath: "",
+          targetLang: "",
+          articleList: [],
+          activeArticlePath:
+            sessionStorage.getItem("checkerActiveArticlePath") || "",
+          issueBlocks: [],
+          currentArticleName: "",
+          loading: true,
+          stats: {
+            totalFiles: 0,
+            translatedBlocks: 0,
+            issueBlocks: 0,
+          },
+          _originArticleData: null,
+          _allIssueData: null,
+          config: null, // 项目配置数据
+        },
+        watch: {
+          targetLang(newLang) {
+            if (newLang && this.projectPath) {
+              this.loadArticle();
+            }
+          },
+        },
+        proto: {
+          clickItem(item) {
+            this.activeArticlePath = item.path;
+            sessionStorage.setItem("checkerActiveArticlePath", item.path);
+            this.currentArticleName = item.name;
+            this.issueBlocks = item.issueData || [];
+          },
+          async loadArticle() {
+            this.loading = true;
+            try {
+              const handle = await get(this.projectPath);
+              this.config = await getData(handle);
+              const articleList = await getArticleData(
+                await handle.get(this.config.writingLang),
+                { isRoot: true },
+              );
+
+              if (!articleList || articleList.length === 0) {
+                console.warn("No articles found");
+                this.articleList = [];
+                this._originArticleData = null;
+                this.loading = false;
+                return;
+              }
+
+              this._originArticleData = articleList;
+              const storage = getStorage(this.targetLang + this.projectPath);
+
+              const articlesWithIssues = [];
+              let totalTranslatedBlocks = 0;
+              let totalIssueBlocks = 0;
+
+              for (const article of articleList) {
+                if (!article.blocks || article.blocks.length === 0) continue;
+
+                const issueData = [];
+                for (let i = 0; i < article.blocks.length; i++) {
+                  const block = article.blocks[i];
+                  const result = await checkBlock(
+                    block,
+                    storage,
+                    this.targetLang,
+                    this.projectPath,
+                    this.config.writingLang,
+                  );
+                  if (result) {
+                    totalTranslatedBlocks++;
+                    result.fileName = article.name;
+                    result.blockIndex = i + 1;
+                    issueData.push(result);
+                    totalIssueBlocks++;
+                  } else {
+                    const cachedData = await storage.getItem(block.rawHash);
+                    if (cachedData) {
+                      totalTranslatedBlocks++;
+                    }
+                  }
+                }
+
+                if (issueData.length > 0) {
+                  articlesWithIssues.push({
+                    name: article.name,
+                    path: article.path,
+                    realPath: article.realPath,
+                    issueCount: issueData.length,
+                    issueData: issueData,
+                  });
+                }
+              }
+
+              this.articleList = articlesWithIssues;
+              this.stats = {
+                totalFiles: articleList.length,
+                translatedBlocks: totalTranslatedBlocks,
+                issueBlocks: totalIssueBlocks,
+              };
+
+              if (this.activeArticlePath) {
+                const article = articlesWithIssues.find(
+                  (a) => a.path === this.activeArticlePath,
+                );
+                if (article) {
+                  this.clickItem(article);
+                } else if (articlesWithIssues.length > 0) {
+                  this.clickItem(articlesWithIssues[0]);
+                } else {
+                  this.issueBlocks = [];
+                  this.currentArticleName = "";
+                }
+              } else if (articlesWithIssues.length > 0) {
+                this.clickItem(articlesWithIssues[0]);
+              } else {
+                this.issueBlocks = [];
+                this.currentArticleName = "";
+              }
+            } catch (error) {
+              console.error("Failed to load article:", error);
+              this.articleList = [];
+              this._originArticleData = null;
+            } finally {
+              this.loading = false;
+            }
+          },
+        },
+        attached() {
+          this.loadArticle();
+        },
+      };
+    };
+
+    const storages = {};
+    const getStorage = (projectPath) => {
+      const key = "translates-" + projectPath;
+      if (storages[key]) {
+        return storages[key];
+      }
+      const storage = (storages[key] = new EverCache(key));
+      return storage;
+    };
+  </script>
+</template>

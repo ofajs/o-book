@@ -1,0 +1,89 @@
+<template component>
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+
+  <link rel="stylesheet" href="../css/hljs.css" />
+  <link rel="stylesheet" href="../css/github-markdown.css" />
+
+  <div :html="htmlContent" class="markdown-body"></div>
+
+  <script>
+    export default async ({ load, url }) => {
+      // url 当前模块的url
+      // load 和 异步 import 的功能差不多一样，但是支持json 文件，并且和 l-m 是一样的功能
+      const { marked } = await load(
+        "https://cdn.jsdelivr.net/npm/marked@17.0.1/lib/marked.esm.js",
+      );
+
+      const { default: hljs } = await load(
+        "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm",
+      );
+
+      marked.use({
+        renderer: {
+          code({ text, lang }) {
+            const code = text || "";
+            const language = lang || null;
+
+            if (language && hljs.getLanguage(language)) {
+              try {
+                const highlighted = hljs.highlight(code, { language }).value;
+                return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`;
+              } catch (e) {
+                console.warn(`Highlight error for language ${language}:`, e);
+              }
+            }
+
+            try {
+              const highlighted = hljs.highlightAuto(code).value;
+              return `<pre><code class="hljs">${highlighted}</code></pre>`;
+            } catch (e) {
+              console.warn("Auto highlight error:", e);
+              return `<pre><code>${code}</code></pre>`;
+            }
+          },
+        },
+      });
+
+      return {
+        tag: "o-md",
+        attrs: {
+          src: null,
+        },
+        data: {
+          htmlContent: "",
+        },
+        watch: {
+          src(newVal) {
+            if (newVal) {
+              this.loadMarkdown();
+            }
+          },
+        },
+        ready() {
+          if (this.src) {
+            this.loadMarkdown();
+          }
+        },
+        proto: {
+          async loadMarkdown() {
+            try {
+              const response = await fetch(this.src);
+              if (!response.ok) {
+                throw new Error(`Failed to load ${this.src}`);
+              }
+              const markdownText = await response.text();
+              this.htmlContent = await marked.parse(markdownText);
+            } catch (error) {
+              console.error("Error loading markdown:", error);
+              this.htmlContent = `<p style="color: red;">Error loading markdown file: ${error.message}</p>`;
+            }
+          },
+        },
+      };
+    };
+  </script>
+</template>
