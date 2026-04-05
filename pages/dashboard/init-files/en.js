@@ -16,6 +16,10 @@ const INIT_FILES = {
   "{lang}/_config.yaml": () =>
     yaml.dump({
       index: "./index.html",
+      header: {
+        name: "documentation",
+        url: "./documentation/_config.yaml",
+      },
     }),
 
   "{lang}/index.html": (projectName) => `<!doctype html>
@@ -31,14 +35,16 @@ const INIT_FILES = {
       <p>Welcome to the documentation system</p>
       <div style="padding: 16px">
         <p-button size="large">
-          <a href="./README.md">Get Started</a>
+          <a href="./documentation/introduction.md">Get Started</a>
         </p-button>
       </div>
     </center-block>
   </body>
 </html>`,
+  "{lang}/documentation/_config.yaml": `- name: introduction
+  url: ./introduction.md`,
 
-  "{lang}/README.md": () => `# Welcome
+  "{lang}/documentation/introduction.md": () => `# Welcome
 
 This is your first document.
 
