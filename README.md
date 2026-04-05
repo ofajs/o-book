@@ -16,7 +16,7 @@ A modern documentation system built on [ofa.js](https://github.com/ofajs/ofa.js)
 ## Quick Start
 
 1. Open [OBook](https://book.ofajs.com) in Chrome browser
-2. Click "选择本地目录" (Select Local Directory)
+2. Click "Select Local Directory"
 3. Choose or create a project folder
 4. Start writing your documentation in Markdown
 
