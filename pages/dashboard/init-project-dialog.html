@@ -82,7 +82,23 @@
   </p-dialog>
 
   <script>
-    import INIT_FILES from "./init-files/en.js";
+    const INIT_FILES_CACHE = {};
+
+    const getInitFiles = async (lang, load) => {
+      if (INIT_FILES_CACHE[lang]) {
+        return INIT_FILES_CACHE[lang];
+      }
+
+      try {
+        const module = await load(`./init-files/${lang}.js`);
+        INIT_FILES_CACHE[lang] = module.default;
+        return module.default;
+      } catch (error) {
+        const module = await load("./init-files/en.js");
+        INIT_FILES_CACHE[lang] = module.default;
+        return module.default;
+      }
+    };
 
     export default async ({ load }) => {
       const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
@@ -147,6 +163,8 @@
             }
           },
           async initProject(handle, writingLang, projectName) {
+            const INIT_FILES = await getInitFiles(writingLang, load);
+
             for (const [filePath, contentValue] of Object.entries(INIT_FILES)) {
               const resolvedPath = filePath.replace("{lang}", writingLang);
               const pathParts = resolvedPath.split("/");
@@ -162,9 +180,10 @@
               const fileHandle = await currentHandle.get(fileName, {
                 create: "file",
               });
-              const content = typeof contentValue === "function" 
-                ? contentValue(projectName, writingLang) 
-                : contentValue;
+              const content =
+                typeof contentValue === "function"
+                  ? contentValue(projectName, writingLang)
+                  : contentValue;
               await fileHandle.write(content);
             }
           },
