@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
   <style>
@@ -42,30 +43,54 @@
 
   <p-dialog :open="open" on:click-mask="handleClose">
     <div class="analytics-dialog">
-      <h3 style="margin: 0 0 8px; font-size: 16px">谷歌统计设置</h3>
+      <h3 style="margin: 0 0 8px; font-size: 16px">
+        <locale-text>
+          <span lang="cn">谷歌统计设置</span>
+          <span lang="en">Google Analytics Settings</span>
+        </locale-text>
+      </h3>
       <div class="analytics-form">
         <div class="form-item">
-          <label>Google Analytics 统计代码</label>
+          <label>
+            <locale-text>
+              <span lang="cn">Google Analytics 统计代码</span>
+              <span lang="en">Google Analytics Code</span>
+            </locale-text>
+          </label>
           <p-input
             sync:value="googleAnalytics"
-            placeholder="请输入 Google Analytics 统计代码"
+            attr:placeholder="gaPlaceholder"
             multiline
             rows="5"
           ></p-input>
           <div class="hint">
-            请粘贴完整的 Google Analytics 脚本代码，例如：&lt;script&gt;...&lt;/script&gt;
+            <locale-text>
+              <span lang="cn">请粘贴完整的 Google Analytics 脚本代码，例如：&lt;script&gt;...&lt;/script&gt;</span>
+              <span lang="en">Paste the complete Google Analytics script code, e.g.: &lt;script&gt;...&lt;/script&gt;</span>
+            </locale-text>
           </div>
         </div>
       </div>
       <div class="dialog-actions">
-        <p-button variant="outlined" on:click="handleClose">取消</p-button>
-        <p-button on:click="handleSave">保存</p-button>
+        <p-button variant="outlined" on:click="handleClose">
+          <locale-text>
+            <span lang="cn">取消</span>
+            <span lang="en">Cancel</span>
+          </locale-text>
+        </p-button>
+        <p-button on:click="handleSave">
+          <locale-text>
+            <span lang="cn">保存</span>
+            <span lang="en">Save</span>
+          </locale-text>
+        </p-button>
       </div>
     </div>
   </p-dialog>
 
   <script>
     import yaml from "/npm/js-yaml@4.1.1/dist/js-yaml.min.mjs";
+    import { getLocaleText } from "/nos/locale-text/get-locale-text.js";
 
     export default async ({ load }) => {
       const { getData } = await load("../../util/yaml-handle.js");
@@ -90,6 +115,12 @@
           },
         },
         proto: {
+          get gaPlaceholder() {
+            return getLocaleText({
+              cn: "请输入 Google Analytics 统计代码",
+              en: "Enter Google Analytics code",
+            });
+          },
           handleClose() {
             this.open = false;
           },
@@ -105,7 +136,10 @@
 
               toast({
                 color: "success",
-                message: "谷歌统计设置保存成功",
+                message: getLocaleText({
+                  cn: "谷歌统计设置保存成功",
+                  en: "Google Analytics settings saved successfully",
+                }),
               });
 
               this.emit("analytics-saved", {
@@ -115,7 +149,10 @@
             } catch (error) {
               toast({
                 color: "error",
-                message: "保存失败: " + error.message,
+                message: getLocaleText({
+                  cn: "保存失败: " + error.message,
+                  en: "Failed to save: " + error.message,
+                }),
               });
             }
           },

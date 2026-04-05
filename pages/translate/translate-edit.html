@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/group.html"></l-m>
@@ -153,14 +154,24 @@
   <div class="layout">
     <div class="left">
       <div class="header">
-        <h3>手动修改翻译</h3>
-        <p>选择语言并编辑翻译内容</p>
+        <h3>
+          <locale-text>
+            <span lang="cn">手动修改翻译</span>
+            <span lang="en">Manual Translation Edit</span>
+          </locale-text>
+        </h3>
+        <p>
+          <locale-text>
+            <span lang="cn">选择语言并编辑翻译内容</span>
+            <span lang="en">Select language and edit translation content</span>
+          </locale-text>
+        </p>
       </div>
 
       <div class="search-box">
         <p-input
           sync:value="searchKeyword"
-          placeholder="搜索文章内容..."
+          attr:placeholder="searchPlaceholder"
           style="width: 100%"
         >
           <n-icon slot="prefix" icon="material-symbols:search"></n-icon>
@@ -174,7 +185,10 @@
           color: var(--md-sys-color-on-surface-variant);
         "
       >
-        文章列表 ({{filteredArticleList.length}})
+        <locale-text>
+          <span lang="cn">文章列表 ({{filteredArticleList.length}})</span>
+          <span lang="en">Article List ({{filteredArticleList.length}})</span>
+        </locale-text>
       </h4>
       <p-list>
         <o-fill :value="filteredArticleList">
@@ -196,7 +210,12 @@
 
     <div class="article-content">
       <o-if :value="loading">
-        <div class="loading">加载中...</div>
+        <div class="loading">
+          <locale-text>
+            <span lang="cn">加载中...</span>
+            <span lang="en">Loading...</span>
+          </locale-text>
+        </div>
       </o-if>
       <o-else-if :value="!loading && !activeArticlePath">
         <div class="empty-state">
@@ -206,17 +225,33 @@
             />
           </svg>
           <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
-            选择一篇文章开始编辑
+            <locale-text>
+              <span lang="cn">选择一篇文章开始编辑</span>
+              <span lang="en">Select an article to start editing</span>
+            </locale-text>
           </div>
-          <div style="font-size: 14px">从左侧列表选择要编辑的文章</div>
+          <div style="font-size: 14px">
+            <locale-text>
+              <span lang="cn">从左侧列表选择要编辑的文章</span>
+              <span lang="en">Select an article from the list on the left</span>
+            </locale-text>
+          </div>
         </div>
       </o-else-if>
       <o-else-if :value="!loading && currentBlocks.length === 0">
         <div class="empty-state">
           <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
-            暂无翻译数据
+            <locale-text>
+              <span lang="cn">暂无翻译数据</span>
+              <span lang="en">No translation data</span>
+            </locale-text>
           </div>
-          <div style="font-size: 14px">该文章还没有翻译内容</div>
+          <div style="font-size: 14px">
+            <locale-text>
+              <span lang="cn">该文章还没有翻译内容</span>
+              <span lang="en">This article has no translation content yet</span>
+            </locale-text>
+          </div>
         </div>
       </o-else-if>
       <o-else>
@@ -225,7 +260,7 @@
           <div class="article-lang">
             <p-select
               sync:value="targetLang"
-              placeholder="选择语言"
+              attr:placeholder="selectLangPlaceholder"
               style="width: 120px"
             >
               <o-fill :value="targetLanguages">
@@ -253,6 +288,7 @@
     import { LANGUAGES } from "./util/translate.js";
     import { getArticleData } from "./util/article-data.js";
     import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
+    import { getLocaleText } from "/nos/locale-text/get-locale-text.js";
 
     export default async ({ load }) => {
       const { get } = await load("/nos/fs/main.js");
@@ -286,6 +322,18 @@
           },
         },
         proto: {
+          get searchPlaceholder() {
+            return getLocaleText({
+              cn: "搜索文章内容...",
+              en: "Search articles...",
+            });
+          },
+          get selectLangPlaceholder() {
+            return getLocaleText({
+              cn: "选择语言",
+              en: "Select language",
+            });
+          },
           getLangWord(lang) {
             return LANGUAGES[lang] || lang;
           },

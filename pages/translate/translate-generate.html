@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
     :host {
@@ -104,20 +105,38 @@
   <div class="container">
     <o-if :value="loading">
       <div class="status-card">
-        <div class="status-title">正在加载...</div>
+        <div class="status-title">
+          <locale-text>
+            <span lang="cn">正在加载...</span>
+            <span lang="en">Loading...</span>
+          </locale-text>
+        </div>
       </div>
     </o-if>
     <o-else-if :value="!loading && allArticles.length === 0">
       <div class="empty-state">
         <div class="empty-icon">📭</div>
-        <div>暂无文章数据</div>
+        <div>
+          <locale-text>
+            <span lang="cn">暂无文章数据</span>
+            <span lang="en">No article data</span>
+          </locale-text>
+        </div>
       </div>
     </o-else-if>
     <o-else>
       <div class="status-card">
-        <div class="status-title">生成翻译文档</div>
+        <div class="status-title">
+          <locale-text>
+            <span lang="cn">生成翻译文档</span>
+            <span lang="en">Generate Translated Documents</span>
+          </locale-text>
+        </div>
         <div class="status-content">
-          将为 <strong>{{targetLanguages.length}}</strong> 种目标语言生成翻译文档
+          <locale-text>
+            <span lang="cn">将为 <strong>{{targetLanguages.length}}</strong> 种目标语言生成翻译文档</span>
+            <span lang="en">Will generate translated documents for <strong>{{targetLanguages.length}}</strong> target languages</span>
+          </locale-text>
         </div>
 
         <o-if :value="isGenerating">
@@ -134,19 +153,28 @@
             <div class="progress-fill completed" style.width: 100%"></div>
           </div>
           <div class="progress-text" style="color: var(--md-sys-color-success)">
-            所有文档已生成完成！
+            <locale-text>
+              <span lang="cn">所有文档已生成完成！</span>
+              <span lang="en">All documents generated successfully!</span>
+            </locale-text>
           </div>
         </o-if>
 
         <div class="button-container">
           <o-if :value="!isGenerating && !isComplete">
             <p-button variant="contained" on:click="startGeneration">
-              开始生成
+              <locale-text>
+                <span lang="cn">开始生成</span>
+                <span lang="en">Start Generation</span>
+              </locale-text>
             </p-button>
           </o-if>
           <o-if :value="isComplete">
             <p-button variant="contained" on:click="goBack">
-              返回
+              <locale-text>
+                <span lang="cn">返回</span>
+                <span lang="en">Back</span>
+              </locale-text>
             </p-button>
           </o-if>
         </div>
@@ -154,7 +182,12 @@
 
       <o-if :value="generatedFiles.length > 0">
         <div class="status-card">
-          <div class="status-title">已生成的文件 ({{generatedFiles.length}})</div>
+          <div class="status-title">
+            <locale-text>
+              <span lang="cn">已生成的文件 ({{generatedFiles.length}})</span>
+              <span lang="en">Generated Files ({{generatedFiles.length}})</span>
+            </locale-text>
+          </div>
           <div class="file-list">
             <o-fill :value="generatedFiles.slice(-10)">
               <div class="file-item">
@@ -162,7 +195,12 @@
                   <span class="file-name">{{$data.name}}</span>
                   <span class="file-lang"> ({{$data.langName}})</span>
                 </div>
-                <span class="file-status success">成功</span>
+                <span class="file-status success">
+                  <locale-text>
+                    <span lang="cn">成功</span>
+                    <span lang="en">Success</span>
+                  </locale-text>
+                </span>
               </div>
             </o-fill>
           </div>
@@ -172,7 +210,10 @@
       <o-if :value="failedFiles.length > 0">
         <div class="status-card">
           <div class="status-title" style="color: var(--md-sys-color-error)">
-            生成失败的文件 ({{failedFiles.length}})
+            <locale-text>
+              <span lang="cn">生成失败的文件 ({{failedFiles.length}})</span>
+              <span lang="en">Failed Files ({{failedFiles.length}})</span>
+            </locale-text>
           </div>
           <div class="file-list">
             <o-fill :value="failedFiles">
@@ -181,13 +222,21 @@
                   <span class="file-name">{{$data.name}}</span>
                   <span class="file-lang"> ({{$data.langName}})</span>
                 </div>
-                <span class="file-status error">失败</span>
+                <span class="file-status error">
+                  <locale-text>
+                    <span lang="cn">失败</span>
+                    <span lang="en">Failed</span>
+                  </locale-text>
+                </span>
               </div>
             </o-fill>
           </div>
           <div style="margin-top: 12px; text-align: center">
             <p-button variant="outlined" on:click="retryFailed">
-              重试失败项
+              <locale-text>
+                <span lang="cn">重试失败项</span>
+                <span lang="en">Retry Failed</span>
+              </locale-text>
             </p-button>
           </div>
         </div>
