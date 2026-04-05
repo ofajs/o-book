@@ -147,7 +147,7 @@
             }
           },
           async initProject(handle, writingLang, projectName) {
-            for (const [filePath, contentFn] of Object.entries(INIT_FILES)) {
+            for (const [filePath, contentValue] of Object.entries(INIT_FILES)) {
               const resolvedPath = filePath.replace("{lang}", writingLang);
               const pathParts = resolvedPath.split("/");
               let currentHandle = handle;
@@ -162,7 +162,9 @@
               const fileHandle = await currentHandle.get(fileName, {
                 create: "file",
               });
-              const content = contentFn(projectName, writingLang);
+              const content = typeof contentValue === "function" 
+                ? contentValue(projectName, writingLang) 
+                : contentValue;
               await fileHandle.write(content);
             }
           },

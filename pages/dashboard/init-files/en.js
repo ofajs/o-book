@@ -16,10 +16,12 @@ const INIT_FILES = {
   "{lang}/_config.yaml": () =>
     yaml.dump({
       index: "./index.html",
-      header: {
-        name: "documentation",
-        url: "./documentation/_config.yaml",
-      },
+      header: [
+        {
+          name: "documentation",
+          url: "./documentation/_config.yaml",
+        },
+      ],
     }),
 
   "{lang}/index.html": (projectName) => `<!doctype html>
