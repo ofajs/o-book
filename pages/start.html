@@ -44,8 +44,31 @@
           <h3 style="padding-top: 14px">历史打开记录</h3>
           <p-list>
             <o-fill :value="list">
-              <p-list-item button on:click="$host.handleClick($data)">
-                {{$data.name}}
+              <p-list-item>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                  "
+                >
+                  <span
+                    on:click="$host.handleClick($data)"
+                    style="cursor: pointer; flex: 1"
+                    >{{$data.name}}</span
+                  >
+                  <span
+                    on:click="$host.confirmDelete($data)"
+                    style="
+                      cursor: pointer;
+                      color: var(--md-sys-color-error);
+                      font-size: 18px;
+                      padding: 4px;
+                    "
+                    >×</span
+                  >
+                </div>
               </p-list-item>
             </o-fill>
           </p-list>
@@ -151,6 +174,27 @@
     </div>
   </p-dialog>
 
+  <p-dialog :open="showDeleteDialog" on:click-mask="showDeleteDialog = false">
+    <div style="width: 400px; max-width: 90vw; padding: 8px 0">
+      <h3 style="margin: 0 0 8px; font-size: 16px">确认删除</h3>
+      <p
+        style="
+          color: var(--md-sys-color-normal);
+          font-size: 14px;
+          margin-bottom: 16px;
+        "
+      >
+        确定要删除"{{deleteTarget?.name}}"的历史记录吗？此操作不会删除本地文件。
+      </p>
+      <div style="display: flex; justify-content: flex-end; gap: 8px">
+        <p-button variant="outlined" on:click="showDeleteDialog = false"
+          >取消</p-button
+        >
+        <p-button on:click="deleteHistoryItem">确认删除</p-button>
+      </div>
+    </div>
+  </p-dialog>
+
   <init-project-dialog
     sync:open="showInitDialog"
     on:init-success="handleInitSuccess"
@@ -171,6 +215,8 @@
           list: [],
           showConfirmDialog: false,
           showInitDialog: false,
+          showDeleteDialog: false,
+          deleteTarget: null,
           _currentHandle: null,
         },
         proto: {
@@ -245,6 +291,26 @@
             if (handle) {
               this.goto(`./dashboard/dashboard.html?path=${handle.path}`);
             }
+          },
+          confirmDelete(item) {
+            this.deleteTarget = item;
+            this.showDeleteDialog = true;
+          },
+          async deleteHistoryItem() {
+            if (!this.deleteTarget) return;
+
+            const history = (await storage.getItem("history")) || [];
+            const newPath = history.filter(
+              (path) => path !== this.deleteTarget._handle.path,
+            );
+            await storage.setItem("history", newPath);
+
+            this.list = this.list.filter(
+              (item) => item._handle.path !== this.deleteTarget._handle.path,
+            );
+
+            this.showDeleteDialog = false;
+            this.deleteTarget = null;
           },
           async loadHistory() {
             const history = (await storage.getItem("history")) || [];
