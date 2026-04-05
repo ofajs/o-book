@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
@@ -76,7 +77,10 @@
     <div class="list-wrapper">
       <div class="list-content">
         <h2 style="display: flex; align-items: center">
-          顶部导航
+          <locale-text>
+            <span lang="cn">顶部导航</span>
+            <span lang="en">Top Navigation</span>
+          </locale-text>
 
           <p-button
             on:click="refreshPreview(true)"
@@ -90,7 +94,10 @@
               icon="material-symbols:refresh"
               slot="prefix"
             ></n-icon>
-            重新生成
+            <locale-text>
+              <span lang="cn">重新生成</span>
+              <span lang="en">Regenerate</span>
+            </locale-text>
           </p-button>
         </h2>
         <p-list style="--ladder-left: 8px">
@@ -141,7 +148,12 @@
             min-width: 200px;
           }
         </style>
-        <h2>导航对应列表</h2>
+        <h2>
+            <locale-text>
+              <span lang="cn">导航对应列表</span>
+              <span lang="en">Navigation List</span>
+            </locale-text>
+          </h2>
         <p-list class="navi-list">
           <o-fill :value="documentList" name="document-item"> </o-fill>
         </p-list>
@@ -172,6 +184,7 @@
   </div>
 
   <script>
+    import { getLocaleText } from "/nos/locale-text/get-locale-text.js";
     import { buildPreviewUrl, buildIndexPreviewUrl } from "./dashboard-data.js";
 
     export default async ({ load, query }) => {
@@ -244,7 +257,10 @@
             if (bool) {
               toast({
                 color: "success",
-                message: "重新生成完毕",
+                message: getLocaleText({
+                  cn: "重新生成完毕",
+                  en: "Regeneration complete",
+                }),
               });
             }
           },

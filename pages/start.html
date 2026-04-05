@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
@@ -57,7 +58,12 @@
           class="left"
           style="flex-shrink: 0; flex-basis: 200px; padding-right: 16px"
         >
-          <h3 style="padding-top: 14px">历史打开记录</h3>
+          <h3 style="padding-top: 14px">
+            <locale-text>
+              <span lang="cn">历史打开记录</span>
+              <span lang="en">Recent Projects</span>
+            </locale-text>
+          </h3>
           <p-list>
             <o-fill :value="list">
               <p-list-item>
@@ -151,11 +157,19 @@
           </p>
         </locale-text>
         <o-if :value="canUse">
-          <p-button on:click="selectDirectory">选择本地目录</p-button>
+          <p-button on:click="selectDirectory">
+            <locale-text>
+              <span lang="cn">选择本地目录</span>
+              <span lang="en">Select Local Directory</span>
+            </locale-text>
+          </p-button>
         </o-if>
         <o-else>
           <p style="color: var(--md-sys-color-error)">
-            您的浏览器不支持选择本地目录，请升级到最新版本的 Chrome 浏览器。
+            <locale-text>
+              <span lang="cn">您的浏览器不支持选择本地目录，请升级到最新版本的 Chrome 浏览器。</span>
+              <span lang="en">Your browser does not support selecting local directories. Please upgrade to the latest version of Chrome.</span>
+            </locale-text>
           </p>
         </o-else>
       </div>
@@ -164,7 +178,12 @@
 
   <p-dialog :open="showConfirmDialog" on:click-mask="showConfirmDialog = false">
     <div style="width: 400px; max-width: 90vw; padding: 8px 0">
-      <h3 style="margin: 0 0 8px; font-size: 16px">目录结构不正确</h3>
+      <h3 style="margin: 0 0 8px; font-size: 16px">
+        <locale-text>
+          <span lang="cn">目录结构不正确</span>
+          <span lang="en">Invalid Directory Structure</span>
+        </locale-text>
+      </h3>
       <p
         style="
           color: var(--md-sys-color-normal);
@@ -172,20 +191,36 @@
           margin-bottom: 16px;
         "
       >
-        当前目录为空或不包含正确的 OBook 项目结构。是否要初始化一个新的项目？
+        <locale-text>
+          <span lang="cn">当前目录为空或不包含正确的 OBook 项目结构。是否要初始化一个新的项目？</span>
+          <span lang="en">The current directory is empty or does not contain a valid OBook project structure. Do you want to initialize a new project?</span>
+        </locale-text>
       </p>
       <div style="display: flex; justify-content: flex-end; gap: 8px">
-        <p-button variant="outlined" on:click="showConfirmDialog = false"
-          >取消</p-button
-        >
-        <p-button on:click="openInitDialog">确认初始化</p-button>
+        <p-button variant="outlined" on:click="showConfirmDialog = false">
+          <locale-text>
+            <span lang="cn">取消</span>
+            <span lang="en">Cancel</span>
+          </locale-text>
+        </p-button>
+        <p-button on:click="openInitDialog">
+          <locale-text>
+            <span lang="cn">确认初始化</span>
+            <span lang="en">Initialize</span>
+          </locale-text>
+        </p-button>
       </div>
     </div>
   </p-dialog>
 
   <p-dialog :open="showDeleteDialog" on:click-mask="showDeleteDialog = false">
     <div style="width: 400px; max-width: 90vw; padding: 8px 0">
-      <h3 style="margin: 0 0 8px; font-size: 16px">确认删除</h3>
+      <h3 style="margin: 0 0 8px; font-size: 16px">
+        <locale-text>
+          <span lang="cn">确认删除</span>
+          <span lang="en">Confirm Delete</span>
+        </locale-text>
+      </h3>
       <p
         style="
           color: var(--md-sys-color-normal);
@@ -193,13 +228,24 @@
           margin-bottom: 16px;
         "
       >
-        确定要删除"{{deleteTarget?.name}}"的历史记录吗？此操作不会删除本地文件。
+        <locale-text>
+          <span lang="cn">确定要删除"{{deleteTarget?.name}}"的历史记录吗？此操作不会删除本地文件。</span>
+          <span lang="en">Are you sure you want to delete the history record for "{{deleteTarget?.name}}"? This will not delete the local files.</span>
+        </locale-text>
       </p>
       <div style="display: flex; justify-content: flex-end; gap: 8px">
-        <p-button variant="outlined" on:click="showDeleteDialog = false"
-          >取消</p-button
-        >
-        <p-button on:click="deleteHistoryItem">确认删除</p-button>
+        <p-button variant="outlined" on:click="showDeleteDialog = false">
+          <locale-text>
+            <span lang="cn">取消</span>
+            <span lang="en">Cancel</span>
+          </locale-text>
+        </p-button>
+        <p-button on:click="deleteHistoryItem">
+          <locale-text>
+            <span lang="cn">确认删除</span>
+            <span lang="en">Delete</span>
+          </locale-text>
+        </p-button>
       </div>
     </div>
   </p-dialog>

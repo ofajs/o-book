@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
     :host {
@@ -267,7 +268,12 @@
   <div class="container">
     <o-if :value="loading">
       <div class="status-card">
-        <div class="status-title">正在加载项目数据</div>
+        <div class="status-title">
+          <locale-text>
+            <span lang="cn">正在加载项目数据</span>
+            <span lang="en">Loading project data</span>
+          </locale-text>
+        </div>
         <div class="check-progress">
           <div class="check-progress-text">{{loadingStep}}</div>
           <div class="progress-bar">
@@ -282,17 +288,29 @@
     <o-else-if :value="!loading && allArticles.length === 0">
       <div class="empty-state">
         <div class="empty-icon">📭</div>
-        <div>暂无文章数据</div>
+        <div>
+          <locale-text>
+            <span lang="cn">暂无文章数据</span>
+            <span lang="en">No article data</span>
+          </locale-text>
+        </div>
       </div>
     </o-else-if>
     <o-else>
       <o-if :value="checkingStatus">
         <div class="status-card">
-          <div class="status-title">正在检查翻译状态</div>
+          <div class="status-title">
+            <locale-text>
+              <span lang="cn">正在检查翻译状态</span>
+              <span lang="en">Checking translation status</span>
+            </locale-text>
+          </div>
           <div class="check-progress">
             <div class="check-progress-text">
-              正在检查 {{checkingLangName}} ({{checkingLangIndex}} /
-              {{totalLangs}})
+              <locale-text>
+                <span lang="cn">正在检查 {{checkingLangName}} ({{checkingLangIndex}} / {{totalLangs}})</span>
+                <span lang="en">Checking {{checkingLangName}} ({{checkingLangIndex}} / {{totalLangs}})</span>
+              </locale-text>
             </div>
             <div class="progress-bar">
               <div
@@ -305,16 +323,28 @@
       </o-if>
       <o-else>
         <div class="status-card">
-          <div class="status-title">翻译状态总览</div>
+          <div class="status-title">
+            <locale-text>
+              <span lang="cn">翻译状态总览</span>
+              <span lang="en">Translation Status Overview</span>
+            </locale-text>
+          </div>
           <div class="status-content">
-            项目共包含 <strong>{{totalBlocks}}</strong> 个内容块，
-            <strong>{{targetLanguages.length}}</strong> 种目标语言
+            <locale-text>
+              <span lang="cn">项目共包含 <strong>{{totalBlocks}}</strong> 个内容块，<strong>{{targetLanguages.length}}</strong> 种目标语言</span>
+              <span lang="en">Project contains <strong>{{totalBlocks}}</strong> content blocks, <strong>{{targetLanguages.length}}</strong> target languages</span>
+            </locale-text>
           </div>
 
           <div class="summary-card">
             <div class="summary-item">
               <div class="summary-number">{{totalTranslatedBlocks}}</div>
-              <div class="summary-label">已翻译块数</div>
+              <div class="summary-label">
+                <locale-text>
+                  <span lang="cn">已翻译块数</span>
+                  <span lang="en">Translated</span>
+                </locale-text>
+              </div>
             </div>
             <div class="summary-item">
               <div
@@ -323,7 +353,12 @@
               >
                 {{totalUntranslatedBlocks}}
               </div>
-              <div class="summary-label">待翻译块数</div>
+              <div class="summary-label">
+                <locale-text>
+                  <span lang="cn">待翻译块数</span>
+                  <span lang="en">Untranslated</span>
+                </locale-text>
+              </div>
             </div>
             <div class="summary-item">
               <div
@@ -332,7 +367,12 @@
               >
                 {{completedLanguagesCount}}
               </div>
-              <div class="summary-label">已完成语言</div>
+              <div class="summary-label">
+                <locale-text>
+                  <span lang="cn">已完成语言</span>
+                  <span lang="en">Completed</span>
+                </locale-text>
+              </div>
             </div>
             <div class="summary-item">
               <div
@@ -341,24 +381,38 @@
               >
                 {{inProgressLanguagesCount}}
               </div>
-              <div class="summary-label">进行中语言</div>
+              <div class="summary-label">
+                <locale-text>
+                  <span lang="cn">进行中语言</span>
+                  <span lang="en">In Progress</span>
+                </locale-text>
+              </div>
             </div>
           </div>
 
           <div class="button-container">
             <o-if :value="!isTranslating && totalUntranslatedBlocks > 0">
               <p-button variant="contained" on:click="startTranslation">
-                开始翻译 ({{totalUntranslatedBlocks}})
+                <locale-text>
+                  <span lang="cn">开始翻译 ({{totalUntranslatedBlocks}})</span>
+                  <span lang="en">Start Translation ({{totalUntranslatedBlocks}})</span>
+                </locale-text>
               </p-button>
             </o-if>
             <o-if :value="isTranslating">
               <p-button variant="outlined" on:click="stopTranslation">
-                停止翻译
+                <locale-text>
+                  <span lang="cn">停止翻译</span>
+                  <span lang="en">Stop</span>
+                </locale-text>
               </p-button>
             </o-if>
             <o-if :value="!isTranslating && !isGenerating">
               <p-button variant="outlined" on:click="refreshStatus">
-                刷新状态
+                <locale-text>
+                  <span lang="cn">刷新状态</span>
+                  <span lang="en">Refresh</span>
+                </locale-text>
               </p-button>
             </o-if>
             <o-if :value="!isTranslating && totalTranslatedBlocks > 0">
@@ -367,7 +421,10 @@
                 color="error"
                 on:click="clearAllCache"
               >
-                清除所有缓存
+                <locale-text>
+                  <span lang="cn">清除所有缓存</span>
+                  <span lang="en">Clear All Cache</span>
+                </locale-text>
               </p-button>
             </o-if>
           </div>
@@ -377,9 +434,17 @@
           :value="totalUntranslatedBlocks === 0 && !isTranslating && !isGenerating"
         >
           <div class="next-step-section">
-            <p>所有内容块已翻译完成，可以进入下一步进行检查。</p>
+            <p>
+              <locale-text>
+                <span lang="cn">所有内容块已翻译完成，可以进入下一步进行检查。</span>
+                <span lang="en">All content blocks translated. Proceed to the next step for verification.</span>
+              </locale-text>
+            </p>
             <p-button variant="contained" on:click="goToNext">
-              下一步
+              <locale-text>
+                <span lang="cn">下一步</span>
+                <span lang="en">Next</span>
+              </locale-text>
             </p-button>
           </div>
         </o-if>
@@ -387,9 +452,17 @@
           :value="totalUntranslatedBlocks > 0 && !isTranslating && !isGenerating && languageStats.length === 0"
         >
           <div class="next-step-section">
-            <p>没有找到目标语言配置，请检查项目配置。</p>
+            <p>
+              <locale-text>
+                <span lang="cn">没有找到目标语言配置，请检查项目配置。</span>
+                <span lang="en">No target language configuration found. Please check project settings.</span>
+              </locale-text>
+            </p>
             <p-button variant="outlined" on:click="refreshStatus">
-              刷新状态
+              <locale-text>
+                <span lang="cn">刷新状态</span>
+                <span lang="en">Refresh</span>
+              </locale-text>
             </p-button>
           </div>
         </o-if>

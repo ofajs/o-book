@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <style>
@@ -67,22 +68,42 @@
     <div class="step-wrapper">
       <div class="step" class:active="step === 0">
         <div class="step-number">1</div>
-        <span>欢迎</span>
+        <span>
+          <locale-text>
+            <span lang="cn">欢迎</span>
+            <span lang="en">Welcome</span>
+          </locale-text>
+        </span>
       </div>
       <div class="step-connector"></div>
       <div class="step" class:active="step === 1">
         <div class="step-number">2</div>
-        <span>翻译</span>
+        <span>
+          <locale-text>
+            <span lang="cn">翻译</span>
+            <span lang="en">Translate</span>
+          </locale-text>
+        </span>
       </div>
       <div class="step-connector"></div>
       <div class="step" class:active="step === 2">
         <div class="step-number">3</div>
-        <span>检验</span>
+        <span>
+          <locale-text>
+            <span lang="cn">检验</span>
+            <span lang="en">Verify</span>
+          </locale-text>
+        </span>
       </div>
       <div class="step-connector"></div>
       <div class="step" class:active="step === 3">
         <div class="step-number">4</div>
-        <span>生成文档</span>
+        <span>
+          <locale-text>
+            <span lang="cn">生成文档</span>
+            <span lang="en">Generate</span>
+          </locale-text>
+        </span>
       </div>
     </div>
   </div>
@@ -101,16 +122,27 @@
       "
     >
       <p>
-        欢迎使用文档自动翻译工具！本工具可将您的文档从源语言翻译为您指定的所有目标语言。
+        <locale-text>
+          <span lang="cn">欢迎使用文档自动翻译工具！本工具可将您的文档从源语言翻译为您指定的所有目标语言。</span>
+          <span lang="en">Welcome to the document auto-translation tool! This tool can translate your documents from the source language to all specified target languages.</span>
+        </locale-text>
       </p>
       <div style="display: flex; margin-top: 16px">
-        <p-button on:click="step = 1"> 下一步 </p-button>
+        <p-button on:click="step = 1">
+          <locale-text>
+            <span lang="cn">下一步</span>
+            <span lang="en">Next</span>
+          </locale-text>
+        </p-button>
         <p-button
           on:click="editMode = true"
           style="margin-left: 8px"
           variant="outlined"
         >
-          编辑翻译
+          <locale-text>
+            <span lang="cn">编辑翻译</span>
+            <span lang="en">Edit Translations</span>
+          </locale-text>
         </p-button>
       </div>
     </div>

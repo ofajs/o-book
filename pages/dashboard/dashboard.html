@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/progress/progress.html"></l-m>
@@ -23,7 +24,12 @@
       sync:value="lang"
       style="width: 200px; margin-right: 16px"
     >
-      <label> 切换语言 </label>
+      <label>
+        <locale-text>
+          <span lang="cn">切换语言</span>
+          <span lang="en">Language</span>
+        </locale-text>
+      </label>
       <o-fill :value="languages">
         <p-option attr:value="$data">{{$host.languageMap[$data]}}</p-option>
       </o-fill>
@@ -35,7 +41,10 @@
       attr:disabled="generating"
     >
       <n-icon icon="material-symbols:settings" slot="prefix"></n-icon>
-      项目配置
+      <locale-text>
+        <span lang="cn">项目配置</span>
+        <span lang="en">Project Settings</span>
+      </locale-text>
     </p-button>
     <p-button
       class="toolbar-btn"
@@ -44,7 +53,10 @@
       attr:disabled="generating"
     >
       <n-icon icon="material-symbols:analytics" slot="prefix"></n-icon>
-      谷歌统计
+      <locale-text>
+        <span lang="cn">谷歌统计</span>
+        <span lang="en">Google Analytics</span>
+      </locale-text>
     </p-button>
     <p-button
       variant="outlined"
@@ -64,7 +76,10 @@
       <x-else>
         <n-icon icon="hugeicons:ai-content-generator-01" slot="prefix"></n-icon>
       </x-else>
-      重新生成全站页面
+      <locale-text>
+        <span lang="cn">重新生成全站页面</span>
+        <span lang="en">Regenerate All Pages</span>
+      </locale-text>
     </p-button>
   </div>
 
@@ -88,6 +103,8 @@
   ></o-page>
 
   <script>
+    import { getLocaleText } from "/nos/locale-text/get-locale-text.js";
+
     export const parent = "../layout.html";
 
     export default async ({ load, query }) => {
@@ -195,7 +212,10 @@
               this.lang = oldLang;
               toast({
                 color: "error",
-                message: `翻译未完成，还有 ${untranslatedCount} 个内容块待翻译，无法切换语言`,
+                message: getLocaleText({
+                  cn: `翻译未完成，还有 ${untranslatedCount} 个内容块待翻译，无法切换语言`,
+                  en: `Translation incomplete. ${untranslatedCount} content blocks remaining. Cannot switch language.`,
+                }),
               });
             }
 
@@ -232,7 +252,10 @@
             if (languages.length === 0) {
               toast({
                 color: "error",
-                message: "没有配置任何语言",
+                message: getLocaleText({
+                  cn: "没有配置任何语言",
+                  en: "No languages configured",
+                }),
               });
               this.generating = false;
               return;
@@ -256,7 +279,10 @@
                 console.error(`生成 ${lang} 失败:`, e);
                 toast({
                   color: "error",
-                  message: `生成 ${LANGUAGES[lang] || lang} 失败`,
+                  message: getLocaleText({
+                    cn: `生成 ${LANGUAGES[lang] || lang} 失败`,
+                    en: `Failed to generate ${LANGUAGES[lang] || lang}`,
+                  }),
                 });
               }
               completed++;
@@ -267,7 +293,10 @@
 
             toast({
               color: "success",
-              message: "所有语言生成完成",
+              message: getLocaleText({
+                cn: "所有语言生成完成",
+                en: "All languages generated successfully",
+              }),
             });
           },
         },

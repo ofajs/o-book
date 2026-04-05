@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
@@ -57,14 +58,29 @@
 
   <p-dialog :open="open" on:click-mask="handleClose">
     <div class="config-dialog">
-      <h3 style="margin: 0 0 8px; font-size: 16px">项目配置</h3>
+      <h3 style="margin: 0 0 8px; font-size: 16px">
+        <locale-text>
+          <span lang="cn">项目配置</span>
+          <span lang="en">Project Settings</span>
+        </locale-text>
+      </h3>
       <div class="config-form">
         <div class="form-item">
-          <label>写作语言 (writingLang)</label>
+          <label>
+            <locale-text>
+              <span lang="cn">写作语言 (writingLang)</span>
+              <span lang="en">Writing Language (writingLang)</span>
+            </locale-text>
+          </label>
           <div>{{languageMap[editConfig.writingLang]}}</div>
         </div>
         <div class="form-item">
-          <label>网站初始语言 (primaryLang)</label>
+          <label>
+            <locale-text>
+              <span lang="cn">网站初始语言 (primaryLang)</span>
+              <span lang="en">Primary Language (primaryLang)</span>
+            </locale-text>
+          </label>
           <p-select
             sync:value="editConfig.primaryLang"
             attr:disabled="editConfig.writingLang === 'en'"
@@ -77,7 +93,12 @@
           </p-select>
         </div>
         <div class="form-item">
-          <label>支持的语言 (languages)</label>
+          <label>
+            <locale-text>
+              <span lang="cn">支持的语言 (languages)</span>
+              <span lang="en">Supported Languages (languages)</span>
+            </locale-text>
+          </label>
           <div class="language-tags">
             <o-fill :value="editConfig.languages">
               <p-chip tonal>
@@ -96,7 +117,10 @@
             </o-fill>
           </div>
           <h5 style="margin: 16px 0 0; color: var(--md-ref-palette-normal40)">
-            可添加的语言
+            <locale-text>
+              <span lang="cn">可添加的语言</span>
+              <span lang="en">Available Languages</span>
+            </locale-text>
           </h5>
           <div class="available-languages">
             <o-fill :value="availableLanguagesToAdd">
@@ -112,14 +136,25 @@
         </div>
       </div>
       <div class="dialog-actions">
-        <p-button variant="outlined" on:click="handleClose">取消</p-button>
-        <p-button on:click="handleSave">保存</p-button>
+        <p-button variant="outlined" on:click="handleClose">
+          <locale-text>
+            <span lang="cn">取消</span>
+            <span lang="en">Cancel</span>
+          </locale-text>
+        </p-button>
+        <p-button on:click="handleSave">
+          <locale-text>
+            <span lang="cn">保存</span>
+            <span lang="en">Save</span>
+          </locale-text>
+        </p-button>
       </div>
     </div>
   </p-dialog>
 
   <script>
     import yaml from "/npm/js-yaml@4.1.1/dist/js-yaml.min.mjs";
+    import { getLocaleText } from "/nos/locale-text/get-locale-text.js";
 
     export default async ({ load }) => {
       const { getData } = await load("../../util/yaml-handle.js");
@@ -216,7 +251,10 @@
 
               toast({
                 color: "success",
-                message: "配置保存成功",
+                message: getLocaleText({
+                  cn: "配置保存成功",
+                  en: "Settings saved successfully",
+                }),
               });
 
               this.emit("config-saved", {
@@ -226,7 +264,10 @@
             } catch (error) {
               toast({
                 color: "error",
-                message: "配置保存失败: " + error.message,
+                message: getLocaleText({
+                  cn: "配置保存失败: " + error.message,
+                  en: "Failed to save settings: " + error.message,
+                }),
               });
             }
           },

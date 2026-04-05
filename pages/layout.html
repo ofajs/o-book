@@ -14,7 +14,10 @@
       <p-nav-bar slot="nav">
         <o-if :value="activeId === 'start'">
           <p-nav-item attr:active-item="activeId === 'start'">
-            开始
+            <locale-text>
+              <span lang="cn">开始</span>
+              <span lang="en">Start</span>
+            </locale-text>
             <n-icon icon="material-symbols:start-rounded" slot="icon"></n-icon>
           </p-nav-item>
         </o-if>
@@ -23,7 +26,10 @@
             attr:active-item="activeId === 'dashboard'"
             on:click="goto('./dashboard/dashboard.html?path='+query.path)"
           >
-            总揽
+            <locale-text>
+              <span lang="cn">总揽</span>
+              <span lang="en">Dashboard</span>
+            </locale-text>
             <n-icon
               icon="material-symbols:dashboard-outline-rounded"
               slot="icon"
@@ -35,7 +41,10 @@
             attr:active-item="activeId === 'translate'"
             on:click="goto('./translate/translate.html?path='+query.path)"
           >
-            AI翻译
+            <locale-text>
+              <span lang="cn">AI翻译</span>
+              <span lang="en">AI Translate</span>
+            </locale-text>
             <n-icon icon="mingcute:ai-line" slot="icon"></n-icon>
           </p-nav-item>
         </o-if>
@@ -44,7 +53,10 @@
             attr:active-item="activeId === 'config'"
             on:click="goto('./config/config.html?path='+query.path)"
           >
-            配置
+            <locale-text>
+              <span lang="cn">配置</span>
+              <span lang="en">Settings</span>
+            </locale-text>
             <n-icon
               icon="material-symbols:settings-outline-rounded"
               slot="icon"

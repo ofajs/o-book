@@ -1,4 +1,5 @@
 <template component>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
@@ -44,7 +45,12 @@
 
   <p-dialog :open="open" on:click-mask="handleClose">
     <div class="init-dialog">
-      <h3 style="margin: 0 0 8px; font-size: 16px">初始化项目</h3>
+      <h3 style="margin: 0 0 8px; font-size: 16px">
+        <locale-text>
+          <span lang="cn">初始化项目</span>
+          <span lang="en">Initialize Project</span>
+        </locale-text>
+      </h3>
       <p
         style="
           color: var(--md-sys-color-normal);
@@ -52,36 +58,64 @@
           margin-bottom: 16px;
         "
       >
-        当前目录为空或结构不正确，将为您创建基础项目结构。
+        <locale-text>
+          <span lang="cn">当前目录为空或结构不正确，将为您创建基础项目结构。</span>
+          <span lang="en">The current directory is empty or has an incorrect structure. A basic project structure will be created for you.</span>
+        </locale-text>
       </p>
       <div class="init-form">
         <div class="form-item">
-          <label>项目名称</label>
+          <label>
+            <locale-text>
+              <span lang="cn">项目名称</span>
+              <span lang="en">Project Name</span>
+            </locale-text>
+          </label>
           <p-input
             sync:value="projectName"
-            placeholder="请输入项目名称"
+            attr:placeholder="projectNamePlaceholder"
           ></p-input>
         </div>
         <div class="form-item">
-          <label>创作语言</label>
+          <label>
+            <locale-text>
+              <span lang="cn">创作语言</span>
+              <span lang="en">Writing Language</span>
+            </locale-text>
+          </label>
           <p-select sync:value="writingLang">
             <x-fill :value="languageOptions">
               <p-option attr:value="$data.value">{{$data.label}}</p-option>
             </x-fill>
           </p-select>
-          <p class="hint-text">创作语言是您撰写文档的主要语言</p>
+          <p class="hint-text">
+            <locale-text>
+              <span lang="cn">创作语言是您撰写文档的主要语言</span>
+              <span lang="en">Writing language is the primary language for your documentation</span>
+            </locale-text>
+          </p>
         </div>
       </div>
       <div class="dialog-actions">
-        <p-button variant="outlined" on:click="handleClose">取消</p-button>
+        <p-button variant="outlined" on:click="handleClose">
+          <locale-text>
+            <span lang="cn">取消</span>
+            <span lang="en">Cancel</span>
+          </locale-text>
+        </p-button>
         <p-button on:click="handleInit" attr:disabled="initializing">
-          {{initializing ? '初始化中...' : '确认初始化'}}
+          <locale-text>
+            <span lang="cn">{{initializing ? '初始化中...' : '确认初始化'}}</span>
+            <span lang="en">{{initializing ? 'Initializing...' : 'Initialize'}}</span>
+          </locale-text>
         </p-button>
       </div>
     </div>
   </p-dialog>
 
   <script>
+    import { getLocaleText } from "/nos/locale-text/get-locale-text.js";
+
     const INIT_FILES_CACHE = {};
 
     const getInitFiles = async (lang, load) => {
@@ -124,6 +158,12 @@
           },
         },
         proto: {
+          get projectNamePlaceholder() {
+            return getLocaleText({
+              cn: "请输入项目名称",
+              en: "Enter project name",
+            });
+          },
           handleClose() {
             this.open = false;
           },
@@ -141,7 +181,10 @@
 
               toast({
                 color: "success",
-                message: "项目初始化成功",
+                message: getLocaleText({
+                  cn: "项目初始化成功",
+                  en: "Project initialized successfully",
+                }),
               });
 
               this.open = false;
@@ -156,7 +199,10 @@
             } catch (error) {
               toast({
                 color: "error",
-                message: "初始化失败: " + error.message,
+                message: getLocaleText({
+                  cn: "初始化失败: " + error.message,
+                  en: "Initialization failed: " + error.message,
+                }),
               });
             } finally {
               this.initializing = false;

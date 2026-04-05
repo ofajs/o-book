@@ -1,4 +1,5 @@
 <template component>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <style>
     :host {
@@ -106,7 +107,7 @@
         class="editable input-editor"
         contenteditable
         class:hide="translating"
-        data-placeholder="未翻译"
+        attr:data-placeholder="placeholderText"
         on:input="handleInput"
       ></div>
       <div
@@ -136,7 +137,10 @@
       :text="provider"
     ></div>
     <div class="edited-tag" :style.display="isEdit ? 'block' : 'none'">
-      已编辑
+      <locale-text>
+        <span lang="cn">已编辑</span>
+        <span lang="en">Edited</span>
+      </locale-text>
     </div>
     <p-button
       size="small"
@@ -144,10 +148,30 @@
       on:click="translate"
       attr:disabled="translating"
     >
-      <o-if :value="thinking"> 思考中... </o-if>
-      <o-else-if :value="translating"> 翻译中... </o-else-if>
-      <o-else-if :value="translateText">重新翻译</o-else-if>
-      <o-else> 翻译 </o-else>
+      <o-if :value="thinking">
+        <locale-text>
+          <span lang="cn">思考中...</span>
+          <span lang="en">Thinking...</span>
+        </locale-text>
+      </o-if>
+      <o-else-if :value="translating">
+        <locale-text>
+          <span lang="cn">翻译中...</span>
+          <span lang="en">Translating...</span>
+        </locale-text>
+      </o-else-if>
+      <o-else-if :value="translateText">
+        <locale-text>
+          <span lang="cn">重新翻译</span>
+          <span lang="en">Retranslate</span>
+        </locale-text>
+      </o-else-if>
+      <o-else>
+        <locale-text>
+          <span lang="cn">翻译</span>
+          <span lang="en">Translate</span>
+        </locale-text>
+      </o-else>
     </p-button>
   </div>
 
@@ -155,22 +179,23 @@
   <script>
     import { EverCache } from "/gh/kirakiray/ever-cache/src/main.js";
     import { translate } from "./util/translate.js";
+    import { getLocaleText } from "/nos/locale-text/get-locale-text.js";
 
     export default async function ({ load }) {
       return {
         tag: "translate-block",
         data: {
-          translateText: "", // 翻译后的文本
-          translating: false, // 是否正在翻译
-          thinking: false, // 是否正在思考
+          translateText: "",
+          translating: false,
+          thinking: false,
           item: null,
-          targetLang: "", // 翻译到目标语言
-          writingLang: "", // 源语言
+          targetLang: "",
+          writingLang: "",
           projectPath: "",
-          provider: "", // 翻译提供商
-          model: "", // 翻译模型
-          id: "", // API Key ID
-          editedText: "", // 用户编辑后的文本
+          provider: "",
+          model: "",
+          id: "",
+          editedText: "",
         },
         watch: {
           item() {
@@ -196,6 +221,12 @@
           },
         },
         proto: {
+          get placeholderText() {
+            return getLocaleText({
+              cn: "未翻译",
+              en: "Untranslated",
+            });
+          },
           get isEdit() {
             if (!this.editedText) {
               return false;
@@ -207,7 +238,6 @@
 
             return false;
           },
-          // 翻译原文
           async translate() {
             if (!this.item || !this.item.raw) {
               return;
@@ -250,7 +280,10 @@
               this.init();
             } catch (error) {
               console.error("Translation failed:", error);
-              this.translateText = "翻译失败: " + error.message;
+              this.translateText = getLocaleText({
+                cn: "翻译失败: " + error.message,
+                en: "Translation failed: " + error.message,
+              });
               this.provider = "";
               this.model = "";
               this.id = "";

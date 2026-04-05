@@ -1,4 +1,5 @@
 <template page>
+  <l-m src="/nos/locale-text/locale-text.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
@@ -385,12 +386,22 @@
 
   <p-dialog :open="isRetrying">
     <div class="retry-dialog">
-      <div class="retry-title">正在重试翻译异常块</div>
+      <div class="retry-title">
+        <locale-text>
+          <span lang="cn">正在重试翻译异常块</span>
+          <span lang="en">Retrying translation of abnormal blocks</span>
+        </locale-text>
+      </div>
 
       <div class="retry-stats">
         <div class="retry-stat">
           <div class="retry-stat-value">{{retryProgress}}%</div>
-          <div class="retry-stat-label">进度</div>
+          <div class="retry-stat-label">
+            <locale-text>
+              <span lang="cn">进度</span>
+              <span lang="en">Progress</span>
+            </locale-text>
+          </div>
         </div>
         <div class="retry-stat">
           <div
@@ -399,7 +410,12 @@
           >
             {{retrySuccessCount}}
           </div>
-          <div class="retry-stat-label">成功</div>
+          <div class="retry-stat-label">
+            <locale-text>
+              <span lang="cn">成功</span>
+              <span lang="en">Success</span>
+            </locale-text>
+          </div>
         </div>
         <div class="retry-stat">
           <div
@@ -408,7 +424,12 @@
           >
             {{retryFailedCount}}
           </div>
-          <div class="retry-stat-label">失败</div>
+          <div class="retry-stat-label">
+            <locale-text>
+              <span lang="cn">失败</span>
+              <span lang="en">Failed</span>
+            </locale-text>
+          </div>
         </div>
         <div class="retry-stat">
           <div
@@ -417,7 +438,12 @@
           >
             {{retryRemainingCount}}
           </div>
-          <div class="retry-stat-label">剩余错误</div>
+          <div class="retry-stat-label">
+            <locale-text>
+              <span lang="cn">剩余错误</span>
+              <span lang="en">Remaining</span>
+            </locale-text>
+          </div>
         </div>
         <div class="retry-stat">
           <div
@@ -426,7 +452,12 @@
           >
             {{retryAttemptCount}}
           </div>
-          <div class="retry-stat-label">重试次数</div>
+          <div class="retry-stat-label">
+            <locale-text>
+              <span lang="cn">重试次数</span>
+              <span lang="en">Retries</span>
+            </locale-text>
+          </div>
         </div>
       </div>
 
@@ -453,22 +484,22 @@
               <div class="retry-item-header">
                 <div>
                   <div class="retry-item-title">
-                    {{$data.articleName}} - 块 #{{$data.blockIndex}}
+                    {{$data.articleName}} - <locale-text><span lang="cn">块</span><span lang="en">Block</span></locale-text> #{{$data.blockIndex}}
                   </div>
                   <div class="retry-item-lang">{{$data.langName}}</div>
                   <o-if :value="$data.model">
-                    <div class="retry-item-model">模型：{{$data.model}}</div>
+                    <div class="retry-item-model"><locale-text><span lang="cn">模型：</span><span lang="en">Model: </span></locale-text>{{$data.model}}</div>
                   </o-if>
                 </div>
                 <div>
                   <o-if :value="$data.status === 'translating'">
-                    <span class="status-badge translating">翻译中</span>
+                    <span class="status-badge translating"><locale-text><span lang="cn">翻译中</span><span lang="en">Translating</span></locale-text></span>
                   </o-if>
                   <o-if :value="$data.status === 'completed'">
-                    <span class="status-badge completed">完成</span>
+                    <span class="status-badge completed"><locale-text><span lang="cn">完成</span><span lang="en">Done</span></locale-text></span>
                   </o-if>
                   <o-if :value="$data.status === 'failed'">
-                    <span class="status-badge failed">失败</span>
+                    <span class="status-badge failed"><locale-text><span lang="cn">失败</span><span lang="en">Failed</span></locale-text></span>
                   </o-if>
                 </div>
               </div>
@@ -482,7 +513,12 @@
       </o-if>
 
       <div class="retry-actions">
-        <p-button variant="outlined" on:click="stopRetry"> 停止重试 </p-button>
+        <p-button variant="outlined" on:click="stopRetry">
+          <locale-text>
+            <span lang="cn">停止重试</span>
+            <span lang="en">Stop Retry</span>
+          </locale-text>
+        </p-button>
       </div>
     </div>
   </p-dialog>
@@ -490,10 +526,17 @@
   <div class="container">
     <div class="left">
       <div class="header">
-        <h3>翻译检查器</h3>
+        <h3>
+          <locale-text>
+            <span lang="cn">翻译检查器</span>
+            <span lang="en">Translation Checker</span>
+          </locale-text>
+        </h3>
         <p>
-          由于采用 AI 翻译，难免会出现一些小问题。<br />
-          这里可以帮助您发现并修复这些问题。
+          <locale-text>
+            <span lang="cn">由于采用 AI 翻译，难免会出现一些小问题。<br />这里可以帮助您发现并修复这些问题。</span>
+            <span lang="en">Since AI translation is used, some minor issues may occur.<br />This tool helps you discover and fix these issues.</span>
+          </locale-text>
         </p>
       </div>
 
@@ -501,19 +544,34 @@
         <div class="stats-row">
           <div class="stat-item">
             <div class="stat-value">{{stats.totalBlocks}}</div>
-            <div class="stat-label">已翻译块</div>
+            <div class="stat-label">
+              <locale-text>
+                <span lang="cn">已翻译块</span>
+                <span lang="en">Translated</span>
+              </locale-text>
+            </div>
           </div>
           <div class="stat-item">
             <div class="stat-value" style="color: var(--md-sys-color-error)">
               {{stats.issueBlocks}}
             </div>
-            <div class="stat-label">异常块</div>
+            <div class="stat-label">
+              <locale-text>
+                <span lang="cn">异常块</span>
+                <span lang="en">Issues</span>
+              </locale-text>
+            </div>
           </div>
           <div class="stat-item">
             <div class="stat-value" style="color: var(--md-sys-color-warning)">
               {{retryAttemptCount}}
             </div>
-            <div class="stat-label">重试次数</div>
+            <div class="stat-label">
+              <locale-text>
+                <span lang="cn">重试次数</span>
+                <span lang="en">Retries</span>
+              </locale-text>
+            </div>
           </div>
         </div>
       </div>
@@ -524,14 +582,20 @@
           on:click="retryAllIssues"
           attr:disabled="isRetrying || isChecking || stats.issueBlocks === 0"
         >
-          重新翻译异常块
+          <locale-text>
+            <span lang="cn">重新翻译异常块</span>
+            <span lang="en">Retry Abnormal Blocks</span>
+          </locale-text>
         </p-button>
         <p-button
           variant="outlined"
           on:click="refreshCheck"
           attr:disabled="isRetrying || isChecking"
         >
-          重新检查
+          <locale-text>
+            <span lang="cn">重新检查</span>
+            <span lang="en">Recheck</span>
+          </locale-text>
         </p-button>
       </div>
 
@@ -541,7 +605,10 @@
             <div class="progress-fill" :style.width="checkProgress + '%'"></div>
           </div>
           <div class="progress-text">
-            正在检查: {{checkStep}} ({{checkedCount}} / {{totalToCheck}})
+            <locale-text>
+              <span lang="cn">正在检查: {{checkStep}} ({{checkedCount}} / {{totalToCheck}})</span>
+              <span lang="en">Checking: {{checkStep}} ({{checkedCount}} / {{totalToCheck}})</span>
+            </locale-text>
           </div>
         </div>
       </o-if>
@@ -553,7 +620,10 @@
           color: var(--md-sys-color-on-surface-variant);
         "
       >
-        有异常的文件 ({{articleList.length}})
+        <locale-text>
+          <span lang="cn">有异常的文件 ({{articleList.length}})</span>
+          <span lang="en">Files with issues ({{articleList.length}})</span>
+        </locale-text>
       </h4>
       <p-list>
         <o-fill :value="articleList">
@@ -573,7 +643,12 @@
 
     <div class="article-content">
       <o-if :value="isChecking">
-        <div class="loading">检查中...</div>
+        <div class="loading">
+          <locale-text>
+            <span lang="cn">检查中...</span>
+            <span lang="en">Checking...</span>
+          </locale-text>
+        </div>
       </o-if>
       <o-else-if
         :value="!isChecking && issueBlocks.length === 0 && stats.totalBlocks > 0"
@@ -585,12 +660,23 @@
             />
           </svg>
           <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
-            没有发现异常
+            <locale-text>
+              <span lang="cn">没有发现异常</span>
+              <span lang="en">No issues found</span>
+            </locale-text>
           </div>
-          <div style="font-size: 14px">所有翻译块都通过了检查</div>
+          <div style="font-size: 14px">
+            <locale-text>
+              <span lang="cn">所有翻译块都通过了检查</span>
+              <span lang="en">All translation blocks passed the check</span>
+            </locale-text>
+          </div>
           <div style="margin-top: 24px">
             <p-button variant="contained" on:click="goToNext">
-              下一步
+              <locale-text>
+                <span lang="cn">下一步</span>
+                <span lang="en">Next</span>
+              </locale-text>
             </p-button>
           </div>
         </div>
@@ -598,16 +684,29 @@
       <o-else-if :value="!isChecking && stats.totalBlocks === 0">
         <div class="empty-state">
           <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
-            暂无翻译数据
+            <locale-text>
+              <span lang="cn">暂无翻译数据</span>
+              <span lang="en">No translation data</span>
+            </locale-text>
           </div>
-          <div style="font-size: 14px">请先完成翻译</div>
+          <div style="font-size: 14px">
+            <locale-text>
+              <span lang="cn">请先完成翻译</span>
+              <span lang="en">Please complete translation first</span>
+            </locale-text>
+          </div>
         </div>
       </o-else-if>
       <o-else>
         <div class="article-header">
           <div class="article-title">{{currentArticleName}}</div>
           <div>
-            <span class="issue-count">{{issueBlocks.length}} 个异常块</span>
+            <span class="issue-count">
+              <locale-text>
+                <span lang="cn">{{issueBlocks.length}} 个异常块</span>
+                <span lang="en">{{issueBlocks.length}} issue blocks</span>
+              </locale-text>
+            </span>
             <span class="lang-badge">{{currentLangName}}</span>
           </div>
         </div>
