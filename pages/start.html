@@ -1,6 +1,8 @@
 <template page>
   <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
   <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
+  <l-m src="./dashboard/init-project-dialog.html"></l-m>
   <style>
     :host {
       display: block;
@@ -31,6 +33,22 @@
       color: var(--md-sys-color-normal);
       margin-top: 32px;
     }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .history-item .delete-btn {
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .history-item:hover .delete-btn {
+      opacity: 1;
+    }
   </style>
   <div class="container">
     <div class="main">
@@ -42,8 +60,24 @@
           <h3 style="padding-top: 14px">历史打开记录</h3>
           <p-list>
             <o-fill :value="list">
-              <p-list-item button on:click="$host.handleClick($data)">
-                {{$data.name}}
+              <p-list-item>
+                <div class="history-item">
+                  <span
+                    on:click="$host.handleClick($data)"
+                    style="cursor: pointer; flex: 1"
+                    >{{$data.name}}</span
+                  >
+                  <p-button
+                    class="delete-btn"
+                    variant="text"
+                    size="mini"
+                    color="error"
+                    icon
+                    on:click="$host.confirmDelete($data)"
+                  >
+                    <n-icon icon="material-symbols:close-rounded"></n-icon>
+                  </p-button>
+                </div>
               </p-list-item>
             </o-fill>
           </p-list>
@@ -127,6 +161,53 @@
       </div>
     </div>
   </div>
+
+  <p-dialog :open="showConfirmDialog" on:click-mask="showConfirmDialog = false">
+    <div style="width: 400px; max-width: 90vw; padding: 8px 0">
+      <h3 style="margin: 0 0 8px; font-size: 16px">目录结构不正确</h3>
+      <p
+        style="
+          color: var(--md-sys-color-normal);
+          font-size: 14px;
+          margin-bottom: 16px;
+        "
+      >
+        当前目录为空或不包含正确的 OBook 项目结构。是否要初始化一个新的项目？
+      </p>
+      <div style="display: flex; justify-content: flex-end; gap: 8px">
+        <p-button variant="outlined" on:click="showConfirmDialog = false"
+          >取消</p-button
+        >
+        <p-button on:click="openInitDialog">确认初始化</p-button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-dialog :open="showDeleteDialog" on:click-mask="showDeleteDialog = false">
+    <div style="width: 400px; max-width: 90vw; padding: 8px 0">
+      <h3 style="margin: 0 0 8px; font-size: 16px">确认删除</h3>
+      <p
+        style="
+          color: var(--md-sys-color-normal);
+          font-size: 14px;
+          margin-bottom: 16px;
+        "
+      >
+        确定要删除"{{deleteTarget?.name}}"的历史记录吗？此操作不会删除本地文件。
+      </p>
+      <div style="display: flex; justify-content: flex-end; gap: 8px">
+        <p-button variant="outlined" on:click="showDeleteDialog = false"
+          >取消</p-button
+        >
+        <p-button on:click="deleteHistoryItem">确认删除</p-button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <init-project-dialog
+    sync:open="showInitDialog"
+    on:init-success="handleInitSuccess"
+  ></init-project-dialog>
   <script>
     export const parent = "./layout.html";
 
@@ -141,6 +222,11 @@
         data: {
           canUse: !!window.showDirectoryPicker,
           list: [],
+          showConfirmDialog: false,
+          showInitDialog: false,
+          showDeleteDialog: false,
+          deleteTarget: null,
+          _currentHandle: null,
         },
         proto: {
           handleClick(item) {
@@ -149,7 +235,7 @@
           async selectDirectory() {
             const handle = await mount();
 
-            await save(handle); // 保存目录句柄
+            await save(handle);
 
             const history = (await storage.getItem("history")) || [];
 
@@ -158,9 +244,82 @@
               await storage.setItem("history", history);
             }
 
-            // TODO: 检查文件夹内容是否符合 OBook 约定
+            const isValid = await this.checkProjectStructure(handle);
+
+            if (!isValid) {
+              this._currentHandle = handle;
+              this.showConfirmDialog = true;
+              return;
+            }
 
             this.goto(`./dashboard/dashboard.html?path=${handle.path}`);
+          },
+          async checkProjectStructure(handle) {
+            try {
+              const configHandle = await handle.get("_config.yaml");
+              const configText = await configHandle.text();
+
+              if (!configText || !configText.trim()) {
+                return false;
+              }
+
+              const yaml =
+                await import("/npm/js-yaml@4.1.1/dist/js-yaml.min.mjs");
+              const configData = yaml.load(configText);
+
+              if (!configData || !configData.writingLang) {
+                return false;
+              }
+
+              try {
+                await handle.get(configData.writingLang);
+              } catch {
+                return false;
+              }
+
+              return true;
+            } catch (error) {
+              return false;
+            }
+          },
+          openInitDialog() {
+            this.showConfirmDialog = false;
+
+            const dialog = this.shadow.$("init-project-dialog");
+            if (dialog) {
+              dialog._handle = this._currentHandle;
+            }
+
+            this.showInitDialog = true;
+          },
+          handleInitSuccess(event) {
+            const handle = event.data.handle || this._currentHandle;
+
+            debugger;
+
+            if (handle) {
+              this.goto(`./dashboard/dashboard.html?path=${handle.path}`);
+            }
+          },
+          confirmDelete(item) {
+            this.deleteTarget = item;
+            this.showDeleteDialog = true;
+          },
+          async deleteHistoryItem() {
+            if (!this.deleteTarget) return;
+
+            const history = (await storage.getItem("history")) || [];
+            const newPath = history.filter(
+              (path) => path !== this.deleteTarget._handle.path,
+            );
+            await storage.setItem("history", newPath);
+
+            this.list = this.list.filter(
+              (item) => item._handle.path !== this.deleteTarget._handle.path,
+            );
+
+            this.showDeleteDialog = false;
+            this.deleteTarget = null;
           },
           async loadHistory() {
             const history = (await storage.getItem("history")) || [];
