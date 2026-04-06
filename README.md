@@ -25,9 +25,13 @@ A modern documentation system built on [ofa.js](https://github.com/ofajs/ofa.js)
 ```
 your-project/
 ├── _config.yaml      # Project configuration
-├── cn/               # Chinese content (writing language)
-│   ├── index.md
-│   └── ...
+├── cn/               # Writing language (can be any language)
+│   ├── _config.yaml  # Chapter config
+│   ├── index.md      # Index page
+│   ├── footer.html   # Footer component (optional)
+│   └── documentation/
+│       ├── _config.yaml
+│       └── introduction.md
 ├── en/               # English content (auto-translated)
 └── website/          # Generated static site
 ```
