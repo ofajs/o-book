@@ -49,7 +49,7 @@
 
       viewer.on("click-md-link", (e) => {
         const href = e.data.href;
-        const url = new URL(href, location.href);
+        const url = new URL(href, link || location.href);
 
         location.href = `./view.html?link=${encodeURIComponent(url.href)}`;
       });
