@@ -62,7 +62,6 @@
         tag: "o-md",
         attrs: {
           src: null,
-          linkTarget: "_blank", // 允许跳转 md 连接, _self 为当前页面跳转; off 就不跳转连接，并且触发 link 事件
         },
         data: {
           htmlContent: "",
@@ -75,6 +74,13 @@
           },
         },
         ready() {
+          const container = this.shadow.$(".markdown-body");
+          if (container) {
+            container.on("click", (e) => {
+              this._handleLinkClick(e);
+            });
+          }
+
           if (this.src) {
             this.loadMarkdown();
           }
@@ -91,6 +97,28 @@
             } catch (error) {
               console.error("Error loading markdown:", error);
               this.htmlContent = `<p style="color: red;">Error loading markdown file: ${error.message}</p>`;
+            }
+          },
+          _handleLinkClick(e) {
+            let target = e.target;
+            while (target && target.tagName !== "A") {
+              target = target.parentElement;
+            }
+
+            if (!target || target.tagName !== "A") {
+              return;
+            }
+
+            const href = target.getAttribute("href");
+
+            if (href && href.toLowerCase().endsWith(".md")) {
+              e.preventDefault();
+              this.emit("click-md-link", {
+                data: {
+                  href: href,
+                  originalEvent: e,
+                },
+              });
             }
           },
         },
