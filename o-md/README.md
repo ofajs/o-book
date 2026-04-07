@@ -1,35 +1,37 @@
-# o-md 组件
+# o-md Component
 
-可以直接使用 o-md 组件，直接在线查阅 markdown 文件，不需要搞乱七八糟的依赖应用什么的。
+[中文版本](./README-cn.md)
 
-只需要引用ofa.js，在使用 l-m 引用 o-md 组件文件，即可开始使用 o-md 组件。
+You can directly use the o-md component to read markdown files online, without needing messy dependencies or applications.
+
+Simply include ofa.js, then use l-m to reference the o-md component file, and you're ready to start using the o-md component.
 
 ```html
-<!-- 确保 ofa.js 主体有引用 -->
+<!-- Ensure ofa.js is included -->
 <script src="https://cdn.jsdelivr.net/gh/ofajs/ofa.js/dist/ofa.min.mjs" type="module"></script>
 
-<!-- 使用 l-m 引用 o-md 组件文件 -->
+<!-- Use l-m to reference the o-md component file -->
 <l-m src="https://book.ofajs.com/o-md/o-md.html"></l-m>
 
-<!-- 使用 o-md 组件，src设置为 markdown 文件路径，即可在线查阅 markdown 文件内容 -->
+<!-- Use the o-md component, set src to the markdown file path to read markdown file content online -->
 <o-md src="./README.md"></o-md>
 ```
 
-## 使用 view.html 查看器
+## Using the view.html Viewer
 
-你也可以直接使用 view.html 查看器，无需额外配置，通过 URL 参数即可直接查看指定的 markdown 文件。
+You can also directly use the view.html viewer without additional configuration. It allows you to view specified markdown files through URL parameters.
 
-view.html 是基于 `o-md` 组件构建的静态页面，专门用于渲染和展示 markdown 文件。
+view.html is a static page built based on the `o-md` component, specifically designed for rendering and displaying markdown files.
 
-### 使用方法
+### Usage
 
-在浏览器中访问 view.html，并通过 `link` 参数指定 markdown 文件的路径：
+Access view.html in your browser and specify the markdown file path through the `link` parameter:
 
 ```
 https://book.ofajs.com/o-md/view.html?link=https%3A%2F%2Fbook.ofajs.com%2Fo-md%2Fview.html
 ```
 
-**参数说明：**
-- `link`：要查看的 markdown 文件 URL
+**Parameter Description:**
+- `link`: URL of the markdown file to view
 
-只需将 `link` 参数的值替换为你要查看的 markdown 文件地址即可。
+Simply replace the value of the `link` parameter with the address of the markdown file you want to view.
