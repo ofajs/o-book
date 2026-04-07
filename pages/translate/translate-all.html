@@ -909,6 +909,7 @@
             let concurrencyLimit = 3;
             if (keys.length > 0) {
               const totalConcurrency = keys.reduce((sum, key) => {
+                if (key.disabled) return sum;
                 return sum + (key.concurrency || 1);
               }, 0);
               concurrencyLimit = Math.max(3, totalConcurrency);
