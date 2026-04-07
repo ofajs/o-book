@@ -5,7 +5,7 @@
     }
   </style>
 
-<link rel="stylesheet" href="../css/github-markdown.css" />
+  <link rel="stylesheet" href="../css/github-markdown.css" />
   <link rel="stylesheet" href="../css/hljs.css" />
 
   <div :html="htmlContent" class="markdown-body"></div>
@@ -74,6 +74,13 @@
           },
         },
         ready() {
+          const container = this.shadow.$(".markdown-body");
+          if (container) {
+            container.on("click", (e) => {
+              this._handleLinkClick(e);
+            });
+          }
+
           if (this.src) {
             this.loadMarkdown();
           }
@@ -90,6 +97,28 @@
             } catch (error) {
               console.error("Error loading markdown:", error);
               this.htmlContent = `<p style="color: red;">Error loading markdown file: ${error.message}</p>`;
+            }
+          },
+          _handleLinkClick(e) {
+            let target = e.target;
+            while (target && target.tagName !== "A") {
+              target = target.parentElement;
+            }
+
+            if (!target || target.tagName !== "A") {
+              return;
+            }
+
+            const href = target.getAttribute("href");
+
+            if (href && href.toLowerCase().endsWith(".md")) {
+              e.preventDefault();
+              this.emit("click-md-link", {
+                data: {
+                  href: href,
+                  originalEvent: e,
+                },
+              });
             }
           },
         },
