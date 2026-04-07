@@ -5,7 +5,7 @@
     }
   </style>
 
-<link rel="stylesheet" href="../css/github-markdown.css" />
+  <link rel="stylesheet" href="../css/github-markdown.css" />
   <link rel="stylesheet" href="../css/hljs.css" />
 
   <div :html="htmlContent" class="markdown-body"></div>
@@ -62,6 +62,7 @@
         tag: "o-md",
         attrs: {
           src: null,
+          linkTarget: "_blank", // 允许跳转 md 连接, _self 为当前页面跳转; off 就不跳转连接，并且触发 link 事件
         },
         data: {
           htmlContent: "",
