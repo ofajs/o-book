@@ -49,9 +49,17 @@
 
       viewer.on("click-md-link", (e) => {
         const href = e.data.href;
-        const url = new URL(href, location.href);
+        const baseUrl = link?.startsWith("http://") || link?.startsWith("https://") ? link : location.href;
+        const url = new URL(href, baseUrl);
 
         location.href = `./view.html?link=${encodeURIComponent(url.href)}`;
+      });
+
+      viewer.on("loaded", () => {
+        const firstHeading = viewer.shadow.$("h1, h2, h3, h4, h5, h6");
+        if (firstHeading) {
+          document.title = firstHeading.text;
+        }
       });
     </script>
   </body>
