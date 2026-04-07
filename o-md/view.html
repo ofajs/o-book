@@ -53,6 +53,13 @@
 
         location.href = `./view.html?link=${encodeURIComponent(url.href)}`;
       });
+
+      viewer.on("loaded", () => {
+        const firstHeading = viewer.shadow.$("h1, h2, h3, h4, h5, h6");
+        if (firstHeading) {
+          document.title = firstHeading.text;
+        }
+      });
     </script>
   </body>
 </html>

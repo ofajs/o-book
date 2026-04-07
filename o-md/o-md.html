@@ -94,6 +94,7 @@
               }
               const markdownText = await response.text();
               this.htmlContent = await marked.parse(markdownText);
+              this.emit("loaded");
             } catch (error) {
               console.error("Error loading markdown:", error);
               this.htmlContent = `<p style="color: red;">Error loading markdown file: ${error.message}</p>`;
