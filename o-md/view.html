@@ -37,13 +37,22 @@
 
     <script type="module">
       const params = new URLSearchParams(location.search);
-      const link = params.get("link");
+      let link = params.get("link");
+
+      const viewer = $("#viewer");
 
       if (link) {
-        $("#viewer").src = link;
+        viewer.src = link;
       } else {
         $("#error").style.display = "block";
       }
+
+      viewer.on("click-md-link", (e) => {
+        const href = e.data.href;
+        const url = new URL(href, location.href);
+
+        location.href = `./view.html?link=${encodeURIComponent(url.href)}`;
+      });
     </script>
   </body>
 </html>
