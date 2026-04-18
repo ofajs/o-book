@@ -482,7 +482,10 @@ const initStaticFile = async ({
 
   await Promise.all(
     staticFileList.map(async ({ name, path: filePath, outputPath }) => {
-      let fileContent = await fetch(filePath).then((r) => r.text());
+      const isImage = /\.(png|jpg|jpeg|gif|webp|ico|svg)$/i.test(name);
+      let fileContent = isImage
+        ? await fetch(filePath).then((r) => r.blob())
+        : await fetch(filePath).then((r) => r.text());
 
       if (name === "index.html" && projectConfig) {
         fileContent = fileContent.replace(
