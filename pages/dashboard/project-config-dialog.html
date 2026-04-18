@@ -181,6 +181,7 @@
             if (val && this.projectPath) {
               this._topHandle = await get(this.projectPath);
               this._projectConfig = await getData(this._topHandle);
+
               this.editConfig.writingLang =
                 this._projectConfig.writingLang || "";
               this.editConfig.primaryLang =

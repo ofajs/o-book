@@ -71,6 +71,9 @@
   </o-provider>
   <script>
     export default async ({ load }) => {
+      const { get } = await load("/nos/fs/handle/mount/mount.js");
+      const { getData } = await load("../util/yaml-handle.js");
+
       return {
         data: {
           activeId: "",
@@ -79,11 +82,20 @@
           },
         },
         ready() {
-          this.on("set-active-id", (e) => {
+          this.on("set-active-id", async (e) => {
             const { name, query } = e.data;
             this.activeId = name;
             if (query && query.path) {
               this.query = query;
+
+              const _topHandle = await get(query.path);
+              const data = await getData(_topHandle);
+
+              const title = `OBook - ${data.name}`;
+
+              if ($("title").text !== title) {
+                $("title").text = title;
+              }
             }
           });
         },
