@@ -273,7 +273,7 @@
           },
           clickItem(item) {
             const prefixUrl = this.app.current.src.split(`/${lang}/`)[0];
-            const url = `${prefixUrl}/${lang}/${item.url}?L=${item.lineIndex}&search=${item.search || this.searchValue}`;
+            const url = `${prefixUrl}/${lang}${item.url}?L=${item.lineIndex}&search=${item.search || this.searchValue}`;
             this.app.goto(url);
             this.showDialog = false;
 
