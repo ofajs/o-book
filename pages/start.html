@@ -54,10 +54,7 @@
   <div class="container">
     <div class="main">
       <o-if :value="list.length">
-        <div
-          class="left"
-          style="flex-shrink: 0; flex-basis: 200px; padding-right: 16px"
-        >
+        <div class="left" style="flex-shrink: 0; flex-basis: 200px; padding-right: 16px">
           <h3 style="padding-top: 14px">
             <locale-text>
               <span lang="cn">历史打开记录</span>
@@ -68,19 +65,9 @@
             <o-fill :value="list">
               <p-list-item>
                 <div class="history-item">
-                  <span
-                    on:click="$host.handleClick($data)"
-                    style="cursor: pointer; flex: 1"
-                    >{{$data.name}}</span
-                  >
-                  <p-button
-                    class="delete-btn"
-                    variant="text"
-                    size="mini"
-                    color="error"
-                    icon
-                    on:click="$host.confirmDelete($data)"
-                  >
+                  <span on:click="$host.handleClick($data)" style="cursor: pointer; flex: 1">{{$data.name}}</span>
+                  <p-button class="delete-btn" variant="text" size="mini" color="error" icon
+                    on:click="$host.confirmDelete($data)">
                     <n-icon icon="material-symbols:close-rounded"></n-icon>
                   </p-button>
                 </div>
@@ -141,9 +128,7 @@
 
         <locale-text>
           <p lang="cn">
-            选择本地文件后，所有操作均在浏览器内完成，<span
-              style="color: var(--md-sys-color-primary)"
-            >
+            选择本地文件后，所有操作均在浏览器内完成，<span style="color: var(--md-sys-color-primary)">
               内容不会上传至任何服务器
             </span>
             ，确保数据完全留在本地，安全无忧。
@@ -152,8 +137,8 @@
             After selecting a local file, all operations are performed within
             the browser, and
             <span style="color: var(--md-sys-color-primary)">
-              no content is uploaded to any server </span
-            >. Your data remains secure and private, with no risk of exposure.
+              no content is uploaded to any server </span>. Your data remains secure and private, with no risk of
+            exposure.
           </p>
         </locale-text>
         <o-if :value="canUse">
@@ -168,7 +153,8 @@
           <p style="color: var(--md-sys-color-error)">
             <locale-text>
               <span lang="cn">您的浏览器不支持选择本地目录，请升级到最新版本的 Chrome 浏览器。</span>
-              <span lang="en">Your browser does not support selecting local directories. Please upgrade to the latest version of Chrome.</span>
+              <span lang="en">Your browser does not support selecting local directories. Please upgrade to the latest
+                version of Chrome.</span>
             </locale-text>
           </p>
         </o-else>
@@ -184,16 +170,15 @@
           <span lang="en">Invalid Directory Structure</span>
         </locale-text>
       </h3>
-      <p
-        style="
+      <p style="
           color: var(--md-sys-color-normal);
           font-size: 14px;
           margin-bottom: 16px;
-        "
-      >
+        ">
         <locale-text>
           <span lang="cn">当前目录为空或不包含正确的 OBook 项目结构。是否要初始化一个新的项目？</span>
-          <span lang="en">The current directory is empty or does not contain a valid OBook project structure. Do you want to initialize a new project?</span>
+          <span lang="en">The current directory is empty or does not contain a valid OBook project structure. Do you
+            want to initialize a new project?</span>
         </locale-text>
       </p>
       <div style="display: flex; justify-content: flex-end; gap: 8px">
@@ -221,16 +206,15 @@
           <span lang="en">Confirm Delete</span>
         </locale-text>
       </h3>
-      <p
-        style="
+      <p style="
           color: var(--md-sys-color-normal);
           font-size: 14px;
           margin-bottom: 16px;
-        "
-      >
+        ">
         <locale-text>
           <span lang="cn">确定要删除"{{deleteTarget?.name}}"的历史记录吗？此操作不会删除本地文件。</span>
-          <span lang="en">Are you sure you want to delete the history record for "{{deleteTarget?.name}}"? This will not delete the local files.</span>
+          <span lang="en">Are you sure you want to delete the history record for "{{deleteTarget?.name}}"? This will not
+            delete the local files.</span>
         </locale-text>
       </p>
       <div style="display: flex; justify-content: flex-end; gap: 8px">
@@ -250,10 +234,7 @@
     </div>
   </p-dialog>
 
-  <init-project-dialog
-    sync:open="showInitDialog"
-    on:init-success="handleInitSuccess"
-  ></init-project-dialog>
+  <init-project-dialog sync:open="showInitDialog" on:init-success="handleInitSuccess"></init-project-dialog>
   <script>
     export const parent = "./layout.html";
 
@@ -261,6 +242,7 @@
       const { mount, save, get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../util/yaml-handle.js");
       const { EverCache } = await load("/gh/kirakiray/ever-cache/src/main.js");
+      const yaml = await load("/npm/js-yaml@4.1.1/dist/js-yaml.min.mjs");
 
       const storage = new EverCache("obook");
 
@@ -309,8 +291,6 @@
                 return false;
               }
 
-              const yaml =
-                await import("/npm/js-yaml@4.1.1/dist/js-yaml.min.mjs");
               const configData = yaml.load(configText);
 
               if (!configData || !configData.writingLang) {
