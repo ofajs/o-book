@@ -1,7 +1,7 @@
 <template page>
   <l-m src="/nos/locale-text/locale-text.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/dialog/dialog.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/input/input.html"></l-m>
   <style>
     .analytics-dialog {
       width: 500px;
@@ -94,7 +94,7 @@
 
     export default async ({ load }) => {
       const { getData } = await load("../../util/yaml-handle.js");
-      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+      const { toast } = await load("/gh/ofajs/Punch-UI@1/packages/util.js");
       const { get } = await load("/nos/fs/handle/mount/mount.js");
 
       return {

@@ -1,8 +1,8 @@
 <template page>
   <l-m src="/nos/locale-text/locale-text.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/progress/progress.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/select/select.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/progress/progress.html"></l-m>
   <style>
     :host {
       display: block;
@@ -114,7 +114,7 @@
         "../translate/util/article-data.js",
       );
       const { EverCache } = await load("/gh/kirakiray/ever-cache/src/main.js");
-      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+      const { toast } = await load("/gh/ofajs/Punch-UI@1/packages/util.js");
       const { LANGUAGES } = await load("../translate/util/translate.js");
       const { buildWebsite } = await load("./generate.js");
 
