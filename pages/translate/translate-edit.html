@@ -11,6 +11,7 @@
       display: block;
       height: 100%;
     }
+
     .layout {
       display: flex;
       gap: 16px;
@@ -19,6 +20,7 @@
       box-sizing: border-box;
       overflow: hidden;
     }
+
     .left {
       width: 320px;
       flex-shrink: 0;
@@ -27,19 +29,24 @@
       height: 100%;
       padding-right: 4px;
     }
+
     .left::-webkit-scrollbar {
       width: 6px;
     }
+
     .left::-webkit-scrollbar-track {
       background: transparent;
     }
+
     .left::-webkit-scrollbar-thumb {
       background: var(--md-sys-color-outline-variant);
       border-radius: 3px;
     }
+
     .left::-webkit-scrollbar-thumb:hover {
       background: var(--md-sys-color-outline);
     }
+
     .article-content {
       flex: 1;
       overflow-y: auto;
@@ -47,60 +54,75 @@
       height: 100%;
       padding-right: 4px;
     }
+
     .article-content::-webkit-scrollbar {
       width: 6px;
     }
+
     .article-content::-webkit-scrollbar-track {
       background: transparent;
     }
+
     .article-content::-webkit-scrollbar-thumb {
       background: var(--md-sys-color-outline-variant);
       border-radius: 3px;
     }
+
     .article-content::-webkit-scrollbar-thumb:hover {
       background: var(--md-sys-color-outline);
     }
+
     .header {
       margin-bottom: 16px;
     }
+
     .header h3 {
       margin: 0 0 8px 0;
       font-size: 16px;
     }
+
     .header p {
       margin: 0;
       font-size: 13px;
       color: var(--md-sys-color-on-surface-variant);
     }
+
     .lang-selector {
       margin-bottom: 16px;
     }
+
     .lang-label {
       font-size: 12px;
       color: var(--md-sys-color-on-surface-variant);
       margin-bottom: 8px;
     }
+
     .search-box {
       margin-bottom: 12px;
     }
+
     p-list-item {
       border-radius: 30px;
     }
+
     p-list-item[active-item] {
       background-color: var(--md-sys-color-primary-container);
     }
+
     .file-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
     }
+
     .file-name {
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+
     .file-translated-count {
       padding: 2px 6px;
       font-size: 11px;
@@ -110,6 +132,7 @@
       font-weight: 500;
       margin-left: 8px;
     }
+
     .empty-state {
       display: flex;
       flex-direction: column;
@@ -120,12 +143,14 @@
       text-align: center;
       padding: 32px;
     }
+
     .empty-state svg {
       width: 64px;
       height: 64px;
       margin-bottom: 16px;
       opacity: 0.5;
     }
+
     .loading {
       display: flex;
       align-items: center;
@@ -133,16 +158,19 @@
       height: 100%;
       color: var(--md-sys-color-on-surface-variant);
     }
+
     .article-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
     }
+
     .article-title {
       font-size: 16px;
       font-weight: 500;
     }
+
     .article-lang {
       padding: 4px 12px;
       border-radius: 16px;
@@ -160,31 +188,26 @@
             <span lang="en">Manual Translation Edit</span>
           </locale-text>
         </h3>
-        <p>
+        <p style="max-width: 300px;">
           <locale-text>
-            <span lang="cn">选择语言并编辑翻译内容</span>
-            <span lang="en">Select language and edit translation content</span>
+            <span lang="cn">选择语言并编辑翻译内容；修改后需重新生成文档</span>
+            <span lang="en">Select language and edit translation content; modifications require require regenerating the
+              document</span>
           </locale-text>
         </p>
       </div>
 
       <div class="search-box">
-        <p-input
-          sync:value="searchKeyword"
-          attr:placeholder="searchPlaceholder"
-          style="width: 100%"
-        >
+        <p-input sync:value="searchKeyword" attr:placeholder="searchPlaceholder" style="width: 100%">
           <n-icon slot="prefix" icon="material-symbols:search"></n-icon>
         </p-input>
       </div>
 
-      <h4
-        style="
+      <h4 style="
           margin: 16px 0 8px 0;
           font-size: 12px;
           color: var(--md-sys-color-on-surface-variant);
-        "
-      >
+        ">
         <locale-text>
           <span lang="cn">文章列表 ({{filteredArticleList.length}})</span>
           <span lang="en">Article List ({{filteredArticleList.length}})</span>
@@ -192,16 +215,11 @@
       </h4>
       <p-list>
         <o-fill :value="filteredArticleList">
-          <p-list-item
-            button
-            on:click="$host.clickItem($data)"
-            attr:active-item="$host.activeArticlePath === $data.path"
-          >
+          <p-list-item button on:click="$host.clickItem($data)"
+            attr:active-item="$host.activeArticlePath === $data.path">
             <div class="file-item">
               <span class="file-name">{{$data.name}}</span>
-              <span class="file-translated-count"
-                >{{$data.translatedCount}}</span
-              >
+              <span class="file-translated-count">{{$data.translatedCount}}</span>
             </div>
           </p-list-item>
         </o-fill>
@@ -221,8 +239,7 @@
         <div class="empty-state">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-            />
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
           </svg>
           <div style="font-size: 18px; font-weight: 500; margin-bottom: 8px">
             <locale-text>
@@ -258,26 +275,16 @@
         <div class="article-header">
           <div class="article-title">{{currentArticleName}}</div>
           <div class="article-lang">
-            <p-select
-              sync:value="targetLang"
-              attr:placeholder="selectLangPlaceholder"
-              style="width: 120px"
-            >
+            <p-select sync:value="targetLang" attr:placeholder="selectLangPlaceholder" style="width: 120px">
               <o-fill :value="targetLanguages">
-                <p-option attr:value="$data"
-                  >{{$host.getLangWord($data)}}</p-option
-                >
+                <p-option attr:value="$data">{{$host.getLangWord($data)}}</p-option>
               </o-fill>
             </p-select>
           </div>
         </div>
         <o-fill :value="filteredCurrentBlocks">
-          <translate-block
-            :item="$data"
-            :target-lang="$host.targetLang"
-            :writing-lang="$host.config.writingLang"
-            :project-path="$host.projectPath"
-          ></translate-block>
+          <translate-block :item="$data" :target-lang="$host.targetLang" :writing-lang="$host.config.writingLang"
+            :project-path="$host.projectPath"></translate-block>
         </o-fill>
       </o-else>
     </div>
