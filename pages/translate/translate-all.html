@@ -427,6 +427,38 @@
                 </locale-text>
               </p-button>
             </o-if>
+            <o-if :value="!isTranslating && totalBlocks > 0 && !isBackingUp && !isImporting && completedLanguagesCount === targetLanguages.length && targetLanguages.length > 0">
+              <p-button variant="outlined" on:click="backupAllTranslations">
+                <locale-text>
+                  <span lang="cn">备份翻译数据</span>
+                  <span lang="en">Backup Translations</span>
+                </locale-text>
+              </p-button>
+            </o-if>
+            <o-if :value="isBackingUp">
+              <p-button variant="outlined" disabled>
+                <locale-text>
+                  <span lang="cn">备份中... {{backupProgress}}%</span>
+                  <span lang="en">Backing up... {{backupProgress}}%</span>
+                </locale-text>
+              </p-button>
+            </o-if>
+            <o-if :value="!isTranslating && totalBlocks > 0 && !isBackingUp && !isImporting">
+              <p-button variant="outlined" on:click="importFromBackup">
+                <locale-text>
+                  <span lang="cn">从备份导入</span>
+                  <span lang="en">Import from Backup</span>
+                </locale-text>
+              </p-button>
+            </o-if>
+            <o-if :value="isImporting">
+              <p-button variant="outlined" disabled>
+                <locale-text>
+                  <span lang="cn">导入中... {{importProgress}}%</span>
+                  <span lang="en">Importing... {{importProgress}}%</span>
+                </locale-text>
+              </p-button>
+            </o-if>
           </div>
         </div>
 
@@ -629,7 +661,7 @@
     import { LANGUAGES, translate } from "./util/translate.js";
     import { getArticleData } from "./util/article-data.js";
     import { EverCache, storage } from "/gh/kirakiray/ever-cache/src/main.js";
-    import { confirm } from "/gh/ofajs/Punch-UI@1/packages/util.js";
+    import { confirm, toast } from "/gh/ofajs/Punch-UI@1/packages/util.js";
 
     export default async ({ load, query }) => {
       const { get } = await load("/nos/fs/main.js");
@@ -659,6 +691,10 @@
           totalToTranslate: 0,
           translatingStep: "",
           isGenerating: false,
+          isBackingUp: false,
+          backupProgress: 0,
+          isImporting: false,
+          importProgress: 0,
         },
         watch: {
           projectPath() {
@@ -1175,6 +1211,162 @@
           },
           goToNext() {
             this.emit("next-step", { composed: true });
+          },
+          async backupAllTranslations() {
+            this.isBackingUp = true;
+            this.backupProgress = 0;
+
+            try {
+              const handle = await get(this.projectPath);
+              const backupDir = await handle.get("_block_backup", { create: "dir" });
+
+              const totalLangs = this.targetLanguages.length;
+              let completedLangs = 0;
+
+              for (const lang of this.targetLanguages) {
+                const langBackupData = {
+                  exportTime: new Date().toISOString(),
+                  projectPath: this.projectPath,
+                  writingLang: this.config?.writingLang,
+                  language: lang,
+                  languageName: LANGUAGES[lang] || lang,
+                  articles: [],
+                };
+
+                const langStorage = this.getStorage(lang);
+
+                for (const article of this.allArticles) {
+                  const articleData = {
+                    name: article.name,
+                    path: article.path,
+                    isTemp: article.isTemp || false,
+                    blocks: [],
+                  };
+
+                  let blocksToProcess = [];
+                  if (article.isTemp && article.blocks && article.blocks.length > 0) {
+                    blocksToProcess = [article.blocks[0]];
+                  } else if (article.blocks && article.blocks.length > 0) {
+                    blocksToProcess = article.blocks.filter(b => b.type !== "space");
+                  }
+
+                  for (const block of blocksToProcess) {
+                    const cachedData = await langStorage.getItem(block.rawHash);
+                    if (cachedData) {
+                      articleData.blocks.push({
+                        rawHash: block.rawHash,
+                        raw: block.raw,
+                        type: block.type,
+                        text: cachedData.text,
+                        provider: cachedData.provider,
+                        model: cachedData.model,
+                        id: cachedData.id,
+                        editedText: cachedData.editedText || "",
+                      });
+                    }
+                  }
+
+                  if (articleData.blocks.length > 0) {
+                    langBackupData.articles.push(articleData);
+                  }
+                }
+
+                const fileName = lang + ".json";
+                const fileHandle = await backupDir.get(fileName, { create: "file" });
+                await fileHandle.write(JSON.stringify(langBackupData, null, 2));
+
+                completedLangs++;
+                this.backupProgress = Math.round((completedLangs / totalLangs) * 100);
+              }
+
+              this.isBackingUp = false;
+              toast({
+                content: "翻译数据已备份到 _block_backup 目录",
+              });
+            } catch (error) {
+              console.error("Backup failed:", error);
+              this.isBackingUp = false;
+              toast({
+                content: "备份失败: " + error.message,
+              });
+            }
+          },
+          async importFromBackup() {
+            this.isImporting = true;
+            this.importProgress = 0;
+
+            try {
+              const handle = await get(this.projectPath);
+              let backupDir;
+              try {
+                backupDir = await handle.get("_block_backup");
+              } catch (e) {
+                this.isImporting = false;
+                toast({
+                  content: "未找到备份目录 _block_backup",
+                });
+                return;
+              }
+
+              let importedCount = 0;
+              const failedLangs = [];
+
+              for (const lang of this.targetLanguages) {
+                const fileName = lang + ".json";
+                let fileExists = false;
+                try {
+                  const fileHandle = await backupDir.get(fileName);
+                  fileExists = true;
+                  const fileContent = await fileHandle.read();
+                  const langBackupData = JSON.parse(fileContent);
+
+                  const langStorage = this.getStorage(lang);
+
+                  for (const article of langBackupData.articles) {
+                    for (const block of article.blocks) {
+                      langStorage.setItem(block.rawHash, {
+                        text: block.text,
+                        provider: block.provider,
+                        model: block.model,
+                        id: block.id,
+                        editedText: block.editedText || "",
+                      });
+                      importedCount++;
+                    }
+                  }
+                } catch (e) {
+                  console.warn(`Failed to import ${fileName}:`, e);
+                }
+
+                if (!fileExists) {
+                  failedLangs.push(LANGUAGES[lang] || lang);
+                }
+
+                this.importProgress = Math.round(
+                  ((this.targetLanguages.indexOf(lang) + 1) / this.targetLanguages.length) * 100,
+                );
+              }
+
+              this.isImporting = false;
+
+              if (failedLangs.length > 0) {
+                toast({
+                  content: `导入完成，${failedLangs.join("、")} 缺少备份文件`,
+                });
+              } else {
+                toast({
+                  content: `成功从备份导入 ${importedCount} 个翻译块`,
+                });
+              }
+
+              this.refreshStatus();
+            } catch (error) {
+              console.error("Import failed:", error);
+              this.isImporting = false;
+              toast({
+                content: "导入失败: " + error.message,
+              });
+            }
           },
         },
         detached() {
