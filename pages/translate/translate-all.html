@@ -7,75 +7,90 @@
       height: 100%;
       padding: 16px;
     }
+
     .container {
       max-width: 900px;
       margin: 0 auto;
     }
+
     .status-card {
       padding: 24px;
       border-radius: 12px;
       background-color: var(--md-sys-color-surface);
       margin-bottom: 16px;
     }
+
     .status-title {
       font-size: 18px;
       font-weight: 500;
       margin-bottom: 12px;
       color: var(--md-sys-color-on-surface);
     }
+
     .status-content {
       font-size: 14px;
       color: var(--md-sys-color-on-surface-variant);
       margin-bottom: 16px;
     }
+
     .stats {
       display: flex;
       gap: 24px;
       margin-bottom: 16px;
     }
+
     .stat-item {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
+
     .stat-number {
       font-size: 32px;
       font-weight: 600;
       color: var(--md-sys-color-primary);
     }
+
     .stat-label {
       font-size: 12px;
       color: var(--md-sys-color-on-surface-variant);
     }
+
     .language-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px;
       margin-top: 16px;
     }
+
     .language-card {
       padding: 16px;
       border-radius: 8px;
       background-color: var(--md-sys-color-surface-container);
       border-left: 4px solid var(--md-sys-color-primary);
     }
+
     .language-card.completed {
       border-left-color: var(--md-sys-color-success);
     }
+
     .language-card.in-progress {
       border-left-color: var(--md-sys-color-warning);
     }
+
     .language-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
     }
+
     .language-name {
       font-size: 16px;
       font-weight: 500;
       color: var(--md-sys-color-on-surface);
     }
+
     .language-code {
       font-size: 12px;
       color: var(--md-sys-color-on-surface-variant);
@@ -83,24 +98,29 @@
       padding: 2px 8px;
       border-radius: 4px;
     }
+
     .language-stats {
       display: flex;
       gap: 16px;
       margin-bottom: 12px;
     }
+
     .lang-stat {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
+
     .lang-stat-number {
       font-size: 20px;
       font-weight: 600;
     }
+
     .lang-stat-label {
       font-size: 11px;
       color: var(--md-sys-color-on-surface-variant);
     }
+
     .progress-bar {
       width: 100%;
       height: 6px;
@@ -108,29 +128,35 @@
       border-radius: 3px;
       overflow: hidden;
     }
+
     .progress-fill {
       height: 100%;
       background-color: var(--md-sys-color-primary);
       transition: width 0.3s ease;
     }
+
     .progress-fill.completed {
       background-color: var(--md-sys-color-success);
     }
+
     .empty-state {
       text-align: center;
       padding: 48px 24px;
       color: var(--md-sys-color-on-surface-variant);
     }
+
     .empty-icon {
       font-size: 48px;
       margin-bottom: 16px;
     }
+
     .button-container {
       display: flex;
       gap: 12px;
       justify-content: center;
       margin-top: 16px;
     }
+
     .summary-card {
       display: flex;
       align-items: center;
@@ -140,34 +166,41 @@
       border-radius: 8px;
       margin-bottom: 16px;
     }
+
     .summary-item {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
+
     .summary-number {
       font-size: 28px;
       font-weight: 600;
       color: var(--md-sys-color-primary);
     }
+
     .summary-label {
       font-size: 12px;
       color: var(--md-sys-color-on-surface-variant);
     }
+
     .check-progress {
       margin-top: 16px;
       padding: 12px;
       background-color: var(--md-sys-color-surface-container);
       border-radius: 8px;
     }
+
     .check-progress-text {
       font-size: 14px;
       color: var(--md-sys-color-on-surface-variant);
       margin-bottom: 8px;
     }
+
     .translating-section {
       margin-top: 16px;
     }
+
     .translating-item {
       padding: 12px 16px;
       border-radius: 8px;
@@ -175,24 +208,29 @@
       margin-bottom: 8px;
       border-left: 4px solid var(--md-sys-color-primary);
     }
+
     .translating-item.completed {
       border-left-color: var(--md-sys-color-success);
     }
+
     .translating-item-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 4px;
     }
+
     .translating-item-title {
       font-size: 13px;
       font-weight: 500;
       color: var(--md-sys-color-on-surface);
     }
+
     .translating-item-lang {
       font-size: 11px;
       color: var(--md-sys-color-on-surface-variant);
     }
+
     .translating-item-preview {
       font-size: 12px;
       color: var(--md-sys-color-on-surface-variant);
@@ -203,6 +241,7 @@
       max-height: 60px;
       overflow: auto;
     }
+
     .stream-content {
       font-size: 12px;
       color: var(--md-sys-color-primary);
@@ -216,32 +255,40 @@
       word-wrap: break-word;
       animation: pulse 1.5s ease-in-out infinite;
     }
+
     @keyframes pulse {
+
       0%,
       100% {
         opacity: 1;
       }
+
       50% {
         opacity: 0.7;
       }
     }
+
     .status-badge {
       padding: 4px 12px;
       border-radius: 12px;
       font-size: 11px;
       font-weight: 500;
     }
+
     .status-badge.translating {
       background-color: var(--md-sys-color-primary);
       color: var(--md-sys-color-on-primary);
     }
+
     .status-badge.completed {
       background-color: var(--md-sys-color-success);
       color: var(--md-sys-color-on-success);
     }
+
     .failed-section {
       margin-top: 16px;
     }
+
     .failed-item {
       padding: 12px 16px;
       border-radius: 8px;
@@ -249,15 +296,18 @@
       margin-bottom: 8px;
       border-left: 4px solid var(--md-sys-color-error);
     }
+
     .error-text {
       margin-top: 8px;
       font-size: 12px;
       color: var(--md-sys-color-error);
     }
+
     .next-step-section {
       text-align: center;
       padding: 32px;
     }
+
     .next-step-section p {
       font-size: 14px;
       color: var(--md-sys-color-on-surface-variant);
@@ -277,10 +327,7 @@
         <div class="check-progress">
           <div class="check-progress-text">{{loadingStep}}</div>
           <div class="progress-bar">
-            <div
-              class="progress-fill"
-              :style.width="loadingProgress + '%'"
-            ></div>
+            <div class="progress-fill" :style.width="loadingProgress + '%'"></div>
           </div>
         </div>
       </div>
@@ -313,10 +360,7 @@
               </locale-text>
             </div>
             <div class="progress-bar">
-              <div
-                class="progress-fill"
-                :style.width="((checkingLangIndex / totalLangs) * 100) + '%'"
-              ></div>
+              <div class="progress-fill" :style.width="((checkingLangIndex / totalLangs) * 100) + '%'"></div>
             </div>
           </div>
         </div>
@@ -331,8 +375,10 @@
           </div>
           <div class="status-content">
             <locale-text>
-              <span lang="cn">项目共包含 <strong>{{totalBlocks}}</strong> 个内容块，<strong>{{targetLanguages.length}}</strong> 种目标语言</span>
-              <span lang="en">Project contains <strong>{{totalBlocks}}</strong> content blocks, <strong>{{targetLanguages.length}}</strong> target languages</span>
+              <span lang="cn">项目共包含 <strong>{{totalBlocks}}</strong> 个内容块，<strong>{{targetLanguages.length}}</strong>
+                种目标语言</span>
+              <span lang="en">Project contains <strong>{{totalBlocks}}</strong> content blocks,
+                <strong>{{targetLanguages.length}}</strong> target languages</span>
             </locale-text>
           </div>
 
@@ -347,10 +393,7 @@
               </div>
             </div>
             <div class="summary-item">
-              <div
-                class="summary-number"
-                style="color: var(--md-sys-color-normal)"
-              >
+              <div class="summary-number" style="color: var(--md-sys-color-normal)">
                 {{totalUntranslatedBlocks}}
               </div>
               <div class="summary-label">
@@ -361,10 +404,7 @@
               </div>
             </div>
             <div class="summary-item">
-              <div
-                class="summary-number"
-                style="color: var(--md-sys-color-success)"
-              >
+              <div class="summary-number" style="color: var(--md-sys-color-success)">
                 {{completedLanguagesCount}}
               </div>
               <div class="summary-label">
@@ -375,10 +415,7 @@
               </div>
             </div>
             <div class="summary-item">
-              <div
-                class="summary-number"
-                style="color: var(--md-sys-color-warning)"
-              >
+              <div class="summary-number" style="color: var(--md-sys-color-warning)">
                 {{inProgressLanguagesCount}}
               </div>
               <div class="summary-label">
@@ -416,19 +453,16 @@
               </p-button>
             </o-if>
             <o-if :value="!isTranslating && totalTranslatedBlocks > 0">
-              <p-button
-                variant="outlined"
-                color="error"
-                on:click="clearAllCache"
-              >
+              <p-button variant="outlined" color="error" on:click="clearAllCache">
                 <locale-text>
                   <span lang="cn">清除所有缓存</span>
                   <span lang="en">Clear All Cache</span>
                 </locale-text>
               </p-button>
             </o-if>
-            <o-if :value="!isTranslating && totalBlocks > 0 && !isBackingUp && !isImporting && completedLanguagesCount === targetLanguages.length && targetLanguages.length > 0">
-              <p-button variant="outlined" on:click="backupAllTranslations">
+            <o-if
+              :value="!isTranslating && totalBlocks > 0 && !isBackingUp && !isImporting && completedLanguagesCount === targetLanguages.length && targetLanguages.length > 0">
+              <p-button variant="text" on:click="backupAllTranslations">
                 <locale-text>
                   <span lang="cn">备份翻译数据</span>
                   <span lang="en">Backup Translations</span>
@@ -436,7 +470,7 @@
               </p-button>
             </o-if>
             <o-if :value="isBackingUp">
-              <p-button variant="outlined" disabled>
+              <p-button variant="text" disabled>
                 <locale-text>
                   <span lang="cn">备份中... {{backupProgress}}%</span>
                   <span lang="en">Backing up... {{backupProgress}}%</span>
@@ -444,7 +478,7 @@
               </p-button>
             </o-if>
             <o-if :value="!isTranslating && totalBlocks > 0 && !isBackingUp && !isImporting">
-              <p-button variant="outlined" on:click="importFromBackup">
+              <p-button variant="text" on:click="importFromBackup">
                 <locale-text>
                   <span lang="cn">从备份导入</span>
                   <span lang="en">Import from Backup</span>
@@ -452,7 +486,7 @@
               </p-button>
             </o-if>
             <o-if :value="isImporting">
-              <p-button variant="outlined" disabled>
+              <p-button variant="text" disabled>
                 <locale-text>
                   <span lang="cn">导入中... {{importProgress}}%</span>
                   <span lang="en">Importing... {{importProgress}}%</span>
@@ -462,9 +496,7 @@
           </div>
         </div>
 
-        <o-if
-          :value="totalUntranslatedBlocks === 0 && !isTranslating && !isGenerating"
-        >
+        <o-if :value="totalUntranslatedBlocks === 0 && !isTranslating && !isGenerating">
           <div class="next-step-section">
             <p>
               <locale-text>
@@ -480,9 +512,7 @@
             </p-button>
           </div>
         </o-if>
-        <o-if
-          :value="totalUntranslatedBlocks > 0 && !isTranslating && !isGenerating && languageStats.length === 0"
-        >
+        <o-if :value="totalUntranslatedBlocks > 0 && !isTranslating && !isGenerating && languageStats.length === 0">
           <div class="next-step-section">
             <p>
               <locale-text>
@@ -508,10 +538,7 @@
                 {{totalToTranslate}})
               </div>
               <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  :style.width="translationProgress + '%'"
-                ></div>
+                <div class="progress-fill" :style.width="translationProgress + '%'"></div>
               </div>
             </div>
 
@@ -557,24 +584,17 @@
                     </div>
                     <div class="translating-item-lang">{{$data.langName}}</div>
                   </div>
-                  <div
-                    class="status-badge"
-                    style="
+                  <div class="status-badge" style="
                       background-color: var(--md-sys-color-error);
                       color: var(--md-sys-color-on-error);
-                    "
-                  >
+                    ">
                     失败
                   </div>
                 </div>
                 <div class="translating-item-preview">{{$data.preview}}</div>
                 <div class="error-text">错误: {{$data.error}}</div>
                 <div style="margin-top: 8px">
-                  <p-button
-                    size="small"
-                    variant="outlined"
-                    on:click="$host.retryFailedItem($data)"
-                  >
+                  <p-button size="small" variant="outlined" on:click="$host.retryFailedItem($data)">
                     重试
                   </p-button>
                 </div>
@@ -592,58 +612,39 @@
           <div class="status-title">各语言翻译详情</div>
           <div class="language-grid">
             <o-fill :value="languageStats">
-              <div
-                class="language-card"
-                class:completed="$data.progress === 100"
-                class:in-progress="$data.progress > 0 && $data.progress < 100"
-              >
+              <div class="language-card" class:completed="$data.progress === 100"
+                class:in-progress="$data.progress > 0 && $data.progress < 100">
                 <div class="language-header">
                   <div class="language-name">{{$data.languageName}}</div>
                   <div class="language-code">{{$data.languageCode}}</div>
                 </div>
                 <div class="language-stats">
                   <div class="lang-stat">
-                    <div
-                      class="lang-stat-number"
-                      style="color: var(--md-sys-color-success)"
-                    >
+                    <div class="lang-stat-number" style="color: var(--md-sys-color-success)">
                       {{$data.translated}}
                     </div>
                     <div class="lang-stat-label">已翻译</div>
                   </div>
                   <div class="lang-stat">
-                    <div
-                      class="lang-stat-number"
-                      style="color: var(--md-sys-color-normal)"
-                    >
+                    <div class="lang-stat-number" style="color: var(--md-sys-color-normal)">
                       {{$data.untranslated}}
                     </div>
                     <div class="lang-stat-label">待翻译</div>
                   </div>
                   <div class="lang-stat">
-                    <div
-                      class="lang-stat-number"
-                      style="color: var(--md-sys-color-primary)"
-                    >
+                    <div class="lang-stat-number" style="color: var(--md-sys-color-primary)">
                       {{$data.progress}}%
                     </div>
                     <div class="lang-stat-label">进度</div>
                   </div>
                 </div>
                 <div class="progress-bar">
-                  <div
-                    class="progress-fill"
-                    class:completed="$data.progress === 100"
-                    :style.width="$data.progress + '%'"
-                  ></div>
+                  <div class="progress-fill" class:completed="$data.progress === 100"
+                    :style.width="$data.progress + '%'"></div>
                 </div>
                 <o-if :value="!$host.isTranslating && $data.translated > 0">
                   <div style="margin-top: 8px">
-                    <p-button
-                      size="small"
-                      variant="outlined"
-                      on:click="$host.clearLanguageCache($data.languageCode)"
-                    >
+                    <p-button size="small" variant="outlined" on:click="$host.clearLanguageCache($data.languageCode)">
                       清除缓存
                     </p-button>
                   </div>
