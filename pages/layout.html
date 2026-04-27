@@ -22,25 +22,18 @@
           </p-nav-item>
         </o-if>
         <o-if :value="activeId !== 'start'">
-          <p-nav-item
-            attr:active-item="activeId === 'dashboard'"
-            on:click="goto('./dashboard/dashboard.html?path='+query.path)"
-          >
+          <p-nav-item attr:active-item="activeId === 'dashboard'"
+            on:click="goto('./dashboard/dashboard.html?path='+query.path)">
             <locale-text>
               <span lang="cn">总揽</span>
               <span lang="en">Dashboard</span>
             </locale-text>
-            <n-icon
-              icon="material-symbols:dashboard-outline-rounded"
-              slot="icon"
-            ></n-icon>
+            <n-icon icon="material-symbols:dashboard-outline-rounded" slot="icon"></n-icon>
           </p-nav-item>
         </o-if>
         <o-if :value="activeId !== 'start'">
-          <p-nav-item
-            attr:active-item="activeId === 'translate'"
-            on:click="goto('./translate/translate.html?path='+query.path)"
-          >
+          <p-nav-item attr:active-item="activeId === 'translate'"
+            on:click="goto('./translate/translate.html?path='+query.path)">
             <locale-text>
               <span lang="cn">AI翻译</span>
               <span lang="en">AI Translate</span>
@@ -49,22 +42,16 @@
           </p-nav-item>
         </o-if>
         <o-if :value="activeId !== 'start'">
-          <p-nav-item
-            attr:active-item="activeId === 'config'"
-            on:click="goto('./config/config.html?path='+query.path)"
-          >
+          <p-nav-item attr:active-item="activeId === 'config'" on:click="goto('./config/config.html?path='+query.path)">
             <locale-text>
               <span lang="cn">配置</span>
               <span lang="en">Settings</span>
             </locale-text>
-            <n-icon
-              icon="material-symbols:settings-outline-rounded"
-              slot="icon"
-            ></n-icon>
+            <n-icon icon="material-symbols:settings-outline-rounded" slot="icon"></n-icon>
           </p-nav-item>
         </o-if>
       </p-nav-bar>
-      <div style="position: relative; height: 100%">
+      <div style="position: relative; height: 100%;transform: translate(0,0);">
         <slot></slot>
       </div>
     </p-nav-layout>

@@ -5,6 +5,7 @@
   <style>
     :host {
       display: block;
+      height: 100%;
     }
     .step-container {
       padding: 32px 0;
@@ -174,7 +175,48 @@
     </div>
   </p-dialog>
 
+  <p-dialog :open="aiUnavailable" mask-closeable="false">
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+        text-align: center;
+      "
+    >
+      <n-icon
+        icon="material-symbols:warning-outline-rounded"
+        style="font-size: 64px; color: var(--md-sys-color-error); margin-bottom: 16px"
+      ></n-icon>
+      <h2 style="margin: 0 0 16px 0">
+        <locale-text>
+          <span lang="cn">AI 不可用</span>
+          <span lang="en">AI Not Available</span>
+        </locale-text>
+      </h2>
+      <p style="margin: 0 0 24px 0; color: var(--md-sys-color-on-surface-variant); max-width: 400px">
+        <locale-text>
+          <span lang="cn">未检测到可用的 AI 配置。请先在设置中添加 AI Key 或配置本地 AI。</span>
+          <span lang="en">No available AI configuration detected. Please add an AI Key or configure a local AI in Settings first.</span>
+        </locale-text>
+      </p>
+      <p-button
+        variant="contained"
+        on:click="gotoSettings"
+      >
+        <locale-text>
+          <span lang="cn">前往设置</span>
+          <span lang="en">Go to Settings</span>
+        </locale-text>
+      </p-button>
+    </div>
+  </p-dialog>
+
   <script>
+    import { storage } from "/gh/kirakiray/ever-cache/src/main.js";
+
     export const parent = "../layout.html";
 
     export default async ({ load, query }) => {
@@ -183,13 +225,23 @@
           step: 0,
           editMode: false,
           projectPath: query.path || "",
+          aiUnavailable: false,
         },
         proto: {
           clickGoBack() {
             this.goto(`../dashboard/dashboard.html?path=${query.path}`);
           },
+          gotoSettings() {
+            this.goto(`../config/config.html?path=${query.path}`);
+          },
         },
-        attached() {
+        async attached() {
+          const keys = (await storage.getItem("ai-keys")) || [];
+          const hasAvailableAI = keys.some((key) => !key.disabled);
+          if (!hasAvailableAI) {
+            this.aiUnavailable = true;
+          }
+
           this.emit("set-active-id", {
             composed: true,
             data: {
