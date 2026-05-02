@@ -33,7 +33,7 @@
   <template name="list-item">
     <p-list-item
       button="suffix"
-      attr:active-item="$host.activeLeftUrl === $data.finalUrl"
+      attr:active-item="$host.isUrlActive($data.finalUrl)"
       collapse-childs="open"
     >
       <x-if :value="$data.finalUrl">
@@ -85,6 +85,11 @@
           },
         },
         proto: {
+          isUrlActive(finalUrl) {
+            if (!finalUrl) return false;
+            const normalizeUrl = (url) => url.replace(/\.html$/, "");
+            return normalizeUrl(this.activeLeftUrl) === normalizeUrl(finalUrl);
+          },
           async refreshList() {
             const { header } = await load(`../${lang}/article-config.json`);
 
