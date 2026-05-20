@@ -13,10 +13,6 @@ if (globalThis.serviceWorker) {
   version = urlParams.get("v") || "";
 }
 
-globalThis.SERVER_OPTIONS = {
-  useNosTool: true,
-};
-
 if (location.host.includes("localhost")) {
   importScripts("http://localhost:3002/sw/dist.js");
 } else {

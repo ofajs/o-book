@@ -1,7 +1,7 @@
 <template page>
   <l-m src="/nos/locale-text/locale-text.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/list/list.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/list/list.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/button/button.html"></l-m>
   <style>
     :host {
       display: block;
@@ -191,7 +191,7 @@
       const { get } = await load("/nos/fs/handle/mount/mount.js");
       const { getData } = await load("../../util/yaml-handle.js");
       const { buildWebsite, watchWebsite } = await load("./generate.js");
-      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+      const { toast } = await load("/gh/ofajs/Punch-UI@1/packages/util.js");
 
       return {
         data: {

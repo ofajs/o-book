@@ -1,9 +1,9 @@
 <template component>
   <l-m src="/nos/locale-text/locale-text.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/dialog/dialog.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/button/button.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/input/input.html"></l-m>
-  <l-m src="/gh/ofajs/Punch-UI/packages/select/select.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/dialog/dialog.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/button/button.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/input/input.html"></l-m>
+  <l-m src="/gh/ofajs/Punch-UI@1/packages/select/select.html"></l-m>
   <style>
     .init-dialog {
       width: 400px;
@@ -135,7 +135,7 @@
     };
 
     export default async ({ load }) => {
-      const { toast } = await load("/gh/ofajs/Punch-UI/packages/util.js");
+      const { toast } = await load("/gh/ofajs/Punch-UI@1/packages/util.js");
       const { LANGUAGES } = await load("../translate/util/translate.js");
 
       return {

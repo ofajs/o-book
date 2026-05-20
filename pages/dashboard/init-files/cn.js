@@ -24,25 +24,16 @@ const INIT_FILES = {
       ],
     }),
 
-  "{lang}/index.html": (projectName) => `<!doctype html>
-<html lang="cn">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${projectName}</title>
-  </head>
-  <body>
-    <center-block>
-      <h2>${projectName}</h2>
-      <p>欢迎使用文档系统</p>
-      <div style="padding: 16px">
-        <p-button size="large">
-          <a href="./documentation/introduction.md">开始使用</a>
-        </p-button>
-      </div>
-    </center-block>
-  </body>
-</html>`,
+  "{lang}/index.html": (projectName) => `<title>${projectName}</title>
+<center-block>
+  <h2>${projectName}</h2>
+  <p>欢迎使用文档系统</p>
+  <div style="padding: 16px">
+    <p-button size="large">
+      <a href="./documentation/introduction.md">开始使用</a>
+    </p-button>
+  </div>
+</center-block>`,
   "{lang}/documentation/_config.yaml": `- name: 介绍
   url: ./introduction.md`,
 

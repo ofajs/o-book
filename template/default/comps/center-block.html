@@ -2,7 +2,10 @@
   <style>
     :host {
       display: block;
-      padding: 128px 16px;
+    }
+
+    .outer {
+      padding: 64px 16px;
     }
 
     .container {
@@ -26,20 +29,23 @@
   </style>
   <match-var pui-real-theme="dark">
     <style>
-      :host(:nth-of-type(2n)) {
+      /* 因为 safari 的渲染bug，所以加上outer */
+      :host(:nth-of-type(2n)) .outer {
         background-color: var(--md-ref-palette-primary20);
       }
     </style>
   </match-var>
   <match-var pui-real-theme="light">
     <style>
-      :host(:nth-of-type(2n)) {
+      :host(:nth-of-type(2n)) .outer {
         background-color: var(--md-ref-palette-primary90);
       }
     </style>
   </match-var>
-  <div class="container">
-    <slot></slot>
+  <div class="outer">
+    <div class="container">
+      <slot></slot>
+    </div>
   </div>
   <script>
     export default async ({ load }) => {
